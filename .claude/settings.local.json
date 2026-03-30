@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npm.cmd install:*)",
+      "Read(//c/Users/Lachlan/AppData/Roaming/**)",
+      "Read(//c/Users/Lachlan/AppData/Local/**)",
+      "Read(//c/Users/Lachlan/**)",
+      "Bash(powershell.exe -Command \"Get-ChildItem ''C:\\\\Users\\\\Lachlan\\\\AppData\\\\Roaming\\\\nvm'' -ErrorAction SilentlyContinue; Get-ChildItem ''C:\\\\Program Files\\\\nodejs'' -ErrorAction SilentlyContinue; Get-ChildItem ''C:\\\\Users\\\\Lachlan\\\\.nvm'' -ErrorAction SilentlyContinue\")",
+      "Bash(powershell.exe -Command \"Get-ChildItem ''C:\\\\Users\\\\Lachlan\\\\AppData\\\\Local'' -Filter ''node*'' -ErrorAction SilentlyContinue | Select Name; Get-ChildItem ''C:\\\\Users\\\\Lachlan\\\\AppData\\\\Roaming'' -Filter ''npm*'' -ErrorAction SilentlyContinue | Select Name\")",
+      "Bash(powershell.exe -Command \"where.exe node 2>&1; where.exe npm 2>&1\")"
+    ]
+  }
+}
