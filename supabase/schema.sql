@@ -97,12 +97,15 @@ create policy "Users can manage their own bucket list"
 -- Every meaningful user action — the B2B data product
 -- ============================================================
 create table if not exists public.events (
-  id          uuid primary key default gen_random_uuid(),
-  user_id     uuid references public.users (id) on delete set null,
-  event_type  text not null,
-  metadata    jsonb not null default '{}',
-  session_id  text,
-  created_at  timestamptz not null default now()
+  id           uuid primary key default gen_random_uuid(),
+  user_id      uuid references public.users (id) on delete set null,
+  event_type   text not null,
+  metadata     jsonb not null default '{}',
+  session_id   text,
+  platform     text not null default 'web',   -- web | ios | android
+  app_version  text not null default '0.1.0',
+  country_code text,                           -- 2-letter ISO from browser locale
+  created_at   timestamptz not null default now()
 );
 
 -- RLS — authenticated users can insert only; reads go through service role
@@ -112,3 +115,13 @@ create policy "Authenticated users can insert events"
   on public.events for insert
   to authenticated
   with check (auth.uid() = user_id);
+
+-- ============================================================
+-- Migration: add platform context columns to events
+-- Run this against existing databases that were created before
+-- the platform/app_version/country_code columns were added.
+-- ============================================================
+alter table public.events
+  add column if not exists platform     text not null default 'web',
+  add column if not exists app_version  text not null default '0.1.0',
+  add column if not exists country_code text;

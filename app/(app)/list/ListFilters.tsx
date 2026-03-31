@@ -74,6 +74,7 @@ export default function ListFilters({ items, userId }: Props) {
 
   function setTab(next: ItemStatus) {
     navigate({ tab: next === 'want' ? null : next })
+    logEvent(userId, 'list_tab_switched', { tab: next })
   }
 
   function toggleCategory(cat: string) {

@@ -1,6 +1,12 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+
+export const metadata: Metadata = {
+  title: 'Home',
+  description: 'Your travel bucket list dashboard.',
+}
 import CategoryBadge from '@/components/CategoryBadge'
 import EmptyBucketList from '@/components/EmptyBucketList'
 import HomeViewTracker from './HomeViewTracker'

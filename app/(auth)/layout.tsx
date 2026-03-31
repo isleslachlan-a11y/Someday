@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Toaster } from 'react-hot-toast'
 
 export const metadata: Metadata = {
-  title: 'Someday — Sign in',
+  title: 'Sign in',
 }
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
@@ -26,9 +26,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         position="top-center"
         toastOptions={{
           style: {
-            background: '#1A1730',
-            color: '#F0EEFF',
-            border: '1px solid #7B4FE8',
+            background: 'var(--color-indigo-deep)',
+            color: 'var(--color-white-soft)',
+            border: '1px solid var(--color-violet-accent)',
             fontFamily: 'var(--font-nunito)',
           },
         }}

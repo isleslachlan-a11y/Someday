@@ -1,5 +1,14 @@
+import type { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { username } = await params
+  return {
+    title: `@${username}`,
+    description: `${username}'s travel bucket list on Someday.`,
+  }
+}
 import Avatar from '@/components/Avatar'
 import CategoryBadge from '@/components/CategoryBadge'
 import ProfileViewTracker from '../ProfileViewTracker'

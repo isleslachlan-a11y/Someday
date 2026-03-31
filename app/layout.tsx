@@ -15,8 +15,17 @@ const nunito = Nunito({
 })
 
 export const metadata: Metadata = {
-  title: 'Someday — Your Travel Bucket List',
+  title: {
+    template: 'Someday | %s',
+    default: 'Someday — Your Travel Bucket List',
+  },
   description: 'Save the experiences you want to have, share them with friends, and make them happen.',
+  openGraph: {
+    title: 'Someday — Your Travel Bucket List',
+    description: 'Save the experiences you want to have, share them with friends, and make them happen.',
+    type: 'website',
+    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+  },
 }
 
 export default function RootLayout({

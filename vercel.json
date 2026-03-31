@@ -1,0 +1,14 @@
+{
+  "framework": "nextjs",
+  "build": {
+    "env": {
+      "NODE_VERSION": "20",
+      "NEXT_PUBLIC_SUPABASE_URL": "@next_public_supabase_url",
+      "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY": "@next_public_supabase_publishable_default_key"
+    }
+  },
+  "env": {
+    "SUPABASE_SERVICE_ROLE_KEY": "@supabase_service_role_key",
+    "ADMIN_USER_ID": "@admin_user_id"
+  }
+}

@@ -8,6 +8,8 @@ A social travel bucket list app where users save experiences, share with friends
 
 **Team:** Lachlan (engineering + AI), Sophia (marketing + BD). Two people — prioritise ruthlessly and avoid scope creep.
 
+> **Next.js version note:** This project may use a version with breaking API changes. Before writing Next.js-specific code, check `node_modules/next/dist/docs/` for the authoritative reference.
+
 ## Build & Run
 
 ```bash
@@ -37,18 +39,26 @@ Run `npm run build` after significant changes and fix all errors before committi
 ### Key Files
 
 - `lib/supabase/client.ts` — browser Supabase client (`createBrowserClient` from `@supabase/ssr`). Use in Client Components.
-- `lib/supabase/server.ts` — async server Supabase client (`createServerClient` with cookies). Use in Server Components and API routes.
+- `lib/supabase/server.ts` — async server Supabase client (`createServerClient` with cookies). Use in Server Components and Server Actions.
 - `lib/supabase/middleware.ts` — `updateSession()` helper called by root `middleware.ts` to refresh the auth session on every request.
-- `lib/events.ts` — `logEvent(userId, eventType, metadata)`. B2B data product foundation — call on every meaningful user action.
-- `lib/analytics.ts` — legacy shim; prefer `lib/events.ts` for new code.
-- `context/AuthContext.tsx` — `useAuth()` hook exposing the current session. Wraps the app via `AuthProvider` in `app/layout.tsx`.
+- `lib/supabase.ts` — legacy re-export of `createClient`; prefer importing directly from `client.ts` or `server.ts`.
+- `lib/events.ts` — `logEvent(userId, eventType, metadata)`. B2B data product foundation. Automatically adds `platform`, `app_version`, and `country_code` (from `navigator.language`) to every event. Call on every meaningful user action.
+- `lib/analytics.ts` — server-side read functions for the B2B data product: `getTopDestinations`, `getCategoryBreakdown`, `getActiveUserCount`, `getConversionRate`. Uses the service-role client — server-only.
+- `lib/supabase/admin.ts` — service-role Supabase client (`createAdminClient`). Never import in client components.
+- `lib/types.ts` — shared TypeScript types (`BucketListItem`, `UserProfile`) and the `CATEGORIES` constant.
 - `middleware.ts` — root route protection; redirects unauthenticated users to `/login`.
 
-### Auth Flow
+### Route Structure
 
-- Protected routes: `/home`, `/bucket-list`, `/profile`, `/messages`, `/explore`
-- Public routes: `/`, `/login`, `/signup`, `/privacy`
-- On signup, always insert a row into `profiles` using the returned `user.id`
+The app uses Next.js route groups:
+- `app/(app)/` — authenticated pages: `home`, `list`, `profile`, `admin/analytics`
+- `app/(auth)/` — public pages: `login`, `signup`
+- `app/actions/` — Server Actions (`'use server'`): `auth.ts`, `bucketList.ts`, `profile.ts`, `search.ts`
+
+**Protected routes:** `/home`, `/list`, `/profile`, `/messages`, `/explore`
+**Public routes:** `/`, `/login`, `/signup`, `/privacy`
+
+Mutations use Server Actions (not API routes — no `app/api/` directory yet). On signup, always insert a row into `profiles` using the returned `user.id`.
 
 ### Database Tables
 
@@ -62,7 +72,7 @@ Run `npm run build` after significant changes and fix all errors before committi
 | `messages` | Direct messages between users |
 | `events` | Every user action — feeds the B2B data product |
 
-Migrations live in `supabase/migrations/`, numbered in run order: `001_profiles.sql`, `002_experiences.sql`, etc.
+Migrations live in `supabase/migrations/`, numbered in run order (e.g. `003_profiles.sql`).
 
 **Row Level Security rules:**
 - `profiles`, `posts` — public read, private write
@@ -76,7 +86,9 @@ Migrations live in `supabase/migrations/`, numbered in run order: `001_profiles.
 ```
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=
-SUPABASE_SERVICE_ROLE_KEY=    # Backend API routes only — never import client-side
+SUPABASE_SERVICE_ROLE_KEY=       # Server-only (lib/analytics.ts, lib/supabase/admin.ts) — never import client-side
+NEXT_PUBLIC_APP_VERSION=0.1.0    # Written to every event row
+ADMIN_USER_ID=                   # Your Supabase user UUID — gates /admin/analytics
 ```
 
 When adding new env variables, also add them to Vercel's environment settings or the production build will fail.
@@ -89,8 +101,8 @@ The `SUPABASE_SERVICE_ROLE_KEY` must never be imported in any file under `app/` 
 - `async/await` — never `.then()` chains.
 - Use `next/image` (`<Image>`) instead of `<img>`.
 - Use `next/link` (`<Link>`) for all internal navigation.
-- All Supabase queries go through `lib/supabase.ts`.
-- API routes live in `app/api/`.
+- Import Supabase from `@/lib/supabase/client` (client components) or `@/lib/supabase/server` (Server Actions / server components).
+- Mutations go in Server Actions under `app/actions/`; API routes (`app/api/`) are not yet used.
 - Reusable components live in `components/`.
 - Use `react-hot-toast` for all user-facing success and error messages.
 - Always handle Supabase errors:
@@ -104,8 +116,8 @@ The `SUPABASE_SERVICE_ROLE_KEY` must never be imported in any file under `app/` 
 **Do not skip event logging when building new features.** It cannot be retrofitted easily and is the foundation of the data business.
 
 ```ts
-import { logEvent } from '@/lib/analytics'
-await logEvent('item_added', { experience_id, category, country })
+import { logEvent } from '@/lib/events'
+await logEvent(userId, 'item_added', { experience_id, category, country })
 ```
 
 Every event must include relevant metadata in `properties`:
@@ -116,8 +128,7 @@ Every event must include relevant metadata in `properties`:
 | `item_completed` | `experience_id`, `category`, `country`, `days_on_list` |
 | `post_created` | `experience_id`, `category` |
 | `user_followed` | `following_id` |
-| `search_performed` | `query`, `results_count`, `category_filter` |
-| `experience_viewed` | `experience_id`, `category`, `source` (feed/search/profile) |
+| `search_performed` | `query`, `result_count` |
 
 ## Brand & Design
 

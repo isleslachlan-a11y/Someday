@@ -35,5 +35,13 @@ export async function searchBucketList(query: string): Promise<SearchResult> {
 
   if (error) return { data: [], error: error.message }
 
-  return { data: (data ?? []) as BucketListItem[] }
+  const results = (data ?? []) as BucketListItem[]
+
+  await supabase.from('events').insert({
+    user_id: user.id,
+    event_type: 'search_performed',
+    metadata: { query: trimmed, result_count: results.length },
+  })
+
+  return { data: results }
 }

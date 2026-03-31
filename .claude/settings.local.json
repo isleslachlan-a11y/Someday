@@ -8,7 +8,17 @@
       "Read(//c/Users/Lachlan/**)",
       "Bash(powershell.exe -Command \"Get-ChildItem ''C:\\\\Users\\\\Lachlan\\\\AppData\\\\Roaming\\\\nvm'' -ErrorAction SilentlyContinue; Get-ChildItem ''C:\\\\Program Files\\\\nodejs'' -ErrorAction SilentlyContinue; Get-ChildItem ''C:\\\\Users\\\\Lachlan\\\\.nvm'' -ErrorAction SilentlyContinue\")",
       "Bash(powershell.exe -Command \"Get-ChildItem ''C:\\\\Users\\\\Lachlan\\\\AppData\\\\Local'' -Filter ''node*'' -ErrorAction SilentlyContinue | Select Name; Get-ChildItem ''C:\\\\Users\\\\Lachlan\\\\AppData\\\\Roaming'' -Filter ''npm*'' -ErrorAction SilentlyContinue | Select Name\")",
-      "Bash(powershell.exe -Command \"where.exe node 2>&1; where.exe npm 2>&1\")"
+      "Bash(powershell.exe -Command \"where.exe node 2>&1; where.exe npm 2>&1\")",
+      "Bash(ls /Users/reallachisles/Desktop/Someday/app/\\\\\\(app\\\\\\))",
+      "Bash(ls /Users/reallachisles/Desktop/Someday/app/\\\\\\(auth\\\\\\))",
+      "Bash(./node_modules/.bin/next build:*)",
+      "Bash(npx tsc:*)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); pkgs=d.get\\(''''packages'''',{}\\); print\\(''''\\\\n''''.join\\(k for k in pkgs if k\\)\\)\")",
+      "Bash(grep -E \"supabase|react-hot|next$\")",
+      "Bash(find /Users/reallachisles/Desktop/Someday/node_modules -name package.json -path *supabase*)",
+      "Bash(find /Users/reallachisles/Desktop/Someday -name *.d.ts -path *supabase*)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(d.get\\(''''version'''',''''?''''\\)\\)\")",
+      "Bash(grep -rn \"#[0-9a-fA-F]\\\\{3,6\\\\}\" /Users/reallachisles/Desktop/Someday/app /Users/reallachisles/Desktop/Someday/components /Users/reallachisles/Desktop/Someday/lib --include=\"*.tsx\" --include=\"*.ts\")"
     ]
   }
 }

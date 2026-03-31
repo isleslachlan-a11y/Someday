@@ -1,7 +1,12 @@
+import type { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import EditForm from './EditForm'
 import type { BucketListItem } from '@/lib/types'
+
+export const metadata: Metadata = {
+  title: 'Edit destination',
+}
 
 interface Props {
   params: Promise<{ id: string }>

@@ -1,7 +1,13 @@
+import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+
+export const metadata: Metadata = {
+  title: 'My List',
+  description: 'Every place and experience you want to have someday.',
+}
 import ListFilters from './ListFilters'
 import type { BucketListItem } from '@/lib/types'
 

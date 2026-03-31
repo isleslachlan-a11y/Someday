@@ -1,6 +1,12 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+
+export const metadata: Metadata = {
+  title: 'Profile',
+  description: 'Your Someday profile and public bucket list.',
+}
 import Avatar from '@/components/Avatar'
 import CategoryBadge from '@/components/CategoryBadge'
 import ProfileViewTracker from './ProfileViewTracker'
