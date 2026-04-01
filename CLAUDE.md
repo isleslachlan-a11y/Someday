@@ -16,8 +16,9 @@ A social travel bucket list app where users save experiences, share with friends
 npm run dev       # Start local development server at localhost:3000
 npm run build     # Production build — fix all errors before committing
 npm run lint      # Run ESLint
-npx playwright test  # Run end-to-end tests
 ```
+
+Seeding and data utilities live in `scripts/`: `seed-experiences.ts` (populates the experiences catalogue) and `check-events.ts` (validates event logging).
 
 Run `npm run build` after significant changes and fix all errors before committing.
 
@@ -55,7 +56,8 @@ The app uses Next.js route groups:
 - `app/(auth)/` — public pages: `login`, `signup`
 - `app/actions/` — Server Actions (`'use server'`): `auth.ts`, `bucketList.ts`, `profile.ts`, `search.ts`
 
-**Protected routes:** `/home`, `/list`, `/profile`, `/messages`, `/explore`
+**Protected routes (implemented):** `/home`, `/list`, `/profile`
+**Protected routes (planned, not yet built):** `/messages`, `/explore`
 **Public routes:** `/`, `/login`, `/signup`, `/privacy`
 
 Mutations use Server Actions (not API routes — no `app/api/` directory yet). On signup, always insert a row into `profiles` using the returned `user.id`.

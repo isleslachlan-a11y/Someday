@@ -30,7 +30,7 @@ export default async function PublicProfilePage({ params }: Props) {
 
   // Fetch the profile for this username
   const { data: profileData } = await supabase
-    .from('users')
+    .from('profiles')
     .select('*')
     .eq('username', username)
     .single()
@@ -47,7 +47,7 @@ export default async function PublicProfilePage({ params }: Props) {
     .from('bucket_list_items')
     .select('*')
     .eq('user_id', profile.id)
-    .eq('is_public', true)
+    .eq('public', true)
     .order('created_at', { ascending: false })
 
   const items = (itemsData ?? []) as BucketListItem[]
@@ -68,7 +68,7 @@ export default async function PublicProfilePage({ params }: Props) {
 
           {/* Profile header */}
           <div className="flex items-start gap-5 mb-8">
-            <Avatar avatarUrl={profile.avatar_url} username={profile.username} size={80} />
+            <Avatar avatarUrl={profile.avatar_url} username={profile.username ?? ''} size={80} />
             <div className="flex-1 min-w-0">
               <h1 className="font-syne text-2xl font-bold text-white-soft leading-tight">
                 @{profile.username}

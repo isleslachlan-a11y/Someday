@@ -21,7 +21,14 @@ async function logEvent(
   eventType: string,
   metadata: Record<string, unknown>
 ) {
-  await supabase.from('events').insert({ user_id: userId, event_type: eventType, metadata })
+  await supabase.from('events').insert({
+    user_id: userId,
+    event_type: eventType,
+    metadata,
+    platform: 'web',
+    app_version: '0.1.0',
+    country_code: null,
+  })
 }
 
 // ─── actions ────────────────────────────────────────────────────────────────
@@ -33,25 +40,29 @@ export interface AddItemData {
   category: string
   priority: number
   notes: string
-  is_public: boolean
+  public: boolean
+  experience_id?: string
 }
 
 export async function addItem(data: AddItemData): Promise<{ error?: string }> {
   const { supabase, user } = await getAuthenticatedUser()
 
+  const insertData: Record<string, unknown> = {
+    user_id: user.id,
+    destination_name: data.destination_name.trim(),
+    country: data.country.trim(),
+    region: data.region.trim() || null,
+    category: data.category,
+    priority: data.priority,
+    notes: data.notes.trim() || null,
+    status: 'want',
+    public: data.public,
+  }
+  if (data.experience_id) insertData.experience_id = data.experience_id
+
   const { data: inserted, error } = await supabase
     .from('bucket_list_items')
-    .insert({
-      user_id: user.id,
-      destination_name: data.destination_name.trim(),
-      country: data.country.trim(),
-      region: data.region.trim() || null,
-      category: data.category,
-      priority: data.priority,
-      notes: data.notes.trim() || null,
-      status: 'want',
-      is_public: data.is_public,
-    })
+    .insert(insertData)
     .select('id')
     .single()
 
@@ -59,7 +70,7 @@ export async function addItem(data: AddItemData): Promise<{ error?: string }> {
 
   await logEvent(supabase, user.id, 'item_added', {
     item_id: inserted.id,
-    destination: data.destination_name,
+    destination_name: data.destination_name,
     country: data.country,
     category: data.category,
     priority: data.priority,
@@ -76,7 +87,8 @@ export interface UpdateItemData {
   category: string
   priority: number
   notes: string
-  is_public: boolean
+  public: boolean
+  photo_url?: string
 }
 
 export async function updateItem(
@@ -86,17 +98,20 @@ export async function updateItem(
 ): Promise<{ error?: string }> {
   const { supabase, user } = await getAuthenticatedUser()
 
+  const updateData: Record<string, unknown> = {
+    destination_name: data.destination_name.trim(),
+    country: data.country.trim(),
+    region: data.region.trim() || null,
+    category: data.category,
+    priority: data.priority,
+    notes: data.notes.trim() || null,
+    public: data.public,
+  }
+  if (data.photo_url !== undefined) updateData.photo_url = data.photo_url
+
   const { error } = await supabase
     .from('bucket_list_items')
-    .update({
-      destination_name: data.destination_name.trim(),
-      country: data.country.trim(),
-      region: data.region.trim() || null,
-      category: data.category,
-      priority: data.priority,
-      notes: data.notes.trim() || null,
-      is_public: data.is_public,
-    })
+    .update(updateData)
     .eq('id', itemId)
     .eq('user_id', user.id)
 

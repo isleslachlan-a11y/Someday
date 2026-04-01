@@ -24,7 +24,7 @@ export default function NewItemPage() {
     category: CATEGORIES[0],
     priority: 3,
     notes: '',
-    is_public: true,
+    public: true,
   })
 
   function set(field: keyof typeof form, value: string | number | boolean) {
@@ -172,15 +172,15 @@ export default function NewItemPage() {
           <div>
             <button
               type="button"
-              onClick={() => set('is_public', !form.is_public)}
+              onClick={() => set('public', !form.public)}
               className={`flex items-center gap-2.5 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors w-full ${
-                form.is_public
+                form.public
                   ? 'border-violet-accent/30 bg-violet-accent/10 text-lavender'
                   : 'border-white/10 bg-white/5 text-muted'
               }`}
             >
-              <span>{form.is_public ? '🌍' : '🔒'}</span>
-              <span>{form.is_public ? 'Public — visible on your profile' : 'Private — only you can see this'}</span>
+              <span>{form.public ? '🌍' : '🔒'}</span>
+              <span>{form.public ? 'Public — visible on your profile' : 'Private — only you can see this'}</span>
             </button>
           </div>
 

@@ -40,7 +40,7 @@ export default function SignupPage() {
 
     // Check username uniqueness before creating auth user
     const { data: existing } = await supabase
-      .from('users')
+      .from('profiles')
       .select('id')
       .eq('username', cleanUsername)
       .maybeSingle()
@@ -73,9 +73,8 @@ export default function SignupPage() {
     }
 
     // Insert public profile row
-    const { error: insertError } = await supabase.from('users').insert({
+    const { error: insertError } = await supabase.from('profiles').insert({
       id: data.user.id,
-      email,
       username: cleanUsername,
     })
 

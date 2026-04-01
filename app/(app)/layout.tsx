@@ -12,7 +12,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!user) redirect('/login')
 
   const { data: profile } = await supabase
-    .from('users')
+    .from('profiles')
     .select('username')
     .eq('id', user.id)
     .single()

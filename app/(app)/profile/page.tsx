@@ -21,7 +21,7 @@ export default async function ProfilePage() {
   if (!user) redirect('/login')
 
   const [profileResult, itemsResult] = await Promise.all([
-    supabase.from('users').select('*').eq('id', user.id).single(),
+    supabase.from('profiles').select('*').eq('id', user.id).single(),
     supabase
       .from('bucket_list_items')
       .select('*')
@@ -36,7 +36,7 @@ export default async function ProfilePage() {
   const total = allItems.length
   const countries = new Set(allItems.map(i => i.country)).size
   const visited = allItems.filter(i => i.status === 'visited').length
-  const publicItems = allItems.filter(i => i.is_public)
+  const publicItems = allItems.filter(i => i.public)
 
   return (
     <>
@@ -47,7 +47,7 @@ export default async function ProfilePage() {
 
           {/* Profile header */}
           <div className="flex items-start gap-5 mb-8">
-            <Avatar avatarUrl={profile.avatar_url} username={profile.username} size={80} />
+            <Avatar avatarUrl={profile.avatar_url} username={profile.username ?? ''} size={80} />
             <div className="flex-1 min-w-0">
               <h1 className="font-syne text-2xl font-bold text-white-soft leading-tight">
                 @{profile.username}

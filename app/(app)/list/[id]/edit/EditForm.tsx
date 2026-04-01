@@ -30,7 +30,7 @@ export default function EditForm({ item }: Props) {
     category: item.category,
     priority: item.priority,
     notes: item.notes ?? '',
-    is_public: item.is_public,
+    public: item.public,
   })
 
   function set(field: keyof typeof form, value: string | number | boolean) {
@@ -45,7 +45,7 @@ export default function EditForm({ item }: Props) {
     if (form.category !== item.category) changed.push('category')
     if (form.priority !== item.priority) changed.push('priority')
     if ((form.notes || null) !== item.notes) changed.push('notes')
-    if (form.is_public !== item.is_public) changed.push('is_public')
+    if (form.public !== item.public) changed.push('public')
     return changed
   }
 
@@ -199,15 +199,15 @@ export default function EditForm({ item }: Props) {
           <div>
             <button
               type="button"
-              onClick={() => set('is_public', !form.is_public)}
+              onClick={() => set('public', !form.public)}
               className={`flex items-center gap-2.5 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors w-full ${
-                form.is_public
+                form.public
                   ? 'border-violet-accent/30 bg-violet-accent/10 text-lavender'
                   : 'border-white/10 bg-white/5 text-muted'
               }`}
             >
-              <span>{form.is_public ? '🌍' : '🔒'}</span>
-              <span>{form.is_public ? 'Public — visible on your profile' : 'Private — only you can see this'}</span>
+              <span>{form.public ? '🌍' : '🔒'}</span>
+              <span>{form.public ? 'Public — visible on your profile' : 'Private — only you can see this'}</span>
             </button>
           </div>
 

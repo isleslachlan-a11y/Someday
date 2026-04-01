@@ -17,7 +17,7 @@ export default function EditProfileForm({ profile }: Props) {
   const [isPending, startTransition] = useTransition()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const [username, setUsername] = useState(profile.username)
+  const [username, setUsername] = useState(profile.username ?? '')
   const [bio, setBio] = useState(profile.bio ?? '')
   const [avatarUrl, setAvatarUrl] = useState<string | null>(profile.avatar_url)
   const [avatarFile, setAvatarFile] = useState<File | null>(null)

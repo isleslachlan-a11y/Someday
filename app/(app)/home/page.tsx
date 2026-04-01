@@ -23,7 +23,7 @@ export default async function HomePage() {
 
   // Fetch profile and all items in parallel
   const [profileResult, itemsResult] = await Promise.all([
-    supabase.from('users').select('username').eq('id', user.id).single(),
+    supabase.from('profiles').select('username').eq('id', user.id).single(),
     supabase
       .from('bucket_list_items')
       .select('*')

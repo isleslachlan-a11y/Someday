@@ -11,7 +11,7 @@ export default async function EditProfilePage() {
 
   if (!user) redirect('/login')
 
-  const { data } = await supabase.from('users').select('*').eq('id', user.id).single()
+  const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
   const profile = data as UserProfile | null
 
   if (!profile) redirect('/login')

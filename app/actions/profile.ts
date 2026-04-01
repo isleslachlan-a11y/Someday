@@ -29,7 +29,7 @@ export async function updateProfile(
 
   // Check username uniqueness (excluding self)
   const { data: existing } = await supabase
-    .from('users')
+    .from('profiles')
     .select('id')
     .eq('username', username)
     .neq('id', user.id)
@@ -39,7 +39,7 @@ export async function updateProfile(
 
   // Fetch current values to compute diff
   const { data: current } = await supabase
-    .from('users')
+    .from('profiles')
     .select('username, bio, avatar_url')
     .eq('id', user.id)
     .single()
@@ -52,7 +52,7 @@ export async function updateProfile(
   const updates: Record<string, string> = { username, bio }
   if (data.avatar_url) updates.avatar_url = data.avatar_url
 
-  const { error } = await supabase.from('users').update(updates).eq('id', user.id)
+  const { error } = await supabase.from('profiles').update(updates).eq('id', user.id)
 
   if (error) return { error: error.message }
 

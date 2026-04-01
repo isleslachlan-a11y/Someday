@@ -2,6 +2,7 @@
 
 import { useTransition } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { toggleStatus } from '@/app/actions/bucketList'
 import CategoryBadge from '@/components/CategoryBadge'
 import type { BucketListItem, ItemStatus } from '@/lib/types'
@@ -39,7 +40,7 @@ export default function BucketListCard({ item }: Props) {
 
   return (
     <article
-      className={`group relative rounded-2xl border bg-white/5 p-5 transition-opacity ${
+      className={`group relative rounded-2xl border overflow-hidden bg-white/5 transition-opacity ${
         isPending ? 'opacity-50 pointer-events-none' : 'opacity-100'
       } ${
         item.status === 'visited'
@@ -47,6 +48,23 @@ export default function BucketListCard({ item }: Props) {
           : 'border-white/10 hover:border-violet-accent/40'
       }`}
     >
+      {/* Card image / gradient header */}
+      {item.photo_url ? (
+        <div className="relative h-32 w-full">
+          <Image
+            src={item.photo_url}
+            alt={item.destination_name}
+            fill
+            className="object-cover"
+            sizes="(max-width: 640px) 100vw, 50vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/40" />
+        </div>
+      ) : (
+        <div className="h-2 w-full bg-gradient-to-r from-indigo-deep via-violet-accent/60 to-violet-accent" />
+      )}
+
+      <div className="p-5">
       {/* Top row: badge + priority */}
       <div className="flex items-start justify-between gap-3 mb-3">
         <CategoryBadge category={item.category} />
@@ -93,6 +111,7 @@ export default function BucketListCard({ item }: Props) {
         >
           Edit
         </Link>
+      </div>
       </div>
     </article>
   )
