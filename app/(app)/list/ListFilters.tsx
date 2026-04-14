@@ -2,22 +2,50 @@
 
 import { useState, useEffect, useMemo, useTransition } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
-import Link from 'next/link'
+import toast from 'react-hot-toast'
 import BucketListCard from '@/components/BucketListCard'
-import CategoryBadge from '@/components/CategoryBadge'
-import { CATEGORIES, type BucketListItem, type ItemStatus } from '@/lib/types'
+import { updateListEntry, removeFromList } from '@/app/actions/bucketList'
 import { logEvent } from '@/lib/events'
+import type { ListEntry, FriendBucketItem, BucketListStatus } from '@/lib/types'
 
-type SortOption = 'date' | 'priority' | 'az'
+// ─── Constants ────────────────────────────────────────────────────────────────
 
-interface Props {
-  items: BucketListItem[]
-  userId: string
+const STATUS_OPTIONS: { value: 'all' | BucketListStatus; label: string }[] = [
+  { value: 'all',       label: 'All' },
+  { value: 'wishlist',  label: 'Wishlist' },
+  { value: 'planning',  label: 'Planning' },
+  { value: 'completed', label: 'Completed' },
+]
+
+const TYPE_OPTIONS: { value: string | null; label: string; icon: string }[] = [
+  { value: null,         label: 'All types',   icon: '✦' },
+  { value: 'city',       label: 'Cities',      icon: '🏙' },
+  { value: 'nature',     label: 'Nature',      icon: '🌿' },
+  { value: 'experience', label: 'Experiences', icon: '✨' },
+  { value: 'food',       label: 'Food',        icon: '🍜' },
+]
+
+const STATUS_LABEL: Record<BucketListStatus, string> = {
+  wishlist:  '✦ Wishlist',
+  planning:  '📅 Planning',
+  completed: '✓ Completed',
 }
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
+const STATUS_ACTIVE: Record<BucketListStatus, string> = {
+  wishlist:  'bg-lavender/15    border-lavender/30    text-lavender',
+  planning:  'bg-violet-accent/15 border-violet-accent/30 text-violet-accent',
+  completed: 'bg-pink-accent/15  border-pink-accent/30  text-pink-accent',
+}
 
-function buildUrl(pathname: string, base: URLSearchParams, updates: Record<string, string | null>) {
+type SortOption = 'date' | 'az'
+
+// ─── URL helper ───────────────────────────────────────────────────────────────
+
+function buildUrl(
+  pathname: string,
+  base: URLSearchParams,
+  updates: Record<string, string | null>
+) {
   const next = new URLSearchParams(base.toString())
   for (const [key, val] of Object.entries(updates)) {
     if (!val) next.delete(key)
@@ -27,66 +55,69 @@ function buildUrl(pathname: string, base: URLSearchParams, updates: Record<strin
   return qs ? `${pathname}?${qs}` : pathname
 }
 
-// ─── Component ──────────────────────────────────────────────────────────────
+// ─── Props ────────────────────────────────────────────────────────────────────
 
-export default function ListFilters({ items, userId }: Props) {
+interface Props {
+  entries: ListEntry[]
+  userId: string
+  friendItems: FriendBucketItem[]
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
+export default function ListFilters({ entries: initialEntries, userId, friendItems }: Props) {
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
   const [, startTransition] = useTransition()
 
-  // Derive state from URL params
-  const tab = (searchParams.get('tab') ?? 'want') as ItemStatus
+  // Local entries state — allows optimistic updates without page refresh
+  const [entries, setEntries] = useState<ListEntry[]>(initialEntries)
+  const [selectedEntry, setSelectedEntry] = useState<ListEntry | null>(null)
+
+  // Sync when server data changes (e.g. navigation back)
+  useEffect(() => {
+    setEntries(initialEntries)
+  }, [initialEntries])
+
+  // ── URL param state ────────────────────────────────────────────────────────
+
+  const status = (searchParams.get('status') ?? 'all') as 'all' | BucketListStatus
+  const selectedType = searchParams.get('type') ?? null
   const qParam = searchParams.get('q') ?? ''
-  const selectedCats = useMemo(
-    () => searchParams.get('cat')?.split(',').filter(Boolean) ?? [],
-    [searchParams]
-  )
   const sort = (searchParams.get('sort') ?? 'date') as SortOption
 
-  // Local state for text input so typing is instant
   const [searchInput, setSearchInput] = useState(qParam)
 
-  // Keep local input in sync when URL changes externally (e.g. browser back)
   useEffect(() => {
     setSearchInput(qParam)
   }, [qParam])
 
-  // Debounce search input → push to URL
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const t = setTimeout(() => {
       const url = buildUrl(pathname, searchParams, { q: searchInput || null })
       startTransition(() => router.replace(url, { scroll: false }))
       if (searchInput && searchInput !== qParam) {
         logEvent(userId, 'list_filtered', { filter_type: 'search', value: searchInput })
       }
     }, 350)
-    return () => clearTimeout(timer)
+    return () => clearTimeout(t)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchInput])
-
-  // ── Param update helpers ─────────────────────────────────────────────────
 
   function navigate(updates: Record<string, string | null>) {
     const url = buildUrl(pathname, searchParams, updates)
     startTransition(() => router.replace(url, { scroll: false }))
   }
 
-  function setTab(next: ItemStatus) {
-    navigate({ tab: next === 'want' ? null : next })
-    logEvent(userId, 'list_tab_switched', { tab: next })
+  function setStatus(next: 'all' | BucketListStatus) {
+    navigate({ status: next === 'all' ? null : next })
+    logEvent(userId, 'list_filtered', { filter_type: 'status', value: next })
   }
 
-  function toggleCategory(cat: string) {
-    const next = selectedCats.includes(cat)
-      ? selectedCats.filter(c => c !== cat)
-      : [...selectedCats, cat]
-    navigate({ cat: next.length ? next.join(',') : null })
-    logEvent(userId, 'list_filtered', {
-      filter_type: 'category',
-      value: cat,
-      active: !selectedCats.includes(cat),
-    })
+  function setType(next: string | null) {
+    navigate({ type: next })
+    logEvent(userId, 'list_filtered', { filter_type: 'type', value: next ?? 'all' })
   }
 
   function setSort(next: SortOption) {
@@ -96,82 +127,168 @@ export default function ListFilters({ items, userId }: Props) {
 
   function clearFilters() {
     setSearchInput('')
-    navigate({ q: null, cat: null, sort: null })
+    navigate({ q: null, type: null, sort: null, status: null })
   }
 
-  // ── Filtering + sorting (client-side) ────────────────────────────────────
+  // ── Social proof map (place_id → matching friends) ─────────────────────────
 
-  const tabItems = useMemo(() => items.filter(i => i.status === tab), [items, tab])
+  const friendsByPlace = useMemo(() => {
+    const map = new Map<string, FriendBucketItem[]>()
+    for (const fi of friendItems) {
+      if (!fi.place_id) continue
+      const existing = map.get(fi.place_id) ?? []
+      map.set(fi.place_id, [...existing, fi])
+    }
+    return map
+  }, [friendItems])
 
-  const filteredItems = useMemo(() => {
-    let result = tabItems
+  // ── Filtering + sorting ───────────────────────────────────────────────────
 
-    if (qParam) {
-      const lower = qParam.toLowerCase()
-      result = result.filter(
-        item =>
-          item.destination_name.toLowerCase().includes(lower) ||
-          item.country.toLowerCase().includes(lower)
-      )
+  const statusFiltered = useMemo(
+    () => (status === 'all' ? entries : entries.filter(e => e.status === status)),
+    [entries, status]
+  )
+
+  const filtered = useMemo(() => {
+    let result = statusFiltered
+
+    if (selectedType) {
+      result = result.filter(e => e.place.type === selectedType)
     }
 
-    if (selectedCats.length > 0) {
-      result = result.filter(item => selectedCats.includes(item.category))
+    if (qParam) {
+      const q = qParam.toLowerCase()
+      result = result.filter(
+        e =>
+          e.place.name.toLowerCase().includes(q) ||
+          e.place.country.toLowerCase().includes(q)
+      )
     }
 
     const sorted = [...result]
     if (sort === 'az') {
-      sorted.sort((a, b) => a.destination_name.localeCompare(b.destination_name))
-    } else if (sort === 'priority') {
-      sorted.sort(
-        (a, b) =>
-          b.priority - a.priority ||
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      )
+      sorted.sort((a, b) => a.place.name.localeCompare(b.place.name))
     } else {
       sorted.sort(
-        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        (a, b) => new Date(b.added_at).getTime() - new Date(a.added_at).getTime()
       )
     }
     return sorted
-  }, [tabItems, qParam, selectedCats, sort])
+  }, [statusFiltered, selectedType, qParam, sort])
 
-  const wantCount = items.filter(i => i.status === 'want').length
-  const visitedCount = items.filter(i => i.status === 'visited').length
-  const hasActiveFilters = !!qParam || selectedCats.length > 0 || sort !== 'date'
+  const counts = useMemo(() => {
+    const c: Record<string, number> = { all: entries.length }
+    for (const e of entries) {
+      c[e.status] = (c[e.status] ?? 0) + 1
+    }
+    return c
+  }, [entries])
 
-  // ── Render ───────────────────────────────────────────────────────────────
+  const hasActiveFilters = !!qParam || !!selectedType || sort !== 'date'
+
+  // ── Optimistic mutations ──────────────────────────────────────────────────
+
+  async function handleSave(
+    id: string,
+    data: { status: BucketListStatus; target_date: string | null; notes: string | null }
+  ) {
+    const snapshot = entries
+    setEntries(prev => prev.map(e => (e.id === id ? { ...e, ...data } : e)))
+    setSelectedEntry(null)
+
+    const result = await updateListEntry(id, data)
+    if (result.error) {
+      setEntries(snapshot)
+      toast.error('Failed to update. Please try again.')
+    }
+  }
+
+  async function handleRemove(id: string) {
+    const snapshot = entries
+    setEntries(prev => prev.filter(e => e.id !== id))
+    setSelectedEntry(null)
+    toast.success('Removed from your list.')
+
+    const result = await removeFromList(id)
+    if (result.error) {
+      setEntries(snapshot)
+      toast.error('Failed to remove. Please try again.')
+    }
+  }
+
+  // ── Render ────────────────────────────────────────────────────────────────
 
   return (
     <>
-      {/* ── Tabs ────────────────────────────────────────────────────────── */}
-      <div className="flex gap-2 border-b border-white/10 pb-1 mb-5">
-        <TabButton active={tab === 'want'} count={wantCount} onClick={() => setTab('want')}>
-          Someday
-        </TabButton>
-        <TabButton active={tab === 'visited'} count={visitedCount} onClick={() => setTab('visited')}>
-          Been There
-        </TabButton>
+      {/* ── Status filter (pill tabs) ──────────────────────────────────── */}
+      <div className="flex gap-2 overflow-x-auto scrollbar-none pb-1 mb-5">
+        {STATUS_OPTIONS.map(({ value, label }) => {
+          const active = status === value
+          const count = counts[value] ?? 0
+          return (
+            <button
+              key={value}
+              onClick={() => setStatus(value)}
+              className={`flex items-center gap-2 shrink-0 rounded-full border px-4 py-1.5 text-sm font-semibold transition-all ${
+                active
+                  ? 'bg-violet-accent/15 border-violet-accent/40 text-violet-accent'
+                  : 'border-white/10 text-muted hover:border-white/20 hover:text-white-soft'
+              }`}
+            >
+              {label}
+              {count > 0 && (
+                <span
+                  className={`rounded-full px-1.5 py-0.5 text-xs ${
+                    active ? 'bg-violet-accent/20 text-lavender' : 'bg-white/10 text-muted'
+                  }`}
+                >
+                  {count}
+                </span>
+              )}
+            </button>
+          )
+        })}
       </div>
 
-      {/* ── Search + Sort ───────────────────────────────────────────────── */}
+      {/* ── Type chips (horizontal scroll) ─────────────────────────────── */}
+      <div className="flex gap-2 overflow-x-auto scrollbar-none pb-1 -mx-4 px-4 mb-5">
+        {TYPE_OPTIONS.map(({ value, label, icon }) => {
+          const active = selectedType === value
+          return (
+            <button
+              key={value ?? 'all'}
+              onClick={() => setType(value)}
+              className={`flex items-center gap-1.5 shrink-0 rounded-full border px-3 py-1 text-xs font-semibold transition-all ${
+                active
+                  ? 'bg-violet-accent/15 border-violet-accent/40 text-lavender'
+                  : 'border-white/10 text-muted hover:border-white/20 hover:text-white-soft'
+              }`}
+            >
+              <span aria-hidden>{icon}</span>
+              {label}
+            </button>
+          )
+        })}
+      </div>
+
+      {/* ── Search + Sort ──────────────────────────────────────────────── */}
       <div className="flex gap-3 mb-4">
         {/* Search */}
         <div className="relative flex-1">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none select-none">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none select-none text-sm">
             ⌕
           </span>
           <input
             type="search"
             value={searchInput}
             onChange={e => setSearchInput(e.target.value)}
-            placeholder="Search destinations or countries…"
+            placeholder="Search places or countries…"
             className="w-full rounded-xl bg-white/5 border border-white/10 pl-8 pr-4 py-2.5 text-sm text-white-soft placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-violet-accent transition"
           />
           {searchInput && (
             <button
               onClick={() => setSearchInput('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-white-soft transition-colors text-xs"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-white-soft text-xs transition-colors"
               aria-label="Clear search"
             >
               ✕
@@ -187,7 +304,6 @@ export default function ListFilters({ items, userId }: Props) {
             className="appearance-none rounded-xl bg-white/5 border border-white/10 pl-3 pr-8 py-2.5 text-sm text-white-soft focus:outline-none focus:ring-2 focus:ring-violet-accent transition cursor-pointer"
           >
             <option value="date">Date added</option>
-            <option value="priority">Priority</option>
             <option value="az">A – Z</option>
           </select>
           <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-muted text-xs">
@@ -196,47 +312,21 @@ export default function ListFilters({ items, userId }: Props) {
         </div>
       </div>
 
-      {/* ── Category chips ──────────────────────────────────────────────── */}
-      <div className="flex gap-2 flex-wrap mb-5">
-        <button
-          onClick={() => navigate({ cat: null })}
-          className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-            selectedCats.length === 0
-              ? 'bg-violet-accent/20 border-violet-accent/40 text-lavender'
-              : 'border-white/10 text-muted hover:text-white-soft hover:border-white/20'
-          }`}
-        >
-          All
-        </button>
-        {CATEGORIES.map(cat => {
-          const active = selectedCats.includes(cat)
-          return (
-            <button
-              key={cat}
-              onClick={() => toggleCategory(cat)}
-              className={`transition-all ${active ? 'ring-2 ring-violet-accent rounded-full' : 'opacity-60 hover:opacity-100'}`}
-            >
-              <CategoryBadge category={cat} size="sm" />
-            </button>
-          )
-        })}
-      </div>
-
-      {/* ── Count + clear ───────────────────────────────────────────────── */}
+      {/* ── Count + clear ──────────────────────────────────────────────── */}
       <div className="flex items-center justify-between mb-4">
         <p className="text-xs text-muted">
           {hasActiveFilters ? (
             <>
               Showing{' '}
-              <span className="text-white-soft font-semibold">{filteredItems.length}</span>
+              <span className="text-white-soft font-semibold">{filtered.length}</span>
               {' '}of{' '}
-              <span className="text-white-soft font-semibold">{tabItems.length}</span>
-              {' '}destination{tabItems.length !== 1 ? 's' : ''}
+              <span className="text-white-soft font-semibold">{statusFiltered.length}</span>
+              {' '}place{statusFiltered.length !== 1 ? 's' : ''}
             </>
           ) : (
             <>
-              <span className="text-white-soft font-semibold">{tabItems.length}</span>
-              {' '}destination{tabItems.length !== 1 ? 's' : ''}
+              <span className="text-white-soft font-semibold">{statusFiltered.length}</span>
+              {' '}place{statusFiltered.length !== 1 ? 's' : ''}
             </>
           )}
         </p>
@@ -250,102 +340,310 @@ export default function ListFilters({ items, userId }: Props) {
         )}
       </div>
 
-      {/* ── Items grid or empty states ──────────────────────────────────── */}
-      {tabItems.length === 0 ? (
-        <TabEmptyState tab={tab} />
-      ) : filteredItems.length === 0 ? (
-        <FilterEmptyState query={qParam} categories={selectedCats} onClear={clearFilters} />
+      {/* ── Grid or empty states ────────────────────────────────────────── */}
+      {statusFiltered.length === 0 ? (
+        <EmptyStatus status={status} />
+      ) : filtered.length === 0 ? (
+        <EmptySearch onClear={clearFilters} />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
-          {filteredItems.map(item => (
-            <BucketListCard key={item.id} item={item} />
+          {filtered.map(entry => (
+            <BucketListCard
+              key={entry.id}
+              entry={entry}
+              friendMatches={friendsByPlace.get(entry.place_id) ?? []}
+              onClick={() => setSelectedEntry(entry)}
+            />
           ))}
         </div>
+      )}
+
+      {/* ── Bottom sheet ────────────────────────────────────────────────── */}
+      {selectedEntry && (
+        <ListItemSheet
+          entry={selectedEntry}
+          onClose={() => setSelectedEntry(null)}
+          onSave={handleSave}
+          onRemove={handleRemove}
+        />
       )}
     </>
   )
 }
 
-// ─── Sub-components ──────────────────────────────────────────────────────────
+// ─── Bottom sheet ─────────────────────────────────────────────────────────────
 
-function TabButton({
-  active,
-  count,
-  onClick,
-  children,
+function ListItemSheet({
+  entry,
+  onClose,
+  onSave,
+  onRemove,
 }: {
-  active: boolean
-  count: number
-  onClick: () => void
-  children: React.ReactNode
+  entry: ListEntry
+  onClose: () => void
+  onSave: (
+    id: string,
+    data: { status: BucketListStatus; target_date: string | null; notes: string | null }
+  ) => Promise<void>
+  onRemove: (id: string) => Promise<void>
 }) {
+  const [form, setForm] = useState({
+    status: entry.status,
+    target_date: entry.target_date ? entry.target_date.slice(0, 7) : '', // YYYY-MM for month input
+    notes: entry.notes ?? '',
+  })
+  const [saving, setSaving] = useState(false)
+  const [removing, setRemoving] = useState(false)
+  const [confirmRemove, setConfirmRemove] = useState(false)
+
+  function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
+    setForm(prev => ({ ...prev, [key]: value }))
+  }
+
+  async function handleSave() {
+    setSaving(true)
+    await onSave(entry.id, {
+      status: form.status,
+      target_date: form.target_date ? `${form.target_date}-01` : null,
+      notes: form.notes.trim() || null,
+    })
+    setSaving(false)
+  }
+
+  async function handleRemove() {
+    setRemoving(true)
+    await onRemove(entry.id)
+    setRemoving(false)
+  }
+
   return (
-    <button
-      onClick={onClick}
-      className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-t-lg transition-colors ${
-        active
-          ? 'text-white-soft border-b-2 border-violet-accent -mb-[1px]'
-          : 'text-muted hover:text-white-soft/80'
-      }`}
-    >
-      {children}
-      <span
-        className={`rounded-full px-1.5 py-0.5 text-xs ${
-          active ? 'bg-violet-accent/20 text-lavender' : 'bg-white/10 text-muted'
-        }`}
+    <>
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+        onClick={onClose}
+        aria-hidden
+      />
+
+      {/* Sheet */}
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={entry.place.name}
+        className="fixed inset-x-0 bottom-0 z-50 rounded-t-3xl bg-indigo-deep border-t border-white/10 max-h-[88vh] overflow-y-auto animate-slide-up"
       >
-        {count}
-      </span>
-    </button>
+        {/* Drag handle */}
+        <div className="sticky top-0 bg-indigo-deep/95 backdrop-blur-sm z-10 flex justify-center pt-3 pb-2">
+          <div className="w-10 h-1 rounded-full bg-white/20" />
+        </div>
+
+        <div className="px-6 pb-10">
+          {/* Header */}
+          <div className="flex items-start justify-between gap-4 pt-2 pb-5 border-b border-white/10 mb-5">
+            <div>
+              <h2 className="font-syne text-xl font-bold text-white-soft leading-tight">
+                {entry.place.name}
+              </h2>
+              <p className="text-muted text-sm mt-1">
+                {entry.place.country}
+                {entry.place.type ? ` · ${entry.place.type}` : ''}
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              aria-label="Close"
+              className="shrink-0 w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-muted hover:text-white-soft hover:border-white/20 transition-colors text-sm"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Place details */}
+          {entry.place.description && (
+            <p className="text-white-soft/65 text-sm leading-relaxed mb-5">
+              {entry.place.description}
+            </p>
+          )}
+
+          {/* Tags */}
+          {entry.place.tags && entry.place.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-3">
+              {entry.place.tags.map(tag => (
+                <span
+                  key={tag}
+                  className="rounded-full bg-white/5 border border-white/10 px-2.5 py-0.5 text-xs text-lavender"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Vibes */}
+          {entry.place.vibes && entry.place.vibes.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-3">
+              {entry.place.vibes.map(vibe => (
+                <span
+                  key={vibe}
+                  className="rounded-full bg-violet-accent/10 border border-violet-accent/20 px-2.5 py-0.5 text-xs text-violet-accent"
+                >
+                  {vibe}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Intensity */}
+          {entry.place.intensity && (
+            <p className="text-xs text-muted mb-6">
+              Intensity:{' '}
+              <span className="text-lavender capitalize">{entry.place.intensity}</span>
+            </p>
+          )}
+
+          {/* ── List settings ────────────────────────────────────────────── */}
+          <div className="border-t border-white/10 pt-5 space-y-5">
+
+            {/* Status selector */}
+            <div>
+              <label className="block text-xs font-semibold text-muted uppercase tracking-wider mb-3">
+                Status
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {(['wishlist', 'planning', 'completed'] as BucketListStatus[]).map(s => {
+                  const active = form.status === s
+                  return (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => update('status', s)}
+                      className={`rounded-xl border py-2.5 text-xs font-semibold capitalize transition-all ${
+                        active
+                          ? STATUS_ACTIVE[s]
+                          : 'border-white/10 text-muted hover:border-white/20 hover:text-white-soft'
+                      }`}
+                    >
+                      {STATUS_LABEL[s]}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Target date */}
+            <div>
+              <label className="block text-xs font-semibold text-muted uppercase tracking-wider mb-2">
+                Target date{' '}
+                <span className="normal-case font-normal">(optional)</span>
+              </label>
+              <input
+                type="month"
+                value={form.target_date}
+                onChange={e => update('target_date', e.target.value)}
+                className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white-soft focus:outline-none focus:ring-2 focus:ring-violet-accent transition"
+              />
+              {form.target_date && (
+                <button
+                  type="button"
+                  onClick={() => update('target_date', '')}
+                  className="mt-1.5 text-xs text-muted hover:text-lavender transition-colors"
+                >
+                  Clear date
+                </button>
+              )}
+            </div>
+
+            {/* Notes */}
+            <div>
+              <label className="block text-xs font-semibold text-muted uppercase tracking-wider mb-2">
+                Notes{' '}
+                <span className="normal-case font-normal">(optional)</span>
+              </label>
+              <textarea
+                rows={3}
+                value={form.notes}
+                onChange={e => update('notes', e.target.value)}
+                placeholder="Best time to visit, who to go with…"
+                className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white-soft placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-violet-accent transition resize-none"
+              />
+            </div>
+
+            {/* Save */}
+            <button
+              onClick={handleSave}
+              disabled={saving || removing}
+              className="w-full rounded-xl bg-violet-accent hover:bg-violet-accent/90 disabled:opacity-50 py-3.5 font-syne font-semibold text-white-soft text-sm transition-all active:scale-[0.98]"
+            >
+              {saving ? 'Saving…' : 'Save changes'}
+            </button>
+
+            {/* Remove */}
+            <div className="pt-2 border-t border-white/10">
+              {confirmRemove ? (
+                <div className="rounded-xl border border-pink-accent/30 bg-pink-accent/5 p-4">
+                  <p className="text-sm text-white-soft mb-3">
+                    Remove <strong>{entry.place.name}</strong> from your list?
+                  </p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setConfirmRemove(false)}
+                      disabled={removing}
+                      className="flex-1 rounded-lg border border-white/10 px-3 py-2 text-sm text-muted hover:text-white-soft transition-colors"
+                    >
+                      Keep it
+                    </button>
+                    <button
+                      onClick={handleRemove}
+                      disabled={removing}
+                      className="flex-1 rounded-lg bg-pink-accent/20 hover:bg-pink-accent/30 border border-pink-accent/30 px-3 py-2 text-sm font-semibold text-pink-accent transition-colors disabled:opacity-50"
+                    >
+                      {removing ? 'Removing…' : 'Remove'}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setConfirmRemove(true)}
+                  disabled={removing}
+                  className="w-full py-2 text-center text-sm text-muted hover:text-pink-accent transition-colors"
+                >
+                  Remove from list
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   )
 }
 
-function TabEmptyState({ tab }: { tab: ItemStatus }) {
+// ─── Empty states ─────────────────────────────────────────────────────────────
+
+function EmptyStatus({ status }: { status: 'all' | BucketListStatus }) {
+  const content = {
+    all:       { icon: '✦',  heading: 'Your list is empty',       body: 'Add places from the home page or search the catalogue.' },
+    wishlist:  { icon: '✦',  heading: 'Nothing on your wishlist', body: 'Save places from the home screen to start dreaming.' },
+    planning:  { icon: '📅', heading: 'Not planning yet',          body: 'Move items from Wishlist to Planning when you\'re ready to book.' },
+    completed: { icon: '🌍', heading: 'No completed trips yet',   body: 'Mark places as completed when you experience them.' },
+  }[status]
+
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center">
-      <div className="text-5xl mb-4 select-none">{tab === 'want' ? '✦' : '🌍'}</div>
-      <h2 className="font-syne text-xl font-bold text-white-soft mb-2">
-        {tab === 'want' ? 'Start dreaming' : 'No visited places yet'}
-      </h2>
-      <p className="text-muted text-sm max-w-xs">
-        {tab === 'want'
-          ? 'Add the places and experiences you want to have someday.'
-          : 'Mark destinations as visited when you experience them.'}
-      </p>
-      {tab === 'want' && (
-        <Link
-          href="/list/new"
-          className="mt-6 rounded-xl bg-violet-accent hover:bg-violet-accent/90 px-5 py-2.5 font-syne font-semibold text-white-soft text-sm transition-colors"
-        >
-          Add your first destination
-        </Link>
-      )}
+      <div className="text-5xl mb-4 select-none">{content.icon}</div>
+      <h2 className="font-syne text-xl font-bold text-white-soft mb-2">{content.heading}</h2>
+      <p className="text-muted text-sm max-w-xs">{content.body}</p>
     </div>
   )
 }
 
-function FilterEmptyState({
-  query,
-  categories,
-  onClear,
-}: {
-  query: string
-  categories: string[]
-  onClear: () => void
-}) {
-  const description =
-    query && categories.length > 0
-      ? `"${query}" in ${categories.join(', ')}`
-      : query
-      ? `"${query}"`
-      : categories.join(', ')
-
+function EmptySearch({ onClear }: { onClear: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center">
       <div className="text-5xl mb-4 select-none">🔍</div>
-      <h2 className="font-syne text-xl font-bold text-white-soft mb-2">No results found</h2>
+      <h2 className="font-syne text-xl font-bold text-white-soft mb-2">No results</h2>
       <p className="text-muted text-sm max-w-xs mb-6">
-        Nothing matched {description}. Try a different search or remove some filters.
+        Try a different search or remove some filters.
       </p>
       <button
         onClick={onClear}

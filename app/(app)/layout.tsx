@@ -11,6 +11,18 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   if (!user) redirect('/login')
 
+  // Onboarding gate — runs on every authenticated route inside (app)/.
+  // /onboarding is outside this group so there is no redirect loop.
+  const { data: context } = await supabase
+    .from('user_context')
+    .select('completed_onboarding')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  if (!context?.completed_onboarding) {
+    redirect('/onboarding')
+  }
+
   const { data: profile } = await supabase
     .from('profiles')
     .select('username')

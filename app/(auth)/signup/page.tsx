@@ -85,8 +85,7 @@ export default function SignupPage() {
 
     await logEvent(data.user.id, 'user_signed_up', { username: cleanUsername })
 
-    toast.success('Welcome to Someday! Start building your bucket list.')
-    router.push('/home')
+    router.push('/onboarding')
     router.refresh()
   }
 

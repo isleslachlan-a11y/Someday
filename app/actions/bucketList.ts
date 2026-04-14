@@ -143,6 +143,73 @@ export async function deleteItem(itemId: string): Promise<{ error?: string }> {
   return {}
 }
 
+// ─── Update status / target_date / notes on a list entry ────────────────────
+
+export async function updateListEntry(
+  entryId: string,
+  updates: {
+    status?: string
+    target_date?: string | null
+    notes?: string | null
+  }
+): Promise<{ error?: string }> {
+  const { supabase, user } = await getAuthenticatedUser()
+
+  const { error } = await supabase
+    .from('bucket_list_items')
+    .update(updates)
+    .eq('id', entryId)
+    .eq('user_id', user.id)
+
+  if (error) return { error: error.message }
+
+  await logEvent(supabase, user.id, 'item_updated', {
+    item_id: entryId,
+    fields: Object.keys(updates),
+  })
+
+  revalidatePath('/list')
+  return {}
+}
+
+// ─── Remove a place from the user's list ─────────────────────────────────────
+
+export async function removeFromList(entryId: string): Promise<{ error?: string }> {
+  const { supabase, user } = await getAuthenticatedUser()
+
+  const { error } = await supabase
+    .from('bucket_list_items')
+    .delete()
+    .eq('id', entryId)
+    .eq('user_id', user.id)
+
+  if (error) return { error: error.message }
+
+  await logEvent(supabase, user.id, 'place_removed', { place_id: entryId })
+
+  revalidatePath('/list')
+  return {}
+}
+
+// ─── Add a place from the curated catalogue to the user's list ──────────────
+
+export async function addPlaceToList(placeId: string): Promise<{ error?: string }> {
+  const { supabase, user } = await getAuthenticatedUser()
+
+  const { error } = await supabase.from('bucket_list_items').insert({
+    user_id: user.id,
+    place_id: placeId,
+    status: 'wishlist',
+  })
+
+  if (error) return { error: error.message }
+
+  await logEvent(supabase, user.id, 'place_saved', { place_id: placeId, source: 'home' })
+
+  revalidatePath('/home')
+  return {}
+}
+
 export async function toggleStatus(
   itemId: string,
   newStatus: ItemStatus

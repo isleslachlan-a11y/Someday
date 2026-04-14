@@ -29,11 +29,20 @@ function ListIcon({ className }: { className?: string }) {
   )
 }
 
-function ExploreIcon({ className }: { className?: string }) {
+function PlanIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" />
+      <path d="M16 2v4M8 2v4M3 10h18" />
+    </svg>
+  )
+}
+
+function SubmitIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="9" />
-      <path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z" />
+      <path d="M12 8v8M8 12h8" />
     </svg>
   )
 }
@@ -60,10 +69,11 @@ function SignOutIcon({ className }: { className?: string }) {
 // ─── Nav config ─────────────────────────────────────────────────────────────
 
 const NAV_LINKS = [
-  { href: '/home',    label: 'Home',     Icon: HomeIcon },
-  { href: '/list',    label: 'My List',  Icon: ListIcon },
-  { href: '/explore', label: 'Explore',  Icon: ExploreIcon },
-  { href: '/profile', label: 'Profile',  Icon: ProfileIcon },
+  { href: '/home',    label: 'Home',    Icon: HomeIcon },
+  { href: '/list',    label: 'List',    Icon: ListIcon },
+  { href: '/plan',    label: 'Plan',    Icon: PlanIcon },
+  { href: '/submit',  label: 'Submit',  Icon: SubmitIcon },
+  { href: '/profile', label: 'Profile', Icon: ProfileIcon },
 ]
 
 // ─── Component ──────────────────────────────────────────────────────────────

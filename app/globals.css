@@ -25,3 +25,43 @@ body {
   color: var(--foreground);
   font-family: var(--font-nunito), sans-serif;
 }
+
+/* ─── Scrollbar suppression ───────────────────────────────────────────────── */
+
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* ─── Bottom sheet slide-up ───────────────────────────────────────────────── */
+
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+/* ─── Onboarding step transitions ─────────────────────────────────────────── */
+
+@keyframes slide-in-right {
+  from { transform: translateX(48px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+@keyframes slide-in-left {
+  from { transform: translateX(-48px); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}

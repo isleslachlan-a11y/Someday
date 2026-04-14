@@ -29,6 +29,19 @@ export default function LoginPage() {
 
     if (data.user) {
       await logEvent(data.user.id, 'user_signed_in', {})
+
+      // Route to onboarding if they haven't completed it yet
+      const { data: context } = await supabase
+        .from('user_context')
+        .select('completed_onboarding')
+        .eq('user_id', data.user.id)
+        .maybeSingle()
+
+      if (!context?.completed_onboarding) {
+        router.push('/onboarding')
+        router.refresh()
+        return
+      }
     }
 
     router.push('/home')

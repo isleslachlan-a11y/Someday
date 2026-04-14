@@ -1,7 +1,7 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-const PROTECTED_ROUTES = ['/home', '/bucket-list', '/profile', '/messages', '/explore', '/list']
+const PROTECTED_ROUTES = ['/home', '/bucket-list', '/profile', '/messages', '/explore', '/list', '/plan', '/submit', '/onboarding']
 const AUTH_ROUTES = ['/login', '/signup']
 
 export async function updateSession(request: NextRequest) {
