@@ -18,6 +18,12 @@
 :root {
   --background: #0D0B1E;
   --foreground: #F0EEFF;
+
+  /* Safe area insets — used for notch/home-indicator aware layouts */
+  --sat: env(safe-area-inset-top);
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
+  --sar: env(safe-area-inset-right);
 }
 
 body {
@@ -64,4 +70,14 @@ body {
 
 .animate-slide-in-left {
   animation: slide-in-left 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+/* ─── Safe area utilities ─────────────────────────────────────────────────── */
+
+.safe-top {
+  padding-top: calc(1rem + env(safe-area-inset-top));
+}
+
+.safe-bottom {
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom));
 }

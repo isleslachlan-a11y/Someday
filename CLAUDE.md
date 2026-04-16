@@ -190,3 +190,14 @@ Do not build Experience Chains, Stamps, or Life Project Management until Phases 
 - Closest competitor: Boop (VC-backed, ex-Tripadvisor/Marriott).
 - Naming conflict: a live iOS task app at someday.im — mitigate via travel context in all metadata.
 - Month 5 B2B pilot is the key near-term forcing function.
+
+## Mobile-First Layout Rules
+
+- Base styles target 390px (sm). Use md: and lg: for larger screens.
+- Never write desktop-first and shrink down.
+- Wrap every page in `<PageContainer>` from `components/layout/PageContainer.tsx`
+- All interactive elements: minimum 44px height (`touchTarget` from `lib/design-tokens.ts`)
+- Apply `safe-top` class to page headers, `safe-bottom` to bottom nav
+- Design tokens live in `lib/design-tokens.ts` — reference before hardcoding any value
+- Nav is one component: bottom bar on mobile, left sidebar on lg+
+- Test at 390px viewport width before marking any UI task done
