@@ -25,11 +25,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('username')
+    .select('username, avatar_url')
     .eq('id', user.id)
     .single()
 
   const username = profile?.username ?? user.email?.split('@')[0] ?? 'traveller'
+  const avatarUrl = (profile as { avatar_url?: string | null } | null)?.avatar_url ?? null
 
-  return <AppShell username={username}>{children}</AppShell>
+  return <AppShell username={username} avatarUrl={avatarUrl}>{children}</AppShell>
 }

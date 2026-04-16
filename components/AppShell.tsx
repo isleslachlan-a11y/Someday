@@ -1,142 +1,94 @@
 'use client'
 
+/**
+ * AppShell — responsive nav wrapper for all authenticated pages.
+ *
+ * Mobile  (default → lg): fixed bottom tab bar, 64px + safe-area-inset-bottom.
+ * Desktop (lg+):          fixed left sidebar, 240px wide (TOKENS.spacing.sidebarWidth).
+ *
+ * Design tokens: lib/design-tokens.ts
+ * Active state uses TOKENS.colors.accentViolet (#7B4FE8).
+ * Touch targets are minimum 44px (TOKENS.touchTarget).
+ */
+
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
+import { Home, BookMarked, Map, Plus, User, LogOut } from 'lucide-react'
 import { signOut } from '@/app/actions/auth'
+import Avatar from '@/components/Avatar'
 
 interface Props {
   username: string
+  avatarUrl?: string | null
   children: React.ReactNode
 }
 
-// ─── SVG icons ──────────────────────────────────────────────────────────────
-
-function HomeIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 12L12 3l9 9" />
-      <path d="M9 21V12h6v9" />
-      <path d="M5 10v11h14V10" />
-    </svg>
-  )
-}
-
-function ListIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z" />
-    </svg>
-  )
-}
-
-function PlanIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="4" width="18" height="18" rx="2" />
-      <path d="M16 2v4M8 2v4M3 10h18" />
-    </svg>
-  )
-}
-
-function SubmitIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 8v8M8 12h8" />
-    </svg>
-  )
-}
-
-function ProfileIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="8" r="4" />
-      <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-    </svg>
-  )
-}
-
-function SignOutIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
-      <polyline points="16 17 21 12 16 7" />
-      <line x1="21" y1="12" x2="9" y2="12" />
-    </svg>
-  )
-}
-
-// ─── Nav config ─────────────────────────────────────────────────────────────
+// ─── Nav config ──────────────────────────────────────────────────────────────
 
 const NAV_LINKS = [
-  { href: '/home',    label: 'Home',    Icon: HomeIcon },
-  { href: '/list',    label: 'List',    Icon: ListIcon },
-  { href: '/plan',    label: 'Plan',    Icon: PlanIcon },
-  { href: '/submit',  label: 'Submit',  Icon: SubmitIcon },
-  { href: '/profile', label: 'Profile', Icon: ProfileIcon },
+  { href: '/home',    label: 'Home',    Icon: Home },
+  { href: '/list',    label: 'List',    Icon: BookMarked },
+  { href: '/plan',    label: 'Plan',    Icon: Map },
+  { href: '/submit',  label: 'Submit',  Icon: Plus },
+  { href: '/profile', label: 'Profile', Icon: User },
 ]
 
-// ─── Component ──────────────────────────────────────────────────────────────
+// ─── Component ───────────────────────────────────────────────────────────────
 
-export default function AppShell({ username, children }: Props) {
+export default function AppShell({ username, avatarUrl, children }: Props) {
   const pathname = usePathname()
 
+  // Match first path segment so /plan/[tripId] still highlights Plan
   function isActive(href: string) {
-    return pathname === href || pathname.startsWith(href + '/')
+    const segment = '/' + (pathname.split('/')[1] ?? '')
+    return segment === href
   }
 
   return (
     <div className="min-h-screen bg-indigo-deep">
 
-      {/* ── Desktop sidebar ─────────────────────────────────────────────── */}
-      <aside className="hidden md:flex fixed inset-y-0 left-0 w-64 flex-col bg-indigo-deep border-r border-white/10 z-40">
+      {/* ── Desktop sidebar (lg+) ────────────────────────────────────────── */}
+      <aside className="hidden lg:flex fixed inset-y-0 left-0 w-[240px] flex-col z-40 bg-[#130f2a] border-r border-white/[0.07]">
 
-        {/* Logo */}
-        <div className="flex items-center gap-3 px-6 py-7 select-none">
+        {/* Wordmark */}
+        <div className="flex items-center gap-3 px-5 py-7 select-none shrink-0">
           <span className="text-2xl text-violet-accent">✦</span>
           <span className="font-syne text-xl font-bold text-white-soft tracking-tight">Someday</span>
         </div>
 
         {/* Nav links */}
-        <nav className="flex-1 px-3 space-y-1">
+        <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto">
           {NAV_LINKS.map(({ href, label, Icon }) => {
             const active = isActive(href)
             return (
               <Link
                 key={href}
                 href={href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                className={`flex items-center gap-3 h-12 px-5 w-full rounded-xl text-sm font-medium font-nunito transition-colors ${
                   active
-                    ? 'bg-violet-accent/15 text-violet-accent'
-                    : 'text-muted hover:text-white-soft hover:bg-white/5'
+                    ? 'bg-violet-accent text-white'
+                    : 'text-[#9b8fc4] hover:bg-white/[0.03] hover:text-white-soft'
                 }`}
               >
-                <Icon className="w-5 h-5 shrink-0" />
+                <Icon size={20} strokeWidth={1.75} className="shrink-0" />
                 {label}
-                {active && (
-                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-violet-accent" />
-                )}
               </Link>
             )
           })}
         </nav>
 
         {/* User + sign out */}
-        <div className="px-3 py-4 border-t border-white/10">
-          <div className="flex items-center gap-3 px-3 py-2 mb-1">
-            <div className="w-8 h-8 rounded-full bg-violet-accent/20 flex items-center justify-center shrink-0">
-              <span className="text-xs font-bold text-lavender uppercase">
-                {username.slice(0, 1)}
-              </span>
-            </div>
-            <span className="text-sm text-white-soft truncate">{username}</span>
+        <div className="px-3 py-4 border-t border-white/[0.07] shrink-0">
+          <div className="flex items-center gap-3 px-2 py-2 mb-1">
+            <Avatar avatarUrl={avatarUrl ?? null} username={username} size={32} />
+            <span className="text-sm text-white-soft truncate">@{username}</span>
           </div>
           <form action={signOut}>
             <button
               type="submit"
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-muted hover:text-white-soft hover:bg-white/5 transition-colors"
+              className="w-full flex items-center gap-3 h-12 px-5 rounded-xl text-sm text-[#9b8fc4] hover:text-white-soft hover:bg-white/[0.03] transition-colors font-nunito"
             >
-              <SignOutIcon className="w-5 h-5 shrink-0" />
+              <LogOut size={20} strokeWidth={1.75} className="shrink-0" />
               Sign out
             </button>
           </form>
@@ -144,32 +96,34 @@ export default function AppShell({ username, children }: Props) {
       </aside>
 
       {/* ── Main content ────────────────────────────────────────────────── */}
-      <div className="md:pl-64 pb-20 md:pb-0">
+      {/* pb-[64px] reserves space for the mobile bottom nav.
+          lg:pl-[240px] offsets the fixed sidebar on desktop. */}
+      <div className="lg:pl-[240px] pb-[64px] lg:pb-0">
         {children}
       </div>
 
-      {/* ── Mobile bottom tab bar ───────────────────────────────────────── */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-indigo-deep/95 backdrop-blur border-t border-white/10 z-40">
-        <div className="flex">
+      {/* ── Mobile bottom tab bar (below lg) ────────────────────────────── */}
+      {/* Height: 64px items + env(safe-area-inset-bottom) spacer. */}
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-50 bg-[#130f2a] border-t border-white/[0.07]">
+        <div className="flex h-16 items-stretch">
           {NAV_LINKS.map(({ href, label, Icon }) => {
             const active = isActive(href)
             return (
               <Link
                 key={href}
                 href={href}
-                className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs font-medium transition-colors ${
-                  active ? 'text-violet-accent' : 'text-muted'
+                className={`flex-1 flex flex-col items-center justify-center gap-1 min-h-[44px] transition-all active:scale-95 duration-150 ${
+                  active ? 'text-violet-accent' : 'text-[#9b8fc4]'
                 }`}
               >
-                <Icon className="w-5 h-5" />
-                <span>{label}</span>
-                {active && (
-                  <span className="absolute bottom-0 w-8 h-0.5 bg-violet-accent rounded-full" />
-                )}
+                <Icon size={24} strokeWidth={1.75} />
+                <span className="text-[10px] font-nunito font-medium leading-none">{label}</span>
               </Link>
             )
           })}
         </div>
+        {/* Safe-area spacer — extends the bar below the home indicator */}
+        <div className="h-[var(--sab)]" />
       </nav>
 
     </div>
