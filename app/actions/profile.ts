@@ -68,3 +68,19 @@ export async function updateProfile(
 
   return { changedFields }
 }
+
+export async function saveMapCityPreference(cityName: string): Promise<{ error?: string }> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({ map_city_preference: cityName })
+    .eq('id', user.id)
+
+  if (error) return { error: error.message }
+  return {}
+}

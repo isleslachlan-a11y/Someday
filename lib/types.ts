@@ -98,6 +98,9 @@ export interface Place {
   image_url: string | null
   image_keyword: string | null
   created_at: string
+  /** WGS-84 coordinates — null means no map pin rendered. */
+  lat: number | null
+  lng: number | null
 }
 
 export interface Event {
