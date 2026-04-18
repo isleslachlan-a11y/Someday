@@ -13,7 +13,7 @@
 
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { Home, BookMarked, Map, Plus, User, LogOut } from 'lucide-react'
+import { Home, BookMarked, Map, MapPin, User, LogOut } from 'lucide-react'
 import { signOut } from '@/app/actions/auth'
 import Avatar from '@/components/Avatar'
 
@@ -29,7 +29,7 @@ const NAV_LINKS = [
   { href: '/home',    label: 'Home',    Icon: Home },
   { href: '/list',    label: 'List',    Icon: BookMarked },
   { href: '/plan',    label: 'Plan',    Icon: Map },
-  { href: '/submit',  label: 'Submit',  Icon: Plus },
+  { href: '/map',     label: 'Map',     Icon: MapPin },
   { href: '/profile', label: 'Profile', Icon: User },
 ]
 

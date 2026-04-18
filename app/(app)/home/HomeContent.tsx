@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { Plus } from 'lucide-react'
 import toast from 'react-hot-toast'
 import Avatar from '@/components/Avatar'
 import HomeViewTracker from './HomeViewTracker'
@@ -76,9 +77,23 @@ export default function HomeContent({
         <span className="font-syne text-lg font-bold text-white-soft">
           <span className="text-violet-accent">✦</span> Someday
         </span>
-        <Link href="/profile" aria-label="Your profile">
-          <Avatar avatarUrl={profile.avatar_url} username={profile.username} size={32} />
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/submit"
+            aria-label="Submit a place"
+            className="flex items-center justify-center w-10 h-11 rounded-full"
+          >
+            <span
+              className="flex items-center justify-center w-10 h-10 rounded-full bg-violet-accent"
+              style={{ boxShadow: '0 4px 12px rgba(123,79,232,0.4)' }}
+            >
+              <Plus size={20} strokeWidth={2.5} className="text-white" />
+            </span>
+          </Link>
+          <Link href="/profile" aria-label="Your profile">
+            <Avatar avatarUrl={profile.avatar_url} username={profile.username} size={32} />
+          </Link>
+        </div>
       </header>
 
       <main className="min-h-screen bg-indigo-deep">
@@ -93,10 +108,24 @@ export default function HomeContent({
               </h1>
               <p className="text-muted text-sm mt-1">Discover your next someday.</p>
             </div>
-            {/* Avatar shown on desktop only — mobile has it in the sticky bar */}
-            <Link href="/profile" aria-label="Your profile" className="hidden md:block shrink-0 ml-4">
-              <Avatar avatarUrl={profile.avatar_url} username={profile.username} size={40} />
-            </Link>
+            {/* Avatar + submit button shown on desktop only — mobile has them in the sticky bar */}
+            <div className="hidden md:flex items-center gap-3 shrink-0 ml-4">
+              <Link
+                href="/submit"
+                aria-label="Submit a place"
+                className="flex items-center justify-center w-11 h-11 rounded-full"
+              >
+                <span
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-violet-accent"
+                  style={{ boxShadow: '0 4px 12px rgba(123,79,232,0.4)' }}
+                >
+                  <Plus size={20} strokeWidth={2.5} className="text-white" />
+                </span>
+              </Link>
+              <Link href="/profile" aria-label="Your profile">
+                <Avatar avatarUrl={profile.avatar_url} username={profile.username} size={40} />
+              </Link>
+            </div>
           </div>
 
           {!hasContent ? (
