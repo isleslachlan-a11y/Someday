@@ -1,6 +1,6 @@
 /**
  * Overlap utility — finds bucket list matches between the current user
- * and the people they follow.
+ * and their accepted friends.
  *
  * Server-only: uses the admin client to read other users' private
  * bucket_list_items (which are RLS-protected).
@@ -12,11 +12,15 @@
  * invalidation after a bucket list mutation, call revalidatePath('/plan')
  * in the relevant Server Action (already done in addPlaceToList /
  * removeFromList in bucketList.ts).
+ *
+ * Social graph source: friendships table (status = 'accepted').
+ * Replaces the old follows table — see migration 20260418200000_friendships.sql.
  */
 
 import { cache } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { getFriends } from '@/lib/friends'
 import type { Place, OverlapResult, OverlapProfile, PlaceOverlap, FriendOverlap } from '@/lib/types'
 
 export const getOverlaps = cache(async (userId: string): Promise<OverlapResult> => {
@@ -36,15 +40,12 @@ export const getOverlaps = cache(async (userId: string): Promise<OverlapResult> 
 
   const myPlaceIds = new Set(myItems.map(i => i.place_id as string))
 
-  // ── 2. People the current user follows ─────────────────────────────────────
-  const { data: follows } = await supabase
-    .from('follows')
-    .select('following_id')
-    .eq('follower_id', userId)
+  // ── 2. Accepted friends (replaces the old follows query) ───────────────────
+  const friends = await getFriends(userId)
 
-  if (!follows || follows.length === 0) return empty
+  if (friends.length === 0) return empty
 
-  const followingIds = follows.map(f => f.following_id as string)
+  const followingIds = friends.map(f => f.id)
 
   // ── 3. Followed users' active bucket items (admin bypasses RLS) ────────────
   const { data: friendItems } = await admin
