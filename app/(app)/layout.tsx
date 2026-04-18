@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getPendingRequests } from '@/lib/friends'
 import AppShell from '@/components/AppShell'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -23,14 +24,18 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     redirect('/onboarding')
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('username, avatar_url')
-    .eq('id', user.id)
-    .single()
+  const [profileResult, pendingRequests] = await Promise.all([
+    supabase.from('profiles').select('username, avatar_url').eq('id', user.id).single(),
+    getPendingRequests(user.id).catch(() => []),
+  ])
 
-  const username = profile?.username ?? user.email?.split('@')[0] ?? 'traveller'
-  const avatarUrl = (profile as { avatar_url?: string | null } | null)?.avatar_url ?? null
+  const username = profileResult.data?.username ?? user.email?.split('@')[0] ?? 'traveller'
+  const avatarUrl = (profileResult.data as { avatar_url?: string | null } | null)?.avatar_url ?? null
+  const pendingRequestCount = pendingRequests.length
 
-  return <AppShell username={username} avatarUrl={avatarUrl}>{children}</AppShell>
+  return (
+    <AppShell username={username} avatarUrl={avatarUrl} pendingRequestCount={pendingRequestCount}>
+      {children}
+    </AppShell>
+  )
 }

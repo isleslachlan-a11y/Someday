@@ -2,10 +2,12 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getFriends } from '@/lib/friends'
 import Avatar from '@/components/Avatar'
 import ProfileViewTracker from './ProfileViewTracker'
 import TravelProfileSection from './TravelProfileSection'
 import PastTripsSection from './PastTripsSection'
+import FriendsSheet from '@/components/friends/FriendsSheet'
 import type { UserProfile, BucketListStatus, PlaceSnap } from '@/lib/types'
 
 export const metadata: Metadata = {
@@ -48,7 +50,7 @@ export default async function ProfilePage() {
   if (!user) redirect('/login')
 
   // ── Parallel queries ────────────────────────────────────────────────────────
-  const [profileResult, itemsResult, contextResult, tripsResult] = await Promise.all([
+  const [profileResult, itemsResult, contextResult, tripsResult, friends] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', user.id).single(),
 
     supabase
@@ -71,6 +73,8 @@ export default async function ProfilePage() {
       .select('id, place_name, country, year')
       .eq('user_id', user.id)
       .order('year', { ascending: false, nullsFirst: false }),
+
+    getFriends(user.id).catch(() => [] as UserProfile[]),
   ])
 
   const profile = profileResult.data as UserProfile | null
@@ -98,26 +102,25 @@ export default async function ProfilePage() {
     })
   }
 
-  // Stats
-  const total = entries.length
-  const countries = new Set(entries.map(e => e.place.country).filter(Boolean)).size
-  const completed = entries.filter(e => e.status === 'completed').length
+  const friendCount = friends.length
+  const placeCount  = entries.length
+  const tripCount   = tripsResult.data?.length ?? 0
 
   const travelContext: UserContext | null = contextResult.data
     ? {
-        travel_style: (contextResult.data.travel_style as string[] | null) ?? null,
-        comfort_zone: (contextResult.data.comfort_zone as string | null) ?? null,
-        budget_range: (contextResult.data.budget_range as string | null) ?? null,
+        travel_style:     (contextResult.data.travel_style as string[] | null) ?? null,
+        comfort_zone:     (contextResult.data.comfort_zone as string | null) ?? null,
+        budget_range:     (contextResult.data.budget_range as string | null) ?? null,
         travel_frequency: (contextResult.data.travel_frequency as string | null) ?? null,
         group_preference: (contextResult.data.group_preference as string | null) ?? null,
       }
     : null
 
   const pastTrips: PastTrip[] = (tripsResult.data ?? []).map(t => ({
-    id: t.id as string,
+    id:         t.id as string,
     place_name: t.place_name as string,
-    country: (t.country as string | null) ?? null,
-    year: (t.year as number | null) ?? null,
+    country:    (t.country as string | null) ?? null,
+    year:       (t.year as number | null) ?? null,
   }))
 
   return (
@@ -127,7 +130,7 @@ export default async function ProfilePage() {
       <main className="min-h-screen bg-indigo-deep px-4 py-8">
         <div className="max-w-3xl mx-auto">
 
-          {/* ── Profile header (unchanged layout) ─────────────────────────── */}
+          {/* ── Profile header ────────────────────────────────────────────── */}
           <div className="flex items-start gap-5 mb-8">
             <Avatar avatarUrl={profile.avatar_url} username={profile.username ?? ''} size={80} />
             <div className="flex-1 min-w-0">
@@ -155,24 +158,37 @@ export default async function ProfilePage() {
             </Link>
           </div>
 
-          {/* ── Stats (updated for new schema) ──────────────────────────────── */}
+          {/* ── Quick stats — Friends · Places · Trips ───────────────────── */}
           <div className="grid grid-cols-3 gap-3 mb-8">
-            <StatCard value={total} label="Saved" accent="violet" />
-            <StatCard
-              value={countries}
-              label={countries === 1 ? 'Country' : 'Countries'}
-              accent="lavender"
-            />
-            <StatCard value={completed} label="Done" accent="pink" />
+            {/* Friends — opens FriendsSheet */}
+            <FriendsSheet initialFriendCount={friendCount} />
+
+            {/* Places — links to list */}
+            <Link
+              href="/list"
+              className="flex flex-col items-center gap-0.5 rounded-2xl border border-white/10 bg-white/5 px-4 py-5 text-center hover:border-violet-accent/30 hover:bg-white/[0.07] transition-colors"
+            >
+              <p className="font-syne text-3xl font-bold text-lavender">{placeCount}</p>
+              <p className="text-muted text-xs mt-1">Places</p>
+            </Link>
+
+            {/* Trips — links to plan */}
+            <Link
+              href="/plan"
+              className="flex flex-col items-center gap-0.5 rounded-2xl border border-white/10 bg-white/5 px-4 py-5 text-center hover:border-violet-accent/30 hover:bg-white/[0.07] transition-colors"
+            >
+              <p className="font-syne text-3xl font-bold text-pink-accent">{tripCount}</p>
+              <p className="text-muted text-xs mt-1">Trips</p>
+            </Link>
           </div>
 
-          {/* ── Travel Profile (new) ─────────────────────────────────────────── */}
+          {/* ── Travel Profile ────────────────────────────────────────────── */}
           <TravelProfileSection context={travelContext} />
 
-          {/* ── Past Trips (new) ─────────────────────────────────────────────── */}
+          {/* ── Past Trips ────────────────────────────────────────────────── */}
           <PastTripsSection trips={pastTrips} />
 
-          {/* ── Bucket list grid (updated schema) ───────────────────────────── */}
+          {/* ── Bucket list grid ──────────────────────────────────────────── */}
           <section>
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-syne text-lg font-bold text-white-soft">Your list</h2>
@@ -221,31 +237,7 @@ export default async function ProfilePage() {
   )
 }
 
-// ─── Stat card (unchanged) ─────────────────────────────────────────────────────
-
-function StatCard({
-  value,
-  label,
-  accent,
-}: {
-  value: number
-  label: string
-  accent: 'violet' | 'lavender' | 'pink'
-}) {
-  const colorMap = {
-    violet: 'text-violet-accent',
-    lavender: 'text-lavender',
-    pink: 'text-pink-accent',
-  }
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-5 text-center">
-      <p className={`font-syne text-3xl font-bold ${colorMap[accent]}`}>{value}</p>
-      <p className="text-muted text-xs mt-1">{label}</p>
-    </div>
-  )
-}
-
-// ─── Profile place card (replaces ProfileListItem) ────────────────────────────
+// ─── Profile place card ────────────────────────────────────────────────────────
 
 const TYPE_ICON: Record<string, string> = {
   city:       '🏙',

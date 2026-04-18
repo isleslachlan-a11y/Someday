@@ -20,6 +20,7 @@ import Avatar from '@/components/Avatar'
 interface Props {
   username: string
   avatarUrl?: string | null
+  pendingRequestCount?: number
   children: React.ReactNode
 }
 
@@ -35,7 +36,7 @@ const NAV_LINKS = [
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export default function AppShell({ username, avatarUrl, children }: Props) {
+export default function AppShell({ username, avatarUrl, pendingRequestCount = 0, children }: Props) {
   const pathname = usePathname()
 
   // Match first path segment so /plan/[tripId] still highlights Plan
@@ -60,17 +61,23 @@ export default function AppShell({ username, avatarUrl, children }: Props) {
         <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto">
           {NAV_LINKS.map(({ href, label, Icon }) => {
             const active = isActive(href)
+            const showBadge = href === '/profile' && pendingRequestCount > 0
             return (
               <Link
                 key={href}
                 href={href}
-                className={`flex items-center gap-3 h-12 px-5 w-full rounded-xl text-sm font-medium font-nunito transition-colors ${
+                className={`relative flex items-center gap-3 h-12 px-5 w-full rounded-xl text-sm font-medium font-nunito transition-colors ${
                   active
                     ? 'bg-violet-accent text-white'
                     : 'text-[#9b8fc4] hover:bg-white/[0.03] hover:text-white-soft'
                 }`}
               >
-                <Icon size={20} strokeWidth={1.75} className="shrink-0" />
+                <span className="relative shrink-0">
+                  <Icon size={20} strokeWidth={1.75} />
+                  {showBadge && (
+                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-pink-accent" />
+                  )}
+                </span>
                 {label}
               </Link>
             )
@@ -108,6 +115,7 @@ export default function AppShell({ username, avatarUrl, children }: Props) {
         <div className="flex h-16 items-stretch">
           {NAV_LINKS.map(({ href, label, Icon }) => {
             const active = isActive(href)
+            const showBadge = href === '/profile' && pendingRequestCount > 0
             return (
               <Link
                 key={href}
@@ -116,7 +124,12 @@ export default function AppShell({ username, avatarUrl, children }: Props) {
                   active ? 'text-violet-accent' : 'text-[#9b8fc4]'
                 }`}
               >
-                <Icon size={24} strokeWidth={1.75} />
+                <span className="relative">
+                  <Icon size={24} strokeWidth={1.75} />
+                  {showBadge && (
+                    <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-pink-accent border-2 border-[#130f2a]" />
+                  )}
+                </span>
                 <span className="text-[10px] font-nunito font-medium leading-none">{label}</span>
               </Link>
             )

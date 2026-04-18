@@ -3,9 +3,11 @@ import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getOverlaps } from '@/lib/overlaps'
+import { getFriendshipStatus } from '@/lib/friends'
 import Avatar from '@/components/Avatar'
 import ProfileViewTracker from '../ProfileViewTracker'
 import OverlapBanner from './OverlapBanner'
+import FriendshipButton from '@/components/friends/FriendshipButton'
 import type { UserProfile, BucketListStatus, PlaceSnap } from '@/lib/types'
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -51,18 +53,24 @@ export default async function PublicProfilePage({ params }: Props) {
 
   if (profile.id === user.id) redirect('/profile')
 
-  // ── Fetch their bucket list items (admin — bypasses owner-only RLS) ────────
-  const { data: itemsData } = await admin
-    .from('bucket_list_items')
-    .select(`
-      id, status,
-      places ( id, name, country, type, description, tags, vibes, intensity, image_keyword )
-    `)
-    .eq('user_id', profile.id)
-    .order('added_at', { ascending: false })
+  // ── Parallel: bucket list + friendship status + overlaps ───────────────────
+  const [itemsData, friendshipStatus, overlapsResult] = await Promise.all([
+    admin
+      .from('bucket_list_items')
+      .select(`
+        id, status,
+        places ( id, name, country, type, description, tags, vibes, intensity, image_keyword )
+      `)
+      .eq('user_id', profile.id)
+      .order('added_at', { ascending: false }),
+
+    getFriendshipStatus(user.id, profile.id).catch(() => 'none' as const),
+
+    getOverlaps(user.id).catch(() => ({ byPlace: {}, byFriend: {} } as import('@/lib/types').OverlapResult)),
+  ])
 
   const entries: BucketEntry[] = []
-  for (const row of itemsData ?? []) {
+  for (const row of itemsData.data ?? []) {
     const place = row.places as unknown as Record<string, unknown> | null
     if (!place) continue
     entries.push({
@@ -87,13 +95,10 @@ export default async function PublicProfilePage({ params }: Props) {
   const countries = new Set(entries.map(e => e.place.country).filter(Boolean)).size
   const completed = entries.filter(e => e.status === 'completed').length
 
-  // ── Overlap data (graceful — follows table may not yet exist) ──────────────
-  let sharedPlaces: PlaceSnap[] = []
-  try {
-    const overlaps = await getOverlaps(user.id)
-    const friendOverlap = overlaps.byFriend[profile.id]
-    if (friendOverlap) {
-      sharedPlaces = friendOverlap.matchingPlaces.map(p => ({
+  // ── Overlaps ───────────────────────────────────────────────────────────────
+  const friendOverlap = overlapsResult.byFriend[profile.id]
+  const sharedPlaces: PlaceSnap[] = friendOverlap
+    ? friendOverlap.matchingPlaces.map(p => ({
         id: p.id,
         name: p.name,
         country: p.country,
@@ -104,9 +109,23 @@ export default async function PublicProfilePage({ params }: Props) {
         intensity: p.intensity ?? null,
         image_keyword: p.image_keyword ?? null,
       }))
-    }
-  } catch {
-    // degrade gracefully
+    : []
+
+  // Friendship row — find the friendship ID for accepted/pending cases
+  // (needed by FriendshipButton for accept/decline actions on pending_received)
+  let friendshipId: string | null = null
+  if (friendshipStatus !== 'none' && friendshipStatus !== 'blocked') {
+    const { data: row } = await admin
+      .from('friendships')
+      .select('id')
+      .or(
+        `and(requester_id.eq.${user.id},addressee_id.eq.${profile.id}),` +
+        `and(requester_id.eq.${profile.id},addressee_id.eq.${user.id})`,
+      )
+      .neq('status', 'declined')
+      .limit(1)
+      .single()
+    friendshipId = (row as { id: string } | null)?.id ?? null
   }
 
   return (
@@ -120,8 +139,8 @@ export default async function PublicProfilePage({ params }: Props) {
       <main className="min-h-screen bg-indigo-deep px-4 py-8">
         <div className="max-w-3xl mx-auto">
 
-          {/* ── Profile header (unchanged layout) ─────────────────────────── */}
-          <div className="flex items-start gap-5 mb-8">
+          {/* ── Profile header ────────────────────────────────────────────── */}
+          <div className="flex items-start gap-5 mb-4">
             <Avatar avatarUrl={profile.avatar_url} username={profile.username ?? ''} size={80} />
             <div className="flex-1 min-w-0">
               <h1 className="font-syne text-2xl font-bold text-white-soft leading-tight">
@@ -142,7 +161,21 @@ export default async function PublicProfilePage({ params }: Props) {
             </div>
           </div>
 
-          {/* ── Stats (updated for new schema) ──────────────────────────────── */}
+          {/* ── Friendship action ─────────────────────────────────────────── */}
+          <div className="flex items-center gap-3 mb-6">
+            <FriendshipButton
+              initialStatus={friendshipStatus}
+              initialFriendshipId={friendshipId}
+              addresseeId={profile.id}
+            />
+            {sharedPlaces.length > 0 && (
+              <p className="text-sm text-lavender">
+                You both want to visit {sharedPlaces.length} place{sharedPlaces.length !== 1 ? 's' : ''}
+              </p>
+            )}
+          </div>
+
+          {/* ── Stats ─────────────────────────────────────────────────────── */}
           <div className="grid grid-cols-3 gap-3 mb-8">
             <StatCard value={total} label="Saved" accent="violet" />
             <StatCard
@@ -153,12 +186,16 @@ export default async function PublicProfilePage({ params }: Props) {
             <StatCard value={completed} label="Done" accent="pink" />
           </div>
 
-          {/* ── Overlap banner (new — only when following and overlaps exist) ─ */}
+          {/* ── Overlap banner ────────────────────────────────────────────── */}
           {sharedPlaces.length > 0 && (
-            <OverlapBanner places={sharedPlaces} username={profile.username ?? username} viewerUserId={user.id} />
+            <OverlapBanner
+              places={sharedPlaces}
+              username={profile.username ?? username}
+              viewerUserId={user.id}
+            />
           )}
 
-          {/* ── Bucket list grid (updated schema) ───────────────────────────── */}
+          {/* ── Bucket list grid ──────────────────────────────────────────── */}
           {entries.length === 0 ? (
             <div className="rounded-2xl border border-white/10 bg-white/5 px-6 py-16 text-center">
               <div className="text-4xl mb-3 select-none">✦</div>
@@ -166,7 +203,6 @@ export default async function PublicProfilePage({ params }: Props) {
             </div>
           ) : (
             <>
-              {/* Active (wishlist + planning) */}
               {entries.filter(e => e.status !== 'completed').length > 0 && (
                 <section className="mb-6">
                   <h2 className="font-syne text-base font-bold text-white-soft mb-3">
@@ -182,7 +218,6 @@ export default async function PublicProfilePage({ params }: Props) {
                 </section>
               )}
 
-              {/* Completed */}
               {entries.filter(e => e.status === 'completed').length > 0 && (
                 <section>
                   <h2 className="font-syne text-base font-bold text-white-soft mb-3">
@@ -218,9 +253,9 @@ function StatCard({
   accent: 'violet' | 'lavender' | 'pink'
 }) {
   const colorMap = {
-    violet: 'text-violet-accent',
+    violet:  'text-violet-accent',
     lavender: 'text-lavender',
-    pink: 'text-pink-accent',
+    pink:    'text-pink-accent',
   }
   return (
     <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-5 text-center">
