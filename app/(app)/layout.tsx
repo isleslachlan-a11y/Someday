@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getPendingRequests } from '@/lib/friends'
+import { getTripUnreadCount } from '@/lib/messaging'
 import AppShell from '@/components/AppShell'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -24,9 +25,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     redirect('/onboarding')
   }
 
-  const [profileResult, pendingRequests] = await Promise.all([
+  const [profileResult, pendingRequests, planUnreadCount] = await Promise.all([
     supabase.from('profiles').select('username, avatar_url').eq('id', user.id).single(),
     getPendingRequests(user.id).catch(() => []),
+    getTripUnreadCount(user.id).catch(() => 0),
   ])
 
   const username = profileResult.data?.username ?? user.email?.split('@')[0] ?? 'traveller'
@@ -34,7 +36,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const pendingRequestCount = pendingRequests.length
 
   return (
-    <AppShell username={username} avatarUrl={avatarUrl} pendingRequestCount={pendingRequestCount}>
+    <AppShell
+      username={username}
+      avatarUrl={avatarUrl}
+      pendingRequestCount={pendingRequestCount}
+      planUnreadCount={planUnreadCount}
+    >
       {children}
     </AppShell>
   )

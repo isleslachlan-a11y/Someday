@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getMessages } from '@/lib/messaging'
 import TripDetail from './TripDetail'
-import type { Trip, TripItem, PlaceSnap } from '@/lib/types'
+import type { Trip, TripItem, PlaceSnap, Message } from '@/lib/types'
 
 export const metadata: Metadata = {
   title: 'Trip',
@@ -10,10 +11,12 @@ export const metadata: Metadata = {
 
 interface Props {
   params: Promise<{ tripId: string }>
+  searchParams: Promise<{ tab?: string }>
 }
 
-export default async function TripDetailPage({ params }: Props) {
+export default async function TripDetailPage({ params, searchParams }: Props) {
   const { tripId } = await params
+  const { tab } = await searchParams
   const supabase = await createClient()
 
   const {
@@ -42,6 +45,7 @@ export default async function TripDetailPage({ params }: Props) {
     members: (tripData.members as string[]) ?? [],
     icon: (tripData.icon as string) ?? '✈️',
     created_at: tripData.created_at as string,
+    conversation_id: (tripData.conversation_id as string | null) ?? null,
   }
 
   // Verify membership (RLS already handles this, but redirect cleanly)
@@ -137,6 +141,18 @@ export default async function TripDetailPage({ params }: Props) {
     })
   }
 
+  // ── Initial chat messages ──────────────────────────────────────────────────
+  let initialMessages: Message[] = []
+  if (trip.conversation_id) {
+    try {
+      initialMessages = await getMessages(trip.conversation_id, 50)
+    } catch {
+      // Non-fatal
+    }
+  }
+
+  const initialTab = tab === 'chat' ? 'chat' : tab === 'map' ? 'map' : 'experiences'
+
   return (
     <main className="min-h-screen bg-indigo-deep px-4 py-8">
       <div className="max-w-3xl mx-auto">
@@ -146,6 +162,8 @@ export default async function TripDetailPage({ params }: Props) {
           memberProfiles={memberProfiles}
           myListPlaces={myListPlaces}
           userId={user.id}
+          initialMessages={initialMessages}
+          initialTab={initialTab as 'experiences' | 'chat' | 'map'}
         />
       </div>
     </main>

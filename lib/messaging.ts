@@ -419,6 +419,126 @@ export async function sendMessage(
   return { messageId: data.id as string }
 }
 
+// ─── createTripChat ───────────────────────────────────────────────────────────
+
+/**
+ * Create a 'trip' type conversation linked to a trip.
+ * Called automatically when a trip is created (or on-demand for existing trips).
+ */
+export async function createTripChat(
+  tripId: string,
+  title: string,
+  createdBy: string,
+  memberIds: string[],
+): Promise<{ conversationId: string; error?: string }> {
+  const admin = createAdminClient()
+
+  const { data: conv, error } = await admin
+    .from('conversations')
+    .insert({ type: 'trip', title: title.trim(), trip_id: tripId, created_by: createdBy })
+    .select('id')
+    .single()
+
+  if (error || !conv) {
+    return { conversationId: '', error: error?.message ?? 'Failed to create trip chat' }
+  }
+
+  const convId     = conv.id as string
+  const uniqueIds  = [...new Set([createdBy, ...memberIds])]
+
+  const { error: memberErr } = await admin
+    .from('conversation_members')
+    .insert(uniqueIds.map(uid => ({ conversation_id: convId, user_id: uid })))
+
+  if (memberErr) {
+    return { conversationId: '', error: memberErr.message }
+  }
+
+  return { conversationId: convId }
+}
+
+// ─── addMemberToTripChat ──────────────────────────────────────────────────────
+
+/**
+ * Add a new member to an existing trip conversation.
+ * Silently ignores duplicate-membership errors.
+ */
+export async function addMemberToTripChat(
+  conversationId: string,
+  userId: string,
+): Promise<{ error?: string }> {
+  const admin = createAdminClient()
+
+  const { error } = await admin
+    .from('conversation_members')
+    .insert({ conversation_id: conversationId, user_id: userId })
+
+  // 23505 = unique_violation — member already exists, safe to ignore
+  if (error && (error as { code?: string }).code !== '23505') {
+    return { error: error.message }
+  }
+
+  return {}
+}
+
+// ─── getTripUnreadCount ───────────────────────────────────────────────────────
+
+/**
+ * Returns the number of trip conversations that have unread messages for
+ * the given user. Used to drive the Plan nav badge.
+ */
+export async function getTripUnreadCount(userId: string): Promise<number> {
+  const admin = createAdminClient()
+
+  const { data: members } = await admin
+    .from('conversation_members')
+    .select('conversation_id, last_read_at')
+    .eq('user_id', userId)
+
+  if (!members || members.length === 0) return 0
+
+  const convIds = members.map(m => m.conversation_id as string)
+
+  const { data: tripConvs } = await admin
+    .from('conversations')
+    .select('id')
+    .eq('type', 'trip')
+    .in('id', convIds)
+
+  if (!tripConvs || tripConvs.length === 0) return 0
+
+  const tripConvIds = tripConvs.map(c => c.id as string)
+  const lastReadMap = new Map(
+    members
+      .filter(m => tripConvIds.includes(m.conversation_id as string))
+      .map(m => [m.conversation_id as string, m.last_read_at as string | null]),
+  )
+
+  const { data: latestMsgs } = await admin
+    .from('messages')
+    .select('conversation_id, created_at')
+    .in('conversation_id', tripConvIds)
+    .neq('sender_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(tripConvIds.length * 3)
+
+  if (!latestMsgs || latestMsgs.length === 0) return 0
+
+  const latestPerConv = new Map<string, string>()
+  for (const msg of latestMsgs) {
+    const cid = msg.conversation_id as string
+    if (!latestPerConv.has(cid)) latestPerConv.set(cid, msg.created_at as string)
+  }
+
+  let count = 0
+  for (const [convId, msgTime] of latestPerConv) {
+    const lastRead = lastReadMap.get(convId) ?? null
+    if (lastRead === null || msgTime > lastRead) count++
+  }
+
+  return count
+}
+
 // ─── markAsRead ───────────────────────────────────────────────────────────────
 
 /**

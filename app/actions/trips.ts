@@ -2,6 +2,8 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { createTripChat, addMemberToTripChat } from '@/lib/messaging'
 
 async function getAuthenticatedUser() {
   const supabase = await createClient()
@@ -43,17 +45,127 @@ export async function createTrip(data: CreateTripData): Promise<{ id?: string; e
 
   if (error) return { error: error.message }
 
+  const tripId = trip.id as string
+
+  // Auto-create a trip conversation
+  const { conversationId } = await createTripChat(tripId, data.title.trim(), user.id, [user.id])
+
+  if (conversationId) {
+    await supabase
+      .from('trips')
+      .update({ conversation_id: conversationId })
+      .eq('id', tripId)
+  }
+
   await supabase.from('events').insert({
     user_id: user.id,
     event_type: 'trip_created',
-    metadata: { trip_id: trip.id, destination: data.destination, member_count: 1 },
+    metadata: { trip_id: tripId, destination: data.destination, member_count: 1 },
     platform: 'web',
     app_version: process.env.NEXT_PUBLIC_APP_VERSION ?? '0.1.0',
     country_code: null,
   })
 
   revalidatePath('/plan')
-  return { id: trip.id as string }
+  return { id: tripId }
+}
+
+// ─── Create trip chat for existing trips ────────────────────────────────────
+
+export async function createTripChatAction(
+  tripId: string,
+): Promise<{ conversationId?: string; error?: string }> {
+  const { supabase, user } = await getAuthenticatedUser()
+
+  const { data: tripData, error: tripError } = await supabase
+    .from('trips')
+    .select('title, members, created_by, conversation_id')
+    .eq('id', tripId)
+    .single()
+
+  if (tripError || !tripData) return { error: 'Trip not found' }
+
+  // Already has a conversation
+  if (tripData.conversation_id) {
+    return { conversationId: tripData.conversation_id as string }
+  }
+
+  const members = (tripData.members as string[]) ?? []
+
+  const { conversationId, error } = await createTripChat(
+    tripId,
+    tripData.title as string,
+    user.id,
+    members,
+  )
+
+  if (error || !conversationId) return { error: error ?? 'Failed to create chat' }
+
+  await supabase
+    .from('trips')
+    .update({ conversation_id: conversationId })
+    .eq('id', tripId)
+
+  revalidatePath(`/plan/${tripId}`)
+  return { conversationId }
+}
+
+// ─── Add a member to a trip ──────────────────────────────────────────────────
+
+export async function addMemberToTripAction(
+  tripId: string,
+  friendId: string,
+): Promise<{ error?: string }> {
+  const { supabase, user } = await getAuthenticatedUser()
+
+  // RLS on trips (select) ensures the caller is already a member
+  const { data: tripData, error: tripError } = await supabase
+    .from('trips')
+    .select('members, conversation_id')
+    .eq('id', tripId)
+    .single()
+
+  if (tripError || !tripData) return { error: 'Trip not found' }
+
+  const members = (tripData.members as string[]) ?? []
+  if (members.includes(friendId)) return {}
+
+  const admin = createAdminClient()
+
+  // Update members array via admin (trips_owner_update only allows the creator)
+  const { error: updateError } = await admin
+    .from('trips')
+    .update({ members: [...members, friendId] })
+    .eq('id', tripId)
+
+  if (updateError) return { error: updateError.message }
+
+  // Get friend's display name for the system message
+  const { data: friendProfile } = await admin
+    .from('profiles')
+    .select('username')
+    .eq('id', friendId)
+    .single()
+
+  const displayName = (friendProfile?.username as string | null) ?? 'Someone'
+
+  // Wire into the trip conversation if it exists
+  const conversationId = tripData.conversation_id as string | null
+  if (conversationId) {
+    await addMemberToTripChat(conversationId, friendId)
+
+    // Send a trip_invite system message as the inviting user
+    await supabase.from('messages').insert({
+      conversation_id: conversationId,
+      sender_id: user.id,
+      content: `${displayName} was added to the trip ✦`,
+      message_type: 'trip_invite',
+      metadata: { invited_user_id: friendId, invited_display_name: displayName },
+    })
+  }
+
+  revalidatePath(`/plan/${tripId}`)
+  return {}
 }
 
 // ─── Add an item to a trip ───────────────────────────────────────────────────

@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-> **Product direction:** Someday is a curated-database travel planning app. All destinations come from the seeded `experiences` table (admin-populated — no UGC feed). Do not add social-feed or UGC features until directed.
+> **Product direction:** Someday is a curated-database travel planning app. All destinations come from the seeded `places` table (admin-populated — no UGC feed). Do not add social-feed or UGC features until directed.
 >
 > **Do not create new files if an existing file can be modified. Do not modify `.pbxproj` files.**
 
@@ -14,6 +14,11 @@ A travel bucket list app where users save experiences and track places they want
 
 > **Next.js version note:** Before writing Next.js-specific code, check `node_modules/next/dist/docs/` for the authoritative API reference.
 
+## Navigation Update (post-v1)
+- Bottom/sidebar nav is now: Home, List, Plan, Map, Profile
+- Submit tab removed from nav — replaced with + button top-right on Home page only
+- Submit functionality (submissions table, form) is preserved — just relocated
+
 ## Build & Run
 
 ```bash
@@ -22,7 +27,7 @@ npm run build     # Production build — fix all errors before committing
 npm run lint      # Run ESLint
 ```
 
-Seeding and data utilities live in `scripts/`: `seed-experiences.ts` (populates the experiences catalogue) and `check-events.ts` (validates event logging).
+Seeding and data utilities live in `scripts/`: `seed-experiences.ts` (populates the places catalogue) and `check-events.ts` (validates event logging).
 
 Run `npm run build` after significant changes and fix all errors before committing.
 
@@ -49,7 +54,11 @@ Run `npm run build` after significant changes and fix all errors before committi
 - `lib/supabase.ts` — legacy re-export; prefer importing from `client.ts` or `server.ts` directly.
 - `lib/events.ts` — `logEvent(userId, eventType, metadata)`. B2B data product foundation. Adds `platform`, `app_version`, and `country_code` automatically. Call on every meaningful user action.
 - `lib/analytics.ts` — server-side B2B read functions: `getTopDestinations`, `getCategoryBreakdown`, `getActiveUserCount`, `getConversionRate`. Service-role only — server-side.
-- `lib/types.ts` — shared TypeScript types: `BucketListItem`, `Experience`, `UserProfile`, `Event`, `ItemStatus`, and the `CATEGORIES` constant.
+- `lib/types.ts` — shared TypeScript types: `BucketListItem`, `Place`, `UserProfile`, `Event`, `ItemStatus`, `Trip`, `OverlapResult`, `Message`, `ConversationListItem`, `ConversationInfo`, `FriendshipStatus`, `PendingRequest`, and the `CATEGORIES` constant.
+- `lib/overlaps.ts` — `getOverlaps(userId)`: finds bucket list matches between the user and people they follow. Server-only (uses admin client). Wrapped with React `cache()` — one DB hit per render tree.
+- `lib/friends.ts` — `getFriends`, `getPendingRequests`, `getFriendshipStatus`, `searchUsers`, `sendFriendRequest`, `acceptFriendRequest`, `declineFriendRequest`. Server-only.
+- `lib/messaging.ts` — `getConversations`, `getConversationInfo`, `getOrCreateDM`, `createGroupChat`, `getMessages`, `sendMessage`, `markAsRead`. Server-only.
+- `lib/design-tokens.ts` — `TOKENS` object (colors, spacing, touchTarget). Reference before hardcoding any value.
 - `middleware.ts` — route protection; redirects unauthenticated users to `/login`.
 - `components/AppShell.tsx` — authenticated layout with desktop sidebar + mobile bottom tab bar.
 
@@ -61,15 +70,19 @@ app/
     home/         — dashboard with stats + recent items
     list/         — bucket list with filters; [id]/edit/ for editing
     list/new/     — add a new destination
+    map/          — city picker + Mapbox map with place pins (mapbox-gl / react-map-gl)
+    messages/     — conversation list; [conversationId]/ for realtime chat view
+    plan/         — trip planning; [tripId]/ for trip detail + group chat
+    submit/       — nominate a destination for the catalogue
     profile/      — own profile; [username]/ for public profiles; edit/
     admin/analytics/  — B2B analytics (gated by ADMIN_USER_ID)
   (auth)/         — public pages: login/, signup/
-  actions/        — Server Actions ('use server'): auth.ts, bucketList.ts, profile.ts, search.ts
+  onboarding/     — onboarding flow (outside (app) to avoid redirect loop)
+  actions/        — Server Actions ('use server'): auth.ts, bucketList.ts, friends.ts, messaging.ts, profile.ts, search.ts, trips.ts, submissions.ts, onboarding.ts
   page.tsx        — landing page (public)
 ```
 
-**Navigation (AppShell):** Home → My List → Explore → Profile  
-`/explore` is in the nav but not yet implemented.
+**Navigation (AppShell):** Home → List → Plan → Map → Profile (bottom bar mobile, left sidebar lg+). Profile icon shows badge for pending friend requests.
 
 Mutations use Server Actions (not API routes). On signup, always insert a row into `profiles` using the returned `user.id`.
 
@@ -79,6 +92,8 @@ Mutations use Server Actions (not API routes). On signup, always insert a row in
 
 **Server Action auth helper:** Every Server Action calls `getAuthenticatedUser()` (defined in `bucketList.ts`) which returns `{ supabase, user }` or throws if unauthenticated.
 
+**Onboarding gate:** `app/(app)/layout.tsx` checks `user_context.completed_onboarding` on every authenticated request and redirects to `/onboarding` if incomplete. `/onboarding` lives outside the `(app)` group to avoid a redirect loop.
+
 **ViewTracker components:** `HomeViewTracker` and `ProfileViewTracker` are thin `'use client'` components that fire `logEvent` in a `useEffect` on mount — used to log page_viewed events without making the whole page client-side.
 
 **Error states:** Pages return inline error UI (not thrown errors) when Supabase queries fail. `error.tsx` files handle unexpected errors per route segment.
@@ -87,21 +102,29 @@ Mutations use Server Actions (not API routes). On signup, always insert a row in
 
 | Table | Purpose | Status |
 |-------|---------|--------|
-| `profiles` | Public user profiles (extends `auth.users`) | Built |
-| `experiences` | Curated catalogue of destinations (admin-seeded) | Built |
-| `bucket_list_items` | A user's personal bucket list (user → experience) | Built |
+| `profiles` | Public user profiles (extends `auth.users`); includes `map_city_preference` | Built |
+| `places` | Curated catalogue of destinations (admin-seeded); includes `lat`, `lng`, vibes, intensity | Built |
+| `bucket_list_items` | A user's personal bucket list (user → place) | Built |
 | `events` | Every user action — feeds the B2B data product | Built |
+| `user_context` | Per-user flags: `completed_onboarding`, travel preferences | Built |
+| `trips` | Group trips; `members` is a `uuid[]` array; `created_by` is owner | Built |
+| `trip_items` | Places proposed for a trip | Built |
+| `trip_item_votes` | Member votes on trip destinations | Built |
+| `submissions` | User-nominated destinations pending admin review | Built |
+| `past_trips` | Self-reported travel history (country, year, notes) | Built |
+| `friendships` | Symmetric friend relationships; status: `pending`/`accepted`/`declined`/`blocked` | Built |
+| `conversations` | Chat rooms — DMs, group chats, and trip-linked chats | Built |
+| `conversation_members` | Membership + `last_read_at` per conversation | Built |
+| `messages` | Chat messages; realtime enabled | Built |
 | `posts` | Strava-style completion posts | Planned |
-| `follows` | Follow relationships | Planned |
-| `messages` | Direct messages | Planned |
 
-Migrations live in `supabase/migrations/`, numbered in run order (e.g. `003_profiles.sql`).
+Migrations live in `supabase/migrations/`. Key migrations: `003_profiles.sql`, `004_events_platform.sql`, `20260414120000_pivot_schema.sql` (places pivot), `20260414200000_trips_schema.sql`, `20260418_map_columns.sql`, `20260418200000_friendships.sql`, `20260421000000_messaging_schema.sql`.
 
 **Row Level Security:**
-- `profiles`, `posts` — public read, private write
-- `experiences` — public read, no user writes
-- `bucket_list_items`, `messages` — private read and write
-- `follows` — public read, private write
+- `profiles` — public read, private write
+- `places` — public read, no user writes
+- `bucket_list_items`, `conversations`, `conversation_members`, `messages` — private read and write
+- `friendships` — public read (accepted), private write
 - `events` — insert only for users, read via service role on backend
 
 ## Environment Variables
@@ -173,14 +196,16 @@ Tailwind CSS v4 is configured via `tailwind.config.ts` (loaded with `@config` in
 1. Environment setup + DB schema ✓
 2. Authentication ✓
 3. Bucket list (core value prop) ✓
-4. Experience database + seeding ✓
+4. Places database + seeding ✓
 5. Profile page ✓
-6. Creating a post (Strava-style)
-7. Home feed
-8. Follow system + messaging
-9. Navigation + polish
-10. B2B data pipeline + reporting endpoint
-11. Testing + launch
+6. Map tab (city view + place pins) ✓
+7. Friends system (discover, requests, profiles) ✓
+8. Messaging (DMs, group chats, trip chat, realtime) ✓
+9. Creating a post (Strava-style)
+10. Home feed
+11. Navigation + polish
+12. B2B data pipeline + reporting endpoint
+13. Testing + launch
 
 Do not build Experience Chains, Stamps, or Life Project Management until Phases 1–9 are solid.
 

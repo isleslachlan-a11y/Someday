@@ -21,6 +21,7 @@ interface Props {
   username: string
   avatarUrl?: string | null
   pendingRequestCount?: number
+  planUnreadCount?: number
   children: React.ReactNode
 }
 
@@ -36,7 +37,7 @@ const NAV_LINKS = [
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export default function AppShell({ username, avatarUrl, pendingRequestCount = 0, children }: Props) {
+export default function AppShell({ username, avatarUrl, pendingRequestCount = 0, planUnreadCount = 0, children }: Props) {
   const pathname = usePathname()
 
   // Match first path segment so /plan/[tripId] still highlights Plan
@@ -61,7 +62,9 @@ export default function AppShell({ username, avatarUrl, pendingRequestCount = 0,
         <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto">
           {NAV_LINKS.map(({ href, label, Icon }) => {
             const active = isActive(href)
-            const showBadge = href === '/profile' && pendingRequestCount > 0
+            const showBadge =
+              (href === '/profile' && pendingRequestCount > 0) ||
+              (href === '/plan' && planUnreadCount > 0)
             return (
               <Link
                 key={href}
@@ -115,7 +118,9 @@ export default function AppShell({ username, avatarUrl, pendingRequestCount = 0,
         <div className="flex h-16 items-stretch">
           {NAV_LINKS.map(({ href, label, Icon }) => {
             const active = isActive(href)
-            const showBadge = href === '/profile' && pendingRequestCount > 0
+            const showBadge =
+              (href === '/profile' && pendingRequestCount > 0) ||
+              (href === '/plan' && planUnreadCount > 0)
             return (
               <Link
                 key={href}

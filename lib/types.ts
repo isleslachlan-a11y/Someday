@@ -128,6 +128,7 @@ export interface Trip {
   members: string[]
   icon: string
   created_at: string
+  conversation_id: string | null
 }
 
 export interface TripItem {

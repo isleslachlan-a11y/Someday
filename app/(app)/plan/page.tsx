@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getOverlaps } from '@/lib/overlaps'
+import { getConversations } from '@/lib/messaging'
 import PlanContent from './PlanContent'
 import type { Trip, OverlapResult } from '@/lib/types'
 
@@ -37,6 +38,7 @@ export default async function PlanPage() {
     members: (t.members as string[]) ?? [],
     icon: (t.icon as string) ?? '✈️',
     created_at: t.created_at as string,
+    conversation_id: (t.conversation_id as string | null) ?? null,
   }))
 
   // ── Overlap data (STATE A: no trips) — always fetch for seamless transition ──
@@ -45,6 +47,19 @@ export default async function PlanPage() {
     overlaps = await getOverlaps(user.id)
   } catch {
     // follows table may not exist yet — degrade gracefully
+  }
+
+  // ── Unread counts for trip conversations ──────────────────────────────────
+  let tripUnreadMap: Record<string, number> = {}
+  try {
+    const conversations = await getConversations(user.id)
+    for (const conv of conversations) {
+      if (conv.type === 'trip' && conv.trip_id && conv.unread_count > 0) {
+        tripUnreadMap[conv.trip_id] = conv.unread_count
+      }
+    }
+  } catch {
+    // Non-fatal
   }
 
   // ── Member profiles for trip cards ────────────────────────────────────────
@@ -73,6 +88,7 @@ export default async function PlanPage() {
           overlaps={overlaps}
           memberProfiles={memberProfiles}
           userId={user.id}
+          tripUnreadMap={tripUnreadMap}
         />
       </div>
     </main>

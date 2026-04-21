@@ -15,11 +15,12 @@ interface Props {
   overlaps: OverlapResult
   memberProfiles: Record<string, { username: string; avatar_url: string | null }>
   userId: string
+  tripUnreadMap: Record<string, number>
 }
 
 // ─── Root ────────────────────────────────────────────────────────────────────
 
-export default function PlanContent({ trips, overlaps, memberProfiles, userId }: Props) {
+export default function PlanContent({ trips, overlaps, memberProfiles, userId, tripUnreadMap }: Props) {
   const [showCreate, setShowCreate] = useState(false)
 
   // Log overlap_viewed when user lands on Plan page with active overlaps
@@ -63,6 +64,7 @@ export default function PlanContent({ trips, overlaps, memberProfiles, userId }:
           trips={trips}
           memberProfiles={memberProfiles}
           overlaps={overlaps}
+          tripUnreadMap={tripUnreadMap}
           onCreateTrip={() => setShowCreate(true)}
         />
       )}
@@ -379,11 +381,13 @@ function TripListState({
   trips,
   memberProfiles,
   overlaps,
+  tripUnreadMap,
   onCreateTrip,
 }: {
   trips: Trip[]
   memberProfiles: Record<string, { username: string; avatar_url: string | null }>
   overlaps: OverlapResult
+  tripUnreadMap: Record<string, number>
   onCreateTrip: () => void
 }) {
   const hasOverlaps = Object.keys(overlaps.byPlace).length > 0
@@ -393,7 +397,12 @@ function TripListState({
       {/* Trip cards */}
       <div className="space-y-4 mb-8">
         {trips.map(trip => (
-          <TripCard key={trip.id} trip={trip} memberProfiles={memberProfiles} />
+          <TripCard
+            key={trip.id}
+            trip={trip}
+            memberProfiles={memberProfiles}
+            unreadCount={tripUnreadMap[trip.id] ?? 0}
+          />
         ))}
       </div>
 
@@ -427,9 +436,11 @@ function TripListState({
 function TripCard({
   trip,
   memberProfiles,
+  unreadCount = 0,
 }: {
   trip: Trip
   memberProfiles: Record<string, { username: string; avatar_url: string | null }>
+  unreadCount?: number
 }) {
   const router = useRouter()
 
@@ -475,6 +486,9 @@ function TripCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
             <h3 className="font-syne font-bold text-white-soft leading-snug">{trip.title}</h3>
+            {unreadCount > 0 && (
+              <span className="w-2 h-2 rounded-full bg-pink-accent shrink-0" aria-label="Unread messages" />
+            )}
             {countdown && (
               <span className="rounded-full bg-pink-accent/10 border border-pink-accent/20 px-2 py-0.5 text-xs font-semibold text-pink-accent whitespace-nowrap">
                 {countdown}
@@ -552,7 +566,7 @@ function CreateTripSheet({ onClose }: { onClose: () => void }) {
 
       toast.success('Trip created!')
       onClose()
-      if (result.id) router.push(`/plan/${result.id}`)
+      if (result.id) router.push(`/plan/${result.id}?tab=chat`)
     })
   }
 
