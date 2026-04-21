@@ -19,7 +19,8 @@ import {
   useTransition,
 } from 'react'
 import Link from 'next/link'
-import { X, Search, Users, UserPlus, Compass } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { X, Search, Users, UserPlus, Compass, MessageCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
 import Avatar from '@/components/Avatar'
 import FriendshipButton from '@/components/friends/FriendshipButton'
@@ -32,6 +33,7 @@ import {
   acceptFriendRequestAction,
   declineFriendRequestAction,
 } from '@/app/actions/friends'
+import { getOrCreateDMAction } from '@/app/actions/messaging'
 import type { UserProfile } from '@/lib/types'
 import type { PendingRequest, UserSearchResult, FriendshipStatus } from '@/lib/friends'
 
@@ -45,6 +47,7 @@ interface Props {
 export default function FriendsSheet({ initialFriendCount }: Props) {
   const [isOpen, setIsOpen]       = useState(false)
   const [activeTab, setActiveTab] = useState<Tab>('friends')
+  const router                    = useRouter()
 
   // Friends tab
   const [friends, setFriends]           = useState<UserProfile[] | null>(null)
@@ -268,6 +271,12 @@ export default function FriendsSheet({ initialFriendCount }: Props) {
                   friends={friends}
                   overlapCounts={overlapCounts}
                   isLoading={friends === null}
+                  onMessage={async (friendId) => {
+                    const { conversationId, error } = await getOrCreateDMAction(friendId)
+                    if (error || !conversationId) { toast.error(error ?? 'Could not open chat'); return }
+                    setIsOpen(false)
+                    router.push(`/messages/${conversationId}`)
+                  }}
                 />
               )}
               {activeTab === 'requests' && (
@@ -302,11 +311,15 @@ function FriendsTab({
   friends,
   overlapCounts,
   isLoading,
+  onMessage,
 }: {
   friends: UserProfile[] | null
   overlapCounts: Record<string, number>
   isLoading: boolean
+  onMessage: (friendId: string) => Promise<void>
 }) {
+  const [messaging, setMessaging] = useState<string | null>(null)
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-16">
@@ -330,26 +343,42 @@ function FriendsTab({
       {friends.map(friend => {
         const count = overlapCounts[friend.id] ?? 0
         return (
-          <Link
-            key={friend.id}
-            href={`/profile/${friend.username}`}
-            className="flex items-center gap-3 px-5 py-4 hover:bg-white/[0.03] transition-colors"
-          >
-            <Avatar avatarUrl={friend.avatar_url} username={friend.username ?? ''} size={40} />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-white-soft truncate">
-                @{friend.username ?? 'unknown'}
-              </p>
-              {count > 0 ? (
-                <p className="text-xs text-lavender mt-0.5">
-                  {count} place{count !== 1 ? 's' : ''} in common
+          <div key={friend.id} className="flex items-center gap-3 px-5 py-4">
+            <Link
+              href={`/profile/${friend.username}`}
+              className="flex items-center gap-3 flex-1 min-w-0 hover:opacity-80 transition-opacity"
+            >
+              <Avatar avatarUrl={friend.avatar_url} username={friend.username ?? ''} size={40} />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-white-soft truncate">
+                  @{friend.username ?? 'unknown'}
                 </p>
-              ) : (
-                <p className="text-xs text-muted mt-0.5">No overlaps yet</p>
-              )}
-            </div>
-            <span className="text-muted text-sm shrink-0">›</span>
-          </Link>
+                {count > 0 ? (
+                  <p className="text-xs text-lavender mt-0.5">
+                    {count} place{count !== 1 ? 's' : ''} in common
+                  </p>
+                ) : (
+                  <p className="text-xs text-muted mt-0.5">No overlaps yet</p>
+                )}
+              </div>
+            </Link>
+            {/* Message icon button */}
+            <button
+              onClick={async () => {
+                setMessaging(friend.id)
+                await onMessage(friend.id)
+                setMessaging(null)
+              }}
+              disabled={messaging === friend.id}
+              aria-label={`Message @${friend.username}`}
+              className="flex items-center justify-center w-9 h-9 rounded-full border border-white/15 text-muted hover:text-white-soft hover:border-white/30 transition-colors disabled:opacity-40 shrink-0"
+            >
+              {messaging === friend.id
+                ? <div className="w-4 h-4 border-2 border-violet-accent/30 border-t-violet-accent rounded-full animate-spin" />
+                : <MessageCircle size={16} />
+              }
+            </button>
+          </div>
         )
       })}
     </div>

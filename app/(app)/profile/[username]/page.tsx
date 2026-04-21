@@ -8,6 +8,7 @@ import Avatar from '@/components/Avatar'
 import ProfileViewTracker from '../ProfileViewTracker'
 import OverlapBanner from './OverlapBanner'
 import FriendshipButton from '@/components/friends/FriendshipButton'
+import MessageButton from './MessageButton'
 import type { UserProfile, BucketListStatus, PlaceSnap } from '@/lib/types'
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -162,12 +163,15 @@ export default async function PublicProfilePage({ params }: Props) {
           </div>
 
           {/* ── Friendship action ─────────────────────────────────────────── */}
-          <div className="flex items-center gap-3 mb-6">
+          <div className="flex items-center gap-3 mb-6 flex-wrap">
             <FriendshipButton
               initialStatus={friendshipStatus}
               initialFriendshipId={friendshipId}
               addresseeId={profile.id}
             />
+            {friendshipStatus === 'accepted' && (
+              <MessageButton friendId={profile.id} />
+            )}
             {sharedPlaces.length > 0 && (
               <p className="text-sm text-lavender">
                 You both want to visit {sharedPlaces.length} place{sharedPlaces.length !== 1 ? 's' : ''}

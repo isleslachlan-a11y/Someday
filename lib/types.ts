@@ -171,3 +171,46 @@ export interface OverlapResult {
   byPlace: Record<string, PlaceOverlap>
   byFriend: Record<string, FriendOverlap>
 }
+
+// ─── Messaging ────────────────────────────────────────────────────────────────
+
+export interface Message {
+  id: string
+  conversation_id: string
+  sender_id: string
+  content: string
+  message_type: 'text' | 'place' | 'trip_invite'
+  metadata: Record<string, unknown> | null
+  created_at: string
+  edited_at: string | null
+  sender: {
+    username: string | null
+    avatar_url: string | null
+  }
+}
+
+export interface ConversationListItem {
+  id: string
+  type: 'dm' | 'group' | 'trip'
+  title: string | null
+  trip_id: string | null
+  /** The other participant — set for DMs only. */
+  other_user: { id: string; username: string | null; avatar_url: string | null } | null
+  last_message: {
+    content: string
+    created_at: string
+    sender_id: string
+    message_type: string
+  } | null
+  /** 1 if there is at least one unread message, 0 otherwise. */
+  unread_count: number
+  updated_at: string
+}
+
+export interface ConversationInfo {
+  id: string
+  type: 'dm' | 'group' | 'trip'
+  title: string | null
+  trip_id: string | null
+  other_user: { id: string; username: string | null; avatar_url: string | null } | null
+}
