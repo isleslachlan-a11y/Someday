@@ -36,6 +36,8 @@ export default async function ListPage() {
         target_date,
         notes,
         status,
+        completed_at,
+        completion_note,
         places (
           id,
           name,
@@ -73,6 +75,8 @@ export default async function ListPage() {
         target_date: (row.target_date as string | null) ?? null,
         notes: (row.notes as string | null) ?? null,
         status: (row.status as BucketListStatus) ?? 'wishlist',
+        completed_at: (row.completed_at as string | null) ?? null,
+        completion_note: (row.completion_note as string | null) ?? null,
         place: {
           id: place.id as string,
           name: place.name as string,

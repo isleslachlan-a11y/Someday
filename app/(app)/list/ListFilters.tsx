@@ -190,7 +190,13 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
 
   async function handleSave(
     id: string,
-    data: { status: BucketListStatus; target_date: string | null; notes: string | null }
+    data: {
+      status: BucketListStatus
+      target_date: string | null
+      notes: string | null
+      completed_at?: string | null
+      completion_note?: string | null
+    }
   ) {
     const snapshot = entries
     setEntries(prev => prev.map(e => (e.id === id ? { ...e, ...data } : e)))
@@ -383,29 +389,45 @@ function ListItemSheet({
   onClose: () => void
   onSave: (
     id: string,
-    data: { status: BucketListStatus; target_date: string | null; notes: string | null }
+    data: {
+      status: BucketListStatus
+      target_date: string | null
+      notes: string | null
+      completed_at?: string | null
+      completion_note?: string | null
+    }
   ) => Promise<void>
   onRemove: (id: string) => Promise<void>
 }) {
   const [form, setForm] = useState({
     status: entry.status,
-    target_date: entry.target_date ? entry.target_date.slice(0, 7) : '', // YYYY-MM for month input
+    target_date: entry.target_date ? entry.target_date.slice(0, 7) : '',
     notes: entry.notes ?? '',
   })
+  const [completionNote, setCompletionNote] = useState('')
   const [saving, setSaving] = useState(false)
   const [removing, setRemoving] = useState(false)
   const [confirmRemove, setConfirmRemove] = useState(false)
+
+  // Show prompt when status first moves to 'completed' and it wasn't already completed
+  const showCompletionPrompt =
+    form.status === 'completed' && entry.status !== 'completed'
 
   function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm(prev => ({ ...prev, [key]: value }))
   }
 
-  async function handleSave() {
+  async function handleSave(note?: string | null) {
     setSaving(true)
+    const isNewCompletion = form.status === 'completed' && entry.status !== 'completed'
     await onSave(entry.id, {
       status: form.status,
       target_date: form.target_date ? `${form.target_date}-01` : null,
       notes: form.notes.trim() || null,
+      ...(isNewCompletion ? {
+        completed_at: new Date().toISOString(),
+        completion_note: note ?? null,
+      } : {}),
     })
     setSaving(false)
   }
@@ -530,6 +552,41 @@ function ListItemSheet({
               </div>
             </div>
 
+            {/* Completion prompt — shown when status first moves to completed */}
+            {showCompletionPrompt && (
+              <div className="rounded-2xl border border-pink-accent/20 bg-pink-accent/5 p-4">
+                <p className="font-syne font-bold text-white-soft text-sm mb-1">
+                  You did it. ✦
+                </p>
+                <p className="text-xs text-muted mb-3">
+                  Add a note? (optional)
+                </p>
+                <textarea
+                  rows={2}
+                  value={completionNote}
+                  onChange={e => setCompletionNote(e.target.value)}
+                  placeholder="How was it? Any tips for friends…"
+                  className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white-soft placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-pink-accent transition resize-none mb-3"
+                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleSave(completionNote.trim() || null)}
+                    disabled={saving}
+                    className="flex-1 rounded-xl bg-pink-accent/20 hover:bg-pink-accent/30 border border-pink-accent/30 py-2.5 text-sm font-semibold text-pink-accent transition-colors disabled:opacity-50"
+                  >
+                    {saving ? 'Saving…' : 'Save'}
+                  </button>
+                  <button
+                    onClick={() => handleSave(null)}
+                    disabled={saving}
+                    className="flex-1 rounded-xl border border-white/10 py-2.5 text-sm text-muted hover:text-white-soft transition-colors disabled:opacity-50"
+                  >
+                    Skip
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Target date */}
             <div>
               <label className="block text-xs font-semibold text-muted uppercase tracking-wider mb-2">
@@ -568,14 +625,16 @@ function ListItemSheet({
               />
             </div>
 
-            {/* Save */}
-            <button
-              onClick={handleSave}
-              disabled={saving || removing}
-              className="w-full rounded-xl bg-violet-accent hover:bg-violet-accent/90 disabled:opacity-50 py-3.5 font-syne font-semibold text-white-soft text-sm transition-all active:scale-[0.98]"
-            >
-              {saving ? 'Saving…' : 'Save changes'}
-            </button>
+            {/* Save — hidden when completion prompt is showing (it has its own Save/Skip) */}
+            {!showCompletionPrompt && (
+              <button
+                onClick={() => handleSave()}
+                disabled={saving || removing}
+                className="w-full rounded-xl bg-violet-accent hover:bg-violet-accent/90 disabled:opacity-50 py-3.5 font-syne font-semibold text-white-soft text-sm transition-all active:scale-[0.98]"
+              >
+                {saving ? 'Saving…' : 'Save changes'}
+              </button>
+            )}
 
             {/* Remove */}
             <div className="pt-2 border-t border-white/10">

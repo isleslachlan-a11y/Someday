@@ -151,6 +151,8 @@ export async function updateListEntry(
     status?: string
     target_date?: string | null
     notes?: string | null
+    completed_at?: string | null
+    completion_note?: string | null
   }
 ): Promise<{ error?: string }> {
   const { supabase, user } = await getAuthenticatedUser()
@@ -163,12 +165,20 @@ export async function updateListEntry(
 
   if (error) return { error: error.message }
 
-  await logEvent(supabase, user.id, 'item_updated', {
-    item_id: entryId,
-    fields: Object.keys(updates),
-  })
+  if (updates.status === 'completed') {
+    await logEvent(supabase, user.id, 'item_status_toggled', {
+      item_id: entryId,
+      new_status: 'completed',
+    })
+  } else {
+    await logEvent(supabase, user.id, 'item_updated', {
+      item_id: entryId,
+      fields: Object.keys(updates),
+    })
+  }
 
   revalidatePath('/list')
+  revalidatePath('/home')
   return {}
 }
 

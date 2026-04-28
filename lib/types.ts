@@ -72,6 +72,8 @@ export interface ListEntry {
   target_date: string | null
   notes: string | null
   status: BucketListStatus
+  completed_at: string | null
+  completion_note: string | null
   place: PlaceSnap
 }
 
@@ -207,6 +209,49 @@ export interface ConversationListItem {
   unread_count: number
   updated_at: string
 }
+
+// ─── Feed ─────────────────────────────────────────────────────────────────────
+
+export interface PromoPost {
+  id: string
+  title: string
+  body: string | null
+  image_url: string | null
+  cta_label: string | null
+  cta_url: string | null
+  place_id: string | null
+  created_at: string
+}
+
+export interface FriendActivity {
+  id: string
+  user_id: string
+  place_id: string
+  completed_at: string
+  completion_note: string | null
+  profile: {
+    id: string
+    username: string
+    avatar_url: string | null
+  }
+  place: Place
+}
+
+export interface StoryUser {
+  id: string
+  username: string
+  avatar_url: string | null
+  hasUnread: boolean
+}
+
+export type FeedItem =
+  | { type: 'daily_highlight'; data: Place }
+  | { type: 'place';           data: Place }
+  | { type: 'friend_activity'; data: FriendActivity }
+  | { type: 'overlap';         data: PlaceOverlap }
+  | { type: 'promotional';     data: PromoPost }
+
+// ─── Messaging ────────────────────────────────────────────────────────────────
 
 export interface ConversationInfo {
   id: string
