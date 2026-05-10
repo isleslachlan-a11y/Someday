@@ -54,12 +54,12 @@ export default async function HomePage() {
           .select('*')
           .not('id', 'in', `(${excludeIds.join(',')})`)
           .order('popularity', { ascending: false })
-          .limit(4)
+          .limit(12)
       : await supabase
           .from('places')
           .select('*')
           .order('popularity', { ascending: false })
-          .limit(4)
+          .limit(12)
 
   const gridPlaces = (gridData ?? []) as Place[]
 

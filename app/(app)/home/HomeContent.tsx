@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
@@ -40,7 +40,7 @@ function GridSkeleton() {
         <div
           key={i}
           className="rounded-2xl animate-pulse"
-          style={{ height: 160, background: '#fcd99a40' }}
+          style={{ height: 260, background: '#fcd99a40' }}
         />
       ))}
     </div>
@@ -75,10 +75,52 @@ export default function HomeContent({
   const [bucketPlaceIds, setBucketPlaceIds] = useState<string[]>(initialBucketPlaceIds)
   const [searchQuery, setSearchQuery] = useState('')
 
+  // ── Infinite scroll state ─────────────────────────────────────────────────
+  const [allGridPlaces, setAllGridPlaces] = useState<Place[]>(gridPlaces)
+  const [page, setPage] = useState(0)
+  const [hasMore, setHasMore] = useState(gridPlaces.length === 12)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const sentinelRef = useRef<HTMLDivElement>(null)
+
   // Page view
   useEffect(() => {
     logEvent(userId, 'page_viewed', { page: 'home' })
   }, [userId])
+
+  // ── Load more ─────────────────────────────────────────────────────────────
+
+  async function loadMore() {
+    if (loadingMore || !hasMore) return
+    setLoadingMore(true)
+    try {
+      const offset = (page + 1) * 12
+      const params = new URLSearchParams({ offset: String(offset) })
+      if (heroPlace?.id) params.set('excludeHeroId', heroPlace.id)
+      const res = await fetch(`/api/places/feed?${params}`)
+      const json = await res.json()
+      const newPlaces: Place[] = json.places ?? []
+      setAllGridPlaces(prev => [...prev, ...newPlaces])
+      setPage(p => p + 1)
+      setHasMore(newPlaces.length === 12)
+    } catch {
+      toast.error('Couldn\'t load more places.')
+    } finally {
+      setLoadingMore(false)
+    }
+  }
+
+  // ── Intersection observer for infinite scroll ─────────────────────────────
+
+  useEffect(() => {
+    const el = sentinelRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      entries => { if (entries[0].isIntersecting) loadMore() },
+      { threshold: 0.1 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [page, hasMore, loadingMore]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Save handlers ─────────────────────────────────────────────────────────
 
@@ -201,7 +243,7 @@ export default function HomeContent({
           <HeroSkeleton />
         )}
 
-        {/* Bucket list grid */}
+        {/* Bucket list section */}
         <div className="mt-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-syne font-bold text-[#131936] text-[18px]">For your bucket list</h2>
@@ -210,23 +252,44 @@ export default function HomeContent({
             </Link>
           </div>
 
-          {gridPlaces.length > 0 ? (
-            <div className="grid grid-cols-2 gap-3">
-              {gridPlaces.slice(0, 4).map((place, index) => (
-                <HomePlaceCard
-                  key={place.id}
-                  place={place}
-                  isAdded={bucketPlaceIds.includes(place.id)}
-                  onAdd={() => handleAdd(place.id, 'home_grid')}
-                  onRemove={() => handleRemove(place.id, 'home_grid')}
-                  index={index}
-                />
-              ))}
-            </div>
-          ) : gridPlaces.length === 0 && heroPlace !== null ? (
-            <EmptyState />
-          ) : (
+          {allGridPlaces.length > 0 ? (
+            <>
+              <div className="grid grid-cols-2 gap-3">
+                {allGridPlaces.map((place, index) => (
+                  <HomePlaceCard
+                    key={place.id}
+                    place={place}
+                    isAdded={bucketPlaceIds.includes(place.id)}
+                    onAdd={() => handleAdd(place.id, 'home_grid')}
+                    onRemove={() => handleRemove(place.id, 'home_grid')}
+                    index={index % 4}
+                  />
+                ))}
+              </div>
+
+              {/* Sentinel — triggers next page load */}
+              {hasMore && (
+                <div ref={sentinelRef} className="h-8" />
+              )}
+
+              {/* Loading spinner */}
+              {loadingMore && (
+                <div className="flex justify-center py-4">
+                  <div className="w-5 h-5 rounded-full border-2 border-[#f08c21] border-t-transparent animate-spin" />
+                </div>
+              )}
+
+              {/* End of feed */}
+              {!hasMore && allGridPlaces.length > 0 && (
+                <p className="text-center font-nunito text-[#131936]/40 text-[12px] py-6">
+                  You&apos;ve seen it all ✦
+                </p>
+              )}
+            </>
+          ) : !heroPlace ? (
             <GridSkeleton />
+          ) : (
+            <EmptyState />
           )}
         </div>
 
