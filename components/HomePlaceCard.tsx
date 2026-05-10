@@ -29,7 +29,7 @@ export default function HomePlaceCard({ place, isAdded, onAdd, onRemove, index }
   return (
     <div
       className="relative rounded-2xl overflow-hidden"
-      style={{ height: 160, background: dark ? '#131936' : '#fcd99a' }}
+      style={{ height: 260, background: dark ? '#131936' : '#fcd99a' }}
     >
       {/* Card body navigation */}
       <Link
@@ -38,19 +38,20 @@ export default function HomePlaceCard({ place, isAdded, onAdd, onRemove, index }
         aria-label={`View ${place.name}`}
       />
 
-      {/* Save button */}
-      <button
-        onClick={isAdded ? onRemove : onAdd}
-        className="absolute top-2.5 right-2.5 z-10 w-8 h-8 rounded-full bg-white flex items-center justify-center"
-        aria-label={isAdded ? 'Remove from list' : 'Save to list'}
-        style={{ minWidth: 44, minHeight: 44, margin: -8 }}
-      >
-        <Heart
-          size={14}
-          className={isAdded ? 'text-[#f08c21]' : 'text-[#131936]'}
-          fill={isAdded ? '#f08c21' : 'transparent'}
-        />
-      </button>
+      {/* Save button — 44px touch target wraps a smaller visible circle */}
+      <div className="absolute top-2 right-2 z-10 w-11 h-11 flex items-center justify-center">
+        <button
+          onClick={isAdded ? onRemove : onAdd}
+          className="w-7 h-7 rounded-full bg-white flex items-center justify-center"
+          aria-label={isAdded ? 'Remove from list' : 'Save to list'}
+        >
+          <Heart
+            size={14}
+            className={isAdded ? 'text-[#f08c21]' : 'text-[#131936]'}
+            fill={isAdded ? '#f08c21' : 'transparent'}
+          />
+        </button>
+      </div>
 
       {/* Bottom text content — pointer-events-none so Link handles taps */}
       <div className="absolute bottom-0 left-0 right-0 p-3 pointer-events-none">
