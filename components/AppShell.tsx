@@ -13,7 +13,7 @@
 
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { Home, BookMarked, Map, MapPin, User, LogOut } from 'lucide-react'
+import { Home, BookMarked, Map, Compass, User, LogOut } from 'lucide-react'
 import { signOut } from '@/app/actions/auth'
 import Avatar from '@/components/Avatar'
 
@@ -28,11 +28,11 @@ interface Props {
 // ─── Nav config ──────────────────────────────────────────────────────────────
 
 const NAV_LINKS = [
-  { href: '/home',    label: 'Home',    Icon: Home },
-  { href: '/list',    label: 'List',    Icon: BookMarked },
-  { href: '/plan',    label: 'Plan',    Icon: Map },
-  { href: '/map',     label: 'Map',     Icon: MapPin },
-  { href: '/profile', label: 'Profile', Icon: User },
+  { href: '/home',     label: 'Home',     Icon: Home },
+  { href: '/discover', label: 'Discover', Icon: Compass },
+  { href: '/list',     label: 'List',     Icon: BookMarked },
+  { href: '/plan',     label: 'Plan',     Icon: Map },
+  { href: '/profile',  label: 'Profile',  Icon: User },
 ]
 
 // ─── Component ───────────────────────────────────────────────────────────────

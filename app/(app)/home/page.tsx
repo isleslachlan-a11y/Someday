@@ -44,11 +44,8 @@ export default async function HomePage() {
 
   const heroPlace = heroData as Place | null
 
-  // Grid: top places, skipping hero and already-saved places
-  const excludeIds = [
-    ...(heroPlace ? [heroPlace.id] : []),
-    ...initialBucketPlaceIds,
-  ]
+  // Grid: top places by popularity, only excluding the hero to avoid duplication
+  const excludeIds = heroPlace ? [heroPlace.id] : []
 
   const { data: gridData } =
     excludeIds.length > 0
