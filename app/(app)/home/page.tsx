@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import HomeContent from './HomeContent'
+import type { Place } from '@/lib/types'
 
 export const metadata: Metadata = {
   title: 'Home',
@@ -17,6 +18,7 @@ export default async function HomePage() {
 
   if (!user) redirect('/login')
 
+  // Fetch profile and saved place IDs in parallel
   const [profileResult, bucketResult] = await Promise.all([
     supabase.from('profiles').select('username, avatar_url').eq('id', user.id).single(),
     supabase.from('bucket_list_items').select('place_id').eq('user_id', user.id),
@@ -31,10 +33,45 @@ export default async function HomePage() {
     .map(row => row.place_id)
     .filter((id): id is string => !!id)
 
+  // Hero: highest-popularity trending place
+  const { data: heroData } = await supabase
+    .from('places')
+    .select('*')
+    .eq('trending', true)
+    .order('popularity', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  const heroPlace = heroData as Place | null
+
+  // Grid: top places, skipping hero and already-saved places
+  const excludeIds = [
+    ...(heroPlace ? [heroPlace.id] : []),
+    ...initialBucketPlaceIds,
+  ]
+
+  const { data: gridData } =
+    excludeIds.length > 0
+      ? await supabase
+          .from('places')
+          .select('*')
+          .not('id', 'in', `(${excludeIds.join(',')})`)
+          .order('popularity', { ascending: false })
+          .limit(4)
+      : await supabase
+          .from('places')
+          .select('*')
+          .order('popularity', { ascending: false })
+          .limit(4)
+
+  const gridPlaces = (gridData ?? []) as Place[]
+
   return (
     <HomeContent
       userId={user.id}
       profile={profile}
+      heroPlace={heroPlace}
+      gridPlaces={gridPlaces}
       initialBucketPlaceIds={initialBucketPlaceIds}
     />
   )

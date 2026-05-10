@@ -220,6 +220,25 @@ export async function addPlaceToList(placeId: string): Promise<{ error?: string 
   return {}
 }
 
+// ─── Remove a place from the user's list by place_id ────────────────────────
+
+export async function removePlaceByPlaceId(placeId: string): Promise<{ error?: string }> {
+  const { supabase, user } = await getAuthenticatedUser()
+
+  const { error } = await supabase
+    .from('bucket_list_items')
+    .delete()
+    .eq('user_id', user.id)
+    .eq('place_id', placeId)
+
+  if (error) return { error: error.message }
+
+  await logEvent(supabase, user.id, 'place_removed', { place_id: placeId })
+
+  revalidatePath('/home')
+  return {}
+}
+
 export async function toggleStatus(
   itemId: string,
   newStatus: ItemStatus

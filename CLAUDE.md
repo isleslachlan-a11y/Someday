@@ -54,10 +54,11 @@ Run `npm run build` after significant changes and fix all errors before committi
 - `lib/supabase.ts` — legacy re-export; prefer importing from `client.ts` or `server.ts` directly.
 - `lib/events.ts` — `logEvent(userId, eventType, metadata)`. B2B data product foundation. Adds `platform`, `app_version`, and `country_code` automatically. Call on every meaningful user action.
 - `lib/analytics.ts` — server-side B2B read functions: `getTopDestinations`, `getCategoryBreakdown`, `getActiveUserCount`, `getConversionRate`. Service-role only — server-side.
-- `lib/types.ts` — shared TypeScript types: `BucketListItem`, `Place`, `UserProfile`, `Event`, `ItemStatus`, `Trip`, `OverlapResult`, `Message`, `ConversationListItem`, `ConversationInfo`, `FriendshipStatus`, `PendingRequest`, and the `CATEGORIES` constant.
+- `lib/types.ts` — shared TypeScript types: `BucketListItem`, `Place`, `UserProfile`, `Event`, `ItemStatus`, `Trip`, `OverlapResult`, `Message`, `ConversationListItem`, `ConversationInfo`, `FriendshipStatus`, `PendingRequest`, `StoryUser`, and the `CATEGORIES` constant.
 - `lib/overlaps.ts` — `getOverlaps(userId)`: finds bucket list matches between the user and people they follow. Server-only (uses admin client). Wrapped with React `cache()` — one DB hit per render tree.
 - `lib/friends.ts` — `getFriends`, `getPendingRequests`, `getFriendshipStatus`, `searchUsers`, `sendFriendRequest`, `acceptFriendRequest`, `declineFriendRequest`. Server-only.
 - `lib/messaging.ts` — `getConversations`, `getConversationInfo`, `getOrCreateDM`, `createGroupChat`, `getMessages`, `sendMessage`, `markAsRead`. Server-only.
+- `lib/feed.ts` — `assembleFeed(pageNum)`: builds the home feed array from daily highlight, friend activity, overlaps, and promotional posts. Page 0 includes the daily highlight (deterministic rotation by day of year). Used by `HomeContent.tsx`.
 - `lib/design-tokens.ts` — `TOKENS` object (colors, spacing, touchTarget). Reference before hardcoding any value.
 - `middleware.ts` — route protection; redirects unauthenticated users to `/login`.
 - `components/AppShell.tsx` — authenticated layout with desktop sidebar + mobile bottom tab bar.
@@ -98,13 +99,17 @@ Mutations use Server Actions (not API routes). On signup, always insert a row in
 
 **Error states:** Pages return inline error UI (not thrown errors) when Supabase queries fail. `error.tsx` files handle unexpected errors per route segment.
 
+**Home feed realtime:** `HomeContent.tsx` subscribes to `bucket_list_items` updates via Supabase Realtime. When a friend's item changes to `status === 'completed'`, it surfaces a "New activity" banner. This is the established pattern for realtime UI on the home screen.
+
+**No notifications table yet:** There is no `notifications` table in the schema. The bell icon in any UI should be inert or hidden until this is built.
+
 ### Database Tables
 
 | Table | Purpose | Status |
 |-------|---------|--------|
 | `profiles` | Public user profiles (extends `auth.users`); includes `map_city_preference` | Built |
-| `places` | Curated catalogue of destinations (admin-seeded); includes `lat`, `lng`, vibes, intensity | Built |
-| `bucket_list_items` | A user's personal bucket list (user → place) | Built |
+| `places` | Curated catalogue of destinations (admin-seeded); includes `lat`, `lng`, `popularity`, `trending`, `image_url`, `vibes` (enum: Adventure/Culture/Foodie/Romantic/Chill/Epic/Peaceful/Wellness), `intensity` (low/medium/high) | Built |
+| `bucket_list_items` | A user's personal bucket list (user → place); includes `completed_at`, `completion_note`, `completion_photo_url` for Strava-style completion tracking | Built |
 | `events` | Every user action — feeds the B2B data product | Built |
 | `user_context` | Per-user flags: `completed_onboarding`, travel preferences | Built |
 | `trips` | Group trips; `members` is a `uuid[]` array; `created_by` is owner | Built |
@@ -116,9 +121,10 @@ Mutations use Server Actions (not API routes). On signup, always insert a row in
 | `conversations` | Chat rooms — DMs, group chats, and trip-linked chats | Built |
 | `conversation_members` | Membership + `last_read_at` per conversation | Built |
 | `messages` | Chat messages; realtime enabled | Built |
-| `posts` | Strava-style completion posts | Planned |
+| `promotional_posts` | Admin-created promotional content for the home feed; columns: `title`, `body`, `image_url`, `cta_label`, `cta_url`, `place_id`, `active`, `starts_at`, `ends_at`. Public read when active and within time window. | Built |
+| `posts` | User-created Strava-style completion posts (distinct from `promotional_posts`) | Planned |
 
-Migrations live in `supabase/migrations/`. Key migrations: `003_profiles.sql`, `004_events_platform.sql`, `20260414120000_pivot_schema.sql` (places pivot), `20260414200000_trips_schema.sql`, `20260418_map_columns.sql`, `20260418200000_friendships.sql`, `20260421000000_messaging_schema.sql`.
+Migrations live in `supabase/migrations/`. Key migrations: `003_profiles.sql`, `004_events_platform.sql`, `20260414120000_pivot_schema.sql` (places pivot), `20260414200000_trips_schema.sql`, `20260418_map_columns.sql`, `20260418200000_friendships.sql`, `20260421000000_messaging_schema.sql`, `20260429000000_promotional_posts.sql`, `20260429000001_completion_columns.sql` (adds completion fields to `bucket_list_items`).
 
 **Row Level Security:**
 - `profiles` — public read, private write
@@ -135,6 +141,8 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=
 SUPABASE_SERVICE_ROLE_KEY=       # Server-only — never import client-side
 NEXT_PUBLIC_APP_VERSION=0.1.0    # Written to every event row
 ADMIN_USER_ID=                   # Supabase user UUID — gates /admin/analytics
+NEXT_PUBLIC_MAPBOX_TOKEN=        # Required for the Map tab (mapbox-gl / react-map-gl)
+UNSPLASH_ACCESS_KEY=             # Used by seed scripts only — not required at runtime
 ```
 
 When adding new env variables, also add them to Vercel's environment settings.
@@ -182,7 +190,7 @@ Tailwind CSS v4 is configured via `tailwind.config.ts` (loaded with `@config` in
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| `bg-indigo-deep` | `#0D0B1A` | Page backgrounds |
+| `bg-indigo-deep` | `#0D0B1E` | Page backgrounds |
 | `text-violet-accent` / `bg-violet-accent` | `#7B4FE8` | Primary accent, buttons, CTAs |
 | `text-lavender` | `#C4B5FD` | Secondary text, tags |
 | `text-pink-accent` | `#FF8FAB` | Highlights, completion states |
@@ -202,7 +210,7 @@ Tailwind CSS v4 is configured via `tailwind.config.ts` (loaded with `@config` in
 7. Friends system (discover, requests, profiles) ✓
 8. Messaging (DMs, group chats, trip chat, realtime) ✓
 9. Creating a post (Strava-style)
-10. Home feed
+10. Home feed ✓ (core built: daily highlight, friend activity, overlaps, promo cards, stories carousel, realtime "new activity" banner, infinite scroll)
 11. Navigation + polish
 12. B2B data pipeline + reporting endpoint
 13. Testing + launch
