@@ -5,9 +5,11 @@
  * The Strava-equivalent card: social proof + discovery.
  */
 
+import Image from 'next/image'
 import Link from 'next/link'
 import Avatar from '@/components/Avatar'
 import type { FriendActivity } from '@/lib/types'
+import UnsplashAttribution from '@/components/ui/UnsplashAttribution'
 
 const TYPE_GRADIENT: Record<string, string> = {
   city:       'from-violet-accent/25 via-violet-accent/8 to-transparent',
@@ -70,8 +72,16 @@ export default function FriendActivityCard({
         <div
           className={`relative h-[180px] bg-gradient-to-br ${gradient} bg-[#0d0b1a] overflow-hidden flex items-center justify-center`}
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-          {place.image_keyword && (
+          {/* Unsplash photo or gradient placeholder */}
+          {place.image_url ? (
+            <Image
+              src={place.image_url}
+              alt={place.name}
+              fill
+              sizes="(max-width: 768px) 100vw, 700px"
+              className="object-cover"
+            />
+          ) : place.image_keyword ? (
             <span
               className="absolute font-syne font-black text-white select-none pointer-events-none whitespace-nowrap"
               style={{ fontSize: '100px', opacity: 0.04 }}
@@ -79,7 +89,14 @@ export default function FriendActivityCard({
             >
               {place.image_keyword}
             </span>
-          )}
+          ) : null}
+
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+
+          {/* Attribution — required by Unsplash API terms */}
+          <div className="absolute bottom-2 right-3">
+            <UnsplashAttribution attribution={place.unsplash_attribution ?? null} />
+          </div>
         </div>
       </Link>
 

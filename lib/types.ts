@@ -85,6 +85,12 @@ export interface FriendBucketItem {
   avatar_url: string | null
 }
 
+export interface UnsplashAttribution {
+  photographer_name: string
+  photographer_url: string
+  photo_url: string
+}
+
 export interface Place {
   id: string
   name: string
@@ -98,7 +104,10 @@ export interface Place {
   popularity: number
   trending: boolean
   image_url: string | null
+  image_thumb_url: string | null
   image_keyword: string | null
+  unsplash_photo_id: string | null
+  unsplash_attribution: UnsplashAttribution | null
   created_at: string
   /** WGS-84 coordinates — null means no map pin rendered. */
   lat: number | null

@@ -6,6 +6,14 @@ const nextConfig: NextConfig = {
     // doesn't mistake the parent /Users/reallachisles lockfile as the root.
     root: __dirname,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+    ],
+  },
 };
 
 export default nextConfig;

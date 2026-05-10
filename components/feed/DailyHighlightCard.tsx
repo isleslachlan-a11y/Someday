@@ -2,12 +2,13 @@
 
 /**
  * DailyHighlightCard — full-width hero, always first in the feed.
- * Uses gradient + watermark text as image placeholder.
- * TODO: Replace gradient with real CDN image via next/image once image_url is populated.
+ * Shows Unsplash image when available, falls back to gradient placeholder.
  */
 
+import Image from 'next/image'
 import Link from 'next/link'
 import type { Place } from '@/lib/types'
+import UnsplashAttribution from '@/components/ui/UnsplashAttribution'
 
 const TYPE_GRADIENT: Record<string, string> = {
   city:       'from-violet-accent/30 via-violet-accent/10 to-transparent',
@@ -37,11 +38,17 @@ export default function DailyHighlightCard({ place, isAdded, onAdd, index = 0 }:
         <div
           className={`relative h-[260px] bg-gradient-to-br ${gradient} bg-[#0d0b1a] overflow-hidden flex items-center justify-center`}
         >
-          {/* Dark overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
-
-          {/* Watermark */}
-          {place.image_keyword && (
+          {/* Unsplash photo or gradient placeholder */}
+          {place.image_url ? (
+            <Image
+              src={place.image_url}
+              alt={place.name}
+              fill
+              sizes="(max-width: 768px) 100vw, 700px"
+              className="object-cover"
+              priority
+            />
+          ) : place.image_keyword ? (
             <span
               className="absolute font-syne font-black text-white select-none pointer-events-none whitespace-nowrap"
               style={{ fontSize: '120px', opacity: 0.04 }}
@@ -49,7 +56,10 @@ export default function DailyHighlightCard({ place, isAdded, onAdd, index = 0 }:
             >
               {place.image_keyword}
             </span>
-          )}
+          ) : null}
+
+          {/* Dark overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
 
           {/* Today's Pick badge */}
           <div className="absolute top-4 left-4 inline-flex items-center gap-1.5 rounded-full bg-[#FF8FAB] px-3 py-1">
@@ -67,6 +77,11 @@ export default function DailyHighlightCard({ place, isAdded, onAdd, index = 0 }:
               {place.country}
               {place.region ? ` · ${place.region}` : ''}
             </p>
+          </div>
+
+          {/* Attribution — required by Unsplash API terms */}
+          <div className="absolute bottom-2 right-3">
+            <UnsplashAttribution attribution={place.unsplash_attribution ?? null} />
           </div>
         </div>
       </Link>

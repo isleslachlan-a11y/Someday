@@ -2,12 +2,13 @@
 
 /**
  * PlaceCard — standard place discovery card in the feed.
- * Full-width, full-bleed image area (gradient placeholder).
- * TODO: Replace gradient with real CDN image via next/image once image_url is populated.
+ * Shows Unsplash image when available, falls back to gradient placeholder.
  */
 
+import Image from 'next/image'
 import Link from 'next/link'
 import type { Place } from '@/lib/types'
+import UnsplashAttribution from '@/components/ui/UnsplashAttribution'
 
 const TYPE_GRADIENT: Record<string, string> = {
   city:       'from-violet-accent/25 via-violet-accent/8 to-transparent',
@@ -54,9 +55,16 @@ export default function PlaceCard({ place, isAdded, onAdd, index = 0 }: Props) {
         <div
           className={`relative h-[200px] bg-gradient-to-br ${gradient} bg-[#0d0b1a] overflow-hidden flex items-center justify-center`}
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-
-          {place.image_keyword && (
+          {/* Unsplash photo or gradient placeholder */}
+          {place.image_url ? (
+            <Image
+              src={place.image_url}
+              alt={place.name}
+              fill
+              sizes="(max-width: 768px) 100vw, 700px"
+              className="object-cover"
+            />
+          ) : place.image_keyword ? (
             <span
               className="absolute font-syne font-black text-white select-none pointer-events-none whitespace-nowrap"
               style={{ fontSize: '100px', opacity: 0.04 }}
@@ -64,7 +72,9 @@ export default function PlaceCard({ place, isAdded, onAdd, index = 0 }: Props) {
             >
               {place.image_keyword}
             </span>
-          )}
+          ) : null}
+
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
 
           {/* Type badge */}
           <span
@@ -79,6 +89,11 @@ export default function PlaceCard({ place, isAdded, onAdd, index = 0 }: Props) {
               📈 Trending
             </span>
           )}
+
+          {/* Attribution — required by Unsplash API terms */}
+          <div className="absolute bottom-2 right-3">
+            <UnsplashAttribution attribution={place.unsplash_attribution ?? null} />
+          </div>
         </div>
       </Link>
 
