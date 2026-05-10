@@ -84,7 +84,7 @@ export default function HomeContent({
 
   async function handleAdd(placeId: string, source: string) {
     setBucketPlaceIds(prev => (prev.includes(placeId) ? prev : [...prev, placeId]))
-    void logEvent(userId, 'item_added', { place_id: placeId, source })
+    void logEvent(userId, 'place_saved', { place_id: placeId, source })
     const result = await addPlaceToList(placeId)
     if (result.error) {
       setBucketPlaceIds(prev => prev.filter(id => id !== placeId))

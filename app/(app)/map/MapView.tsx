@@ -231,7 +231,7 @@ export default function MapView({ places, initialBucketPlaceIds, savedCityPrefer
     if (bucketIds.has(place.id)) return
     setBucketIds(prev => new Set([...prev, place.id]))
     toast.success('Added to your list ✦')
-    const result = await addPlaceToList(place.id)
+    const result = await addPlaceToList(place.id, 'map')
     if (result.error) {
       setBucketIds(prev => {
         const next = new Set(prev)

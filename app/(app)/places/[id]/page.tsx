@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import type { Place } from '@/lib/types'
+import PlaceViewTracker from './PlaceViewTracker'
 
 export const metadata: Metadata = {
   title: 'Place',
@@ -31,6 +32,7 @@ export default async function PlaceDetailPage({ params }: { params: Promise<{ id
 
   return (
     <main className="min-h-screen bg-indigo-deep px-4 py-8">
+      <PlaceViewTracker userId={user.id} placeId={id} />
       <div className="max-w-2xl mx-auto">
         <Link
           href="/home"

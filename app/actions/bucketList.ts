@@ -195,7 +195,7 @@ export async function removeFromList(entryId: string): Promise<{ error?: string 
 
   if (error) return { error: error.message }
 
-  await logEvent(supabase, user.id, 'place_removed', { place_id: entryId })
+  await logEvent(supabase, user.id, 'item_removed', { place_id: entryId, source: 'list_page' })
 
   revalidatePath('/list')
   return {}
@@ -203,7 +203,10 @@ export async function removeFromList(entryId: string): Promise<{ error?: string 
 
 // ─── Add a place from the curated catalogue to the user's list ──────────────
 
-export async function addPlaceToList(placeId: string): Promise<{ error?: string }> {
+export async function addPlaceToList(
+  placeId: string,
+  source = 'home'
+): Promise<{ error?: string }> {
   const { supabase, user } = await getAuthenticatedUser()
 
   const { error } = await supabase.from('bucket_list_items').insert({
@@ -214,7 +217,7 @@ export async function addPlaceToList(placeId: string): Promise<{ error?: string 
 
   if (error) return { error: error.message }
 
-  await logEvent(supabase, user.id, 'place_saved', { place_id: placeId, source: 'home' })
+  await logEvent(supabase, user.id, 'place_saved', { place_id: placeId, source })
 
   revalidatePath('/home')
   return {}
@@ -233,7 +236,7 @@ export async function removePlaceByPlaceId(placeId: string): Promise<{ error?: s
 
   if (error) return { error: error.message }
 
-  await logEvent(supabase, user.id, 'place_removed', { place_id: placeId })
+  await logEvent(supabase, user.id, 'item_removed', { place_id: placeId, source: 'home' })
 
   revalidatePath('/home')
   return {}
