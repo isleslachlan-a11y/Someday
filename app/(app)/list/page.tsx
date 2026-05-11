@@ -1,13 +1,12 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import ListFilters from './ListFilters'
 import type { BucketListStatus, ListEntry, FriendBucketItem } from '@/lib/types'
 
 export const metadata: Metadata = {
-  title: 'My List',
+  title: "My Someday's",
   description: 'Every place you want to visit someday.',
 }
 
@@ -22,10 +21,8 @@ export default async function ListPage() {
 
   // ── Primary queries (parallel) ───────────────────────────────────────────
 
-  const [profileResult, itemsResult, followsResult] = await Promise.all([
-    supabase.from('profiles').select('username').eq('id', user.id).single(),
-
-    // bucket_list_items joined with places
+  const [itemsResult, followsResult] = await Promise.all([
+    // bucket_list_items joined with places — includes image + location fields for card display
     supabase
       .from('bucket_list_items')
       .select(`
@@ -47,7 +44,12 @@ export default async function ListPage() {
           tags,
           vibes,
           intensity,
-          image_keyword
+          image_keyword,
+          image_url,
+          image_thumb_url,
+          popularity,
+          lat,
+          lng
         )
       `)
       .eq('user_id', user.id)
@@ -63,7 +65,6 @@ export default async function ListPage() {
 
   if (!itemsResult.error && itemsResult.data) {
     for (const row of itemsResult.data) {
-      // places is returned as an object (FK join); skip rows where the join failed
       const place = row.places as unknown as Record<string, unknown> | null
       if (!place) continue
 
@@ -87,6 +88,12 @@ export default async function ListPage() {
           vibes: (place.vibes as string[] | null) ?? null,
           intensity: (place.intensity as string | null) ?? null,
           image_keyword: (place.image_keyword as string | null) ?? null,
+          // Extra fields for HomePlaceCard — not on PlaceSnap type but safe to carry
+          ...(place.image_url !== undefined && { image_url: (place.image_url as string | null) ?? null }),
+          ...(place.image_thumb_url !== undefined && { image_thumb_url: (place.image_thumb_url as string | null) ?? null }),
+          ...(place.popularity !== undefined && { popularity: (place.popularity as number) ?? 0 }),
+          ...(place.lat !== undefined && { lat: (place.lat as number | null) ?? null }),
+          ...(place.lng !== undefined && { lng: (place.lng as number | null) ?? null }),
         },
       })
     }
@@ -119,29 +126,19 @@ export default async function ListPage() {
     }
   }
 
-  const username = profileResult.data?.username ?? 'traveller'
-
   return (
-    <main className="min-h-screen bg-indigo-deep px-4 py-8">
-      <div className="max-w-3xl mx-auto">
+    <main className="min-h-screen bg-[#fff9f0]">
 
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="font-syne text-3xl font-bold text-white-soft">My List</h1>
-            <p className="text-muted text-sm mt-1">
-              {entries.length} place{entries.length !== 1 ? 's' : ''} saved
-            </p>
-          </div>
-          <Link
-            href="/list/new"
-            className="rounded-xl bg-violet-accent hover:bg-violet-accent/90 px-4 py-2.5 font-syne font-semibold text-white-soft text-sm transition-colors"
-          >
-            + Add
-          </Link>
+      {/* Sticky top bar */}
+      <header className="sticky top-0 z-30 bg-[#fff9f0] border-b border-[#fcd99a]/50">
+        <div className="max-w-[480px] mx-auto px-4 h-14 flex items-center justify-center">
+          <h1 className="font-syne font-bold text-[#131936] text-[20px] tracking-widest uppercase">
+            MY SOMEDAY&apos;S
+          </h1>
         </div>
+      </header>
 
-        {/* Filters, list, and bottom sheet — all client-side */}
+      <div className="max-w-[480px] mx-auto px-4 pt-4 pb-24">
         <Suspense fallback={<FiltersPlaceholder />}>
           <ListFilters
             entries={entries}
@@ -149,8 +146,8 @@ export default async function ListPage() {
             friendItems={friendItems}
           />
         </Suspense>
-
       </div>
+
     </main>
   )
 }
@@ -160,17 +157,17 @@ function FiltersPlaceholder() {
     <div className="space-y-4 animate-pulse">
       <div className="flex gap-2 pb-1">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="h-9 w-24 rounded-full bg-white/5 border border-white/10" />
+          <div key={i} className="h-9 w-24 rounded-full bg-[#fcd99a]/20 border border-[#fcd99a]/30" />
         ))}
       </div>
       <div className="flex gap-2 overflow-hidden">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="h-7 w-20 shrink-0 rounded-full bg-white/5 border border-white/10" />
+          <div key={i} className="h-7 w-20 shrink-0 rounded-full bg-[#fcd99a]/20 border border-[#fcd99a]/30" />
         ))}
       </div>
-      <div className="grid gap-4 sm:grid-cols-2 mt-4">
+      <div className="grid grid-cols-2 gap-3 mt-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="h-44 rounded-2xl bg-white/5 border border-white/10" />
+          <div key={i} className="h-[260px] rounded-2xl bg-[#fcd99a]/20 border border-[#fcd99a]/30" />
         ))}
       </div>
     </div>
