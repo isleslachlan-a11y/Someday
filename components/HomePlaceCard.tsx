@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { Heart, MapPin } from 'lucide-react'
 import type { Place } from '@/lib/types'
 
@@ -31,9 +32,25 @@ export default function HomePlaceCard({ place, isAdded, onAdd, onRemove, index }
       className="relative rounded-2xl overflow-hidden"
       style={{ height: 260, background: dark ? '#131936' : '#fcd99a' }}
     >
+      {/* Unsplash photo */}
+      {place.image_url && (
+        <Image
+          src={place.image_url}
+          alt={place.name}
+          fill
+          sizes="(max-width: 480px) 50vw, 240px"
+          className="object-cover"
+        />
+      )}
+
+      {/* Gradient overlay so bottom text stays readable */}
+      {place.image_url && (
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+      )}
+
       {/* Card body navigation */}
       <Link
-        href={`/experience/${place.id}`}
+        href={`/places/${place.id}`}
         className="absolute inset-0 z-0"
         aria-label={`View ${place.name}`}
       />
@@ -56,14 +73,24 @@ export default function HomePlaceCard({ place, isAdded, onAdd, onRemove, index }
       {/* Bottom text content — pointer-events-none so Link handles taps */}
       <div className="absolute bottom-0 left-0 right-0 p-3 pointer-events-none">
         <h3
-          className={`font-syne font-bold leading-tight truncate ${dark ? 'text-white' : 'text-[#131936]'}`}
+          className={`font-syne font-bold leading-tight truncate ${place.image_url || dark ? 'text-white' : 'text-[#131936]'}`}
           style={{ fontSize: 14 }}
         >
           {place.name}
         </h3>
+        {(place.type === 'experience' || place.type === 'food') && (
+          <span
+            className={`inline-block rounded-full px-2 py-0.5 font-nunito mt-0.5 ${
+              dark ? 'bg-[#f08c21]/20 text-[#fcd99a]' : 'bg-[#131936]/10 text-[#131936]/70'
+            }`}
+            style={{ fontSize: 9 }}
+          >
+            {place.type === 'food' ? '🍜 Food' : '✨ Experience'}
+          </span>
+        )}
         {location && (
           <p
-            className={`flex items-center gap-0.5 font-nunito mt-0.5 truncate ${dark ? 'text-[#fcd99a]' : 'text-[#131936]/70'}`}
+            className={`flex items-center gap-0.5 font-nunito mt-0.5 truncate ${place.image_url || dark ? 'text-white/75' : 'text-[#131936]/70'}`}
             style={{ fontSize: 11 }}
           >
             <MapPin size={10} className="shrink-0" />
@@ -71,7 +98,7 @@ export default function HomePlaceCard({ place, isAdded, onAdd, onRemove, index }
           </p>
         )}
         <p
-          className={`flex items-center gap-0.5 font-nunito mt-1 ${dark ? 'text-white/60' : 'text-[#131936]/50'}`}
+          className={`flex items-center gap-0.5 font-nunito mt-1 ${place.image_url || dark ? 'text-white/60' : 'text-[#131936]/50'}`}
           style={{ fontSize: 10 }}
         >
           <Heart size={9} fill="currentColor" />

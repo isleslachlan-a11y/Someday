@@ -114,6 +114,20 @@ export interface Place {
   lng: number | null
 }
 
+export const DESTINATION_TYPES = ['city', 'nature'] as const
+export const EXPERIENCE_TYPES  = ['experience', 'food'] as const
+
+export type DestinationType = (typeof DESTINATION_TYPES)[number]
+export type ExperienceType  = (typeof EXPERIENCE_TYPES)[number]
+
+export function isDestination(place: Place): boolean {
+  return DESTINATION_TYPES.includes(place.type as DestinationType)
+}
+
+export function isExperience(place: Place): boolean {
+  return EXPERIENCE_TYPES.includes(place.type as ExperienceType)
+}
+
 export interface Event {
   id: string
   user_id: string
