@@ -1,0 +1,553 @@
+'use client'
+
+import { useState, useRef, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import Image from 'next/image'
+import { ChevronLeft, ChevronRight, Heart, Share2, Compass } from 'lucide-react'
+import toast from 'react-hot-toast'
+import Map, { Marker } from 'react-map-gl/mapbox'
+import 'mapbox-gl/dist/mapbox-gl.css'
+import { logEvent } from '@/lib/events'
+import { addPlaceToList, removePlaceByPlaceId } from '@/app/actions/bucketList'
+import Avatar from '@/components/Avatar'
+import type { Place } from '@/lib/types'
+
+const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? ''
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+export interface FriendVisitor {
+  id: string
+  username: string
+  avatar_url: string | null
+}
+
+interface Props {
+  place: Place
+  userId: string
+  initialIsSaved: boolean
+  similarPlaces: Place[]
+  friendVisitors: FriendVisitor[]
+}
+
+// ─── Month logic ──────────────────────────────────────────────────────────────
+
+const MONTHS = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D']
+
+function getPeakAndShoulder(tags: string[] | null): { peak: Set<number>; shoulder: Set<number> } {
+  const t = tags ?? []
+  let peak: number[]
+  if (t.includes('summer'))      peak = [5, 6, 7]
+  else if (t.includes('winter')) peak = [11, 0, 1]
+  else if (t.includes('spring')) peak = [2, 3, 4]
+  else                           peak = [3, 4, 8]
+
+  const peakSet = new Set(peak)
+  const shoulderSet = new Set<number>()
+  for (const m of peak) {
+    const prev = (m - 1 + 12) % 12
+    const next = (m + 1) % 12
+    if (!peakSet.has(prev)) shoulderSet.add(prev)
+    if (!peakSet.has(next)) shoulderSet.add(next)
+  }
+  const trimmed = new Set<number>()
+  let count = 0
+  for (const m of shoulderSet) {
+    if (count >= 2) break
+    trimmed.add(m)
+    count++
+  }
+  return { peak: peakSet, shoulder: trimmed }
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
+
+export default function PlaceDetailContent({
+  place,
+  userId,
+  initialIsSaved,
+  similarPlaces,
+  friendVisitors,
+}: Props) {
+  const router = useRouter()
+  const [isSaved, setIsSaved] = useState(initialIsSaved)
+  const [descExpanded, setDescExpanded] = useState(false)
+  const [activeDot, setActiveDot] = useState(0)
+  const [savedSimilarIds, setSavedSimilarIds] = useState<Set<string>>(new Set())
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    logEvent(userId, 'page_viewed', { page: 'place_detail', place_id: place.id })
+  }, [userId, place.id])
+
+  // ── Save / remove ─────────────────────────────────────────────────────────
+
+  async function handleSave() {
+    setIsSaved(true)
+    void logEvent(userId, 'place_saved', { place_id: place.id, source: 'detail_page' })
+    const result = await addPlaceToList(place.id, 'detail_page')
+    if (result.error) {
+      setIsSaved(false)
+      toast.error('Something went wrong. Please try again.')
+    } else {
+      toast.success('Added to your list ✦')
+    }
+  }
+
+  async function handleRemove() {
+    setIsSaved(false)
+    void logEvent(userId, 'item_removed', { place_id: place.id, source: 'detail_page' })
+    const result = await removePlaceByPlaceId(place.id)
+    if (result.error) {
+      setIsSaved(true)
+      toast.error('Something went wrong. Please try again.')
+    }
+  }
+
+  async function handleSaveSimilar(placeId: string) {
+    setSavedSimilarIds(prev => new Set([...prev, placeId]))
+    void logEvent(userId, 'place_saved', { place_id: placeId, source: 'detail_similar' })
+    const result = await addPlaceToList(placeId, 'detail_similar')
+    if (result.error) {
+      setSavedSimilarIds(prev => { const s = new Set(prev); s.delete(placeId); return s })
+      toast.error('Something went wrong.')
+    }
+  }
+
+  // ── Share ─────────────────────────────────────────────────────────────────
+
+  async function handleShare() {
+    const url = window.location.href
+    if (navigator.share) {
+      try { await navigator.share({ title: place.name, url }) } catch { /* cancelled */ }
+    } else {
+      await navigator.clipboard.writeText(url)
+      toast.success('Link copied!')
+    }
+  }
+
+  // ── Scroll tracking ───────────────────────────────────────────────────────
+
+  function handleScroll() {
+    const el = scrollRef.current
+    if (!el) return
+    const ratio = el.scrollLeft / Math.max(1, el.scrollWidth - el.clientWidth)
+    setActiveDot(Math.round(ratio * 2))
+  }
+
+  // ── Derived values ────────────────────────────────────────────────────────
+
+  const { peak, shoulder } = getPeakAndShoulder(place.tags)
+  const location = [place.region, place.country].filter(Boolean).join(', ')
+  const activities = (place.tags ?? []).slice(0, 3)
+  const seasonTags = (place.tags ?? []).slice(0, 2)
+
+  return (
+    <div className="min-h-screen bg-[#fff9f0] pb-24">
+
+      {/* ── Hero ────────────────────────────────────────────────────────────── */}
+      <div className="relative h-64 w-full bg-gradient-to-br from-[#f08c21] to-[#fcd99a]">
+        {place.image_url && (
+          <Image
+            src={place.image_url}
+            alt={place.name}
+            fill
+            sizes="100vw"
+            className="object-cover"
+            priority
+          />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/25" />
+
+        {/* Back button */}
+        <button
+          onClick={() => router.back()}
+          className="absolute top-4 left-4 w-10 h-10 rounded-full bg-black/30 flex items-center justify-center"
+          aria-label="Go back"
+        >
+          <ChevronLeft size={20} className="text-white" />
+        </button>
+
+        {/* Place info overlay */}
+        <div className="absolute bottom-0 left-0 right-0 p-4">
+          <p className="font-nunito text-white/70 text-[12px] capitalize mb-0.5">{place.type}</p>
+          <h1 className="font-syne font-bold text-white text-[26px] leading-tight">{place.name}</h1>
+          {location && (
+            <p className="font-nunito text-white/70 text-[13px] mt-0.5">{location}</p>
+          )}
+        </div>
+      </div>
+
+      {/* ── Body ────────────────────────────────────────────────────────────── */}
+      <div className="max-w-[480px] mx-auto">
+
+        {/* Tags */}
+        {(place.tags ?? []).length > 0 && (
+          <div className="flex flex-wrap gap-2 px-4 pt-4">
+            {(place.tags ?? []).map(tag => (
+              <span
+                key={tag}
+                className="px-3 py-1 rounded-full bg-[#fcd99a]/50 text-[#131936] font-nunito text-[11px]"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Description */}
+        {place.description && (
+          <div className="px-4 pt-4">
+            <p
+              className={`font-nunito text-[14px] text-[#131936]/70 leading-relaxed ${
+                descExpanded ? '' : 'line-clamp-3'
+              }`}
+            >
+              {place.description}
+            </p>
+            {place.description.length > 120 && (
+              <button
+                onClick={() => setDescExpanded(v => !v)}
+                className="mt-1 font-nunito text-[13px] text-[#f08c21] font-medium min-h-[44px] flex items-center"
+              >
+                {descExpanded ? 'Show less' : 'Read more'}
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* ── Map ──────────────────────────────────────────────────────────── */}
+        <div className="pt-6">
+          {place.lat && place.lng ? (
+            <div className="mx-4 rounded-2xl overflow-hidden" style={{ height: 160 }}>
+              {MAPBOX_TOKEN ? (
+                <Map
+                  initialViewState={{
+                    longitude: place.lng,
+                    latitude:  place.lat,
+                    zoom:      11,
+                  }}
+                  style={{ width: '100%', height: '100%' }}
+                  mapStyle="mapbox://styles/mapbox/light-v11"
+                  mapboxAccessToken={MAPBOX_TOKEN}
+                  interactive={false}
+                  reuseMaps
+                >
+                  <Marker longitude={place.lng} latitude={place.lat} anchor="bottom">
+                    <div
+                      style={{
+                        width:           32,
+                        height:          32,
+                        borderRadius:    '50%',
+                        backgroundColor: '#f08c21',
+                        border:          '2px solid white',
+                        boxShadow:       '0 2px 8px rgba(240,140,33,0.5)',
+                        display:         'flex',
+                        alignItems:      'center',
+                        justifyContent:  'center',
+                      }}
+                    >
+                      <span style={{ fontSize: 14 }}>★</span>
+                    </div>
+                  </Marker>
+                </Map>
+              ) : (
+                <div className="w-full h-full bg-[#fcd99a]/30 flex items-center justify-center rounded-2xl">
+                  <p className="font-nunito text-[#131936]/30 text-[12px]">Map not configured</p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div
+              className="mx-4 rounded-2xl bg-[#fcd99a]/30 flex items-center justify-center"
+              style={{ height: 160 }}
+            >
+              <p className="font-nunito text-[#131936]/30 text-[12px]">No location data</p>
+            </div>
+          )}
+        </div>
+
+        {/* ── Top activities ────────────────────────────────────────────────── */}
+        {activities.length > 0 && (
+          <div className="px-4 pt-6">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="font-syne font-bold text-[#131936] text-[16px]">Top activities</h2>
+              <Link
+                href={`/discover?type=${encodeURIComponent(place.type)}`}
+                className="font-nunito text-[13px] text-[#f08c21]"
+              >
+                See all →
+              </Link>
+            </div>
+            <div className="flex flex-col gap-2">
+              {activities.map((tag, i) => (
+                <div key={tag} className="bg-white rounded-2xl p-3 flex flex-row items-center gap-3">
+                  <div className="w-7 h-7 rounded-full bg-[#131936] flex items-center justify-center shrink-0">
+                    <span className="font-bold text-white text-[12px]">{i + 1}</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-syne font-bold text-[#131936] text-[14px] leading-tight capitalize">
+                      {tag}
+                    </p>
+                    <p className="font-nunito text-[11px] text-[#131936]/50 capitalize">
+                      {place.type} · ★ 4.8 · Tap for details
+                    </p>
+                  </div>
+                  <ChevronRight size={16} className="text-[#131936]/30 shrink-0" />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── Best time to visit ────────────────────────────────────────────── */}
+        <div className="px-4 pt-6">
+          <div className="bg-white rounded-2xl p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="font-syne font-bold text-[#131936] text-[16px]">Best time to visit</h2>
+              {seasonTags.length > 0 && (
+                <span className="font-nunito text-[12px] text-[#f08c21] capitalize">
+                  {seasonTags.join(' · ')}
+                </span>
+              )}
+            </div>
+
+            {/* Month bubbles */}
+            <div className="flex justify-between">
+              {MONTHS.map((letter, i) => {
+                const isPeak = peak.has(i)
+                const isShoulder = !isPeak && shoulder.has(i)
+                return (
+                  <div
+                    key={i}
+                    className={`w-7 h-7 rounded-full flex items-center justify-center font-nunito text-[10px] ${
+                      isPeak
+                        ? 'bg-[#f08c21] text-white'
+                        : isShoulder
+                        ? 'bg-[#fcd99a] text-[#131936]'
+                        : 'bg-[#131936]/[0.08] text-[#131936]/50'
+                    }`}
+                  >
+                    {letter}
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Legend */}
+            <div className="flex items-center gap-4 mt-3">
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full bg-[#f08c21]" />
+                <span className="font-nunito text-[11px] text-[#131936]/60">Peak</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full bg-[#fcd99a]" />
+                <span className="font-nunito text-[11px] text-[#131936]/60">Shoulder</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── More like {country} ───────────────────────────────────────────── */}
+        {similarPlaces.length > 0 && (
+          <div className="pt-6">
+            <div className="flex items-center justify-between px-4 mb-3">
+              <h2 className="font-syne font-bold text-[#131936] text-[16px]">
+                More like {place.country}
+              </h2>
+              <Link
+                href={`/discover?country=${encodeURIComponent(place.country)}`}
+                className="font-nunito text-[13px] text-[#f08c21]"
+              >
+                Explore →
+              </Link>
+            </div>
+
+            {/* Horizontal scroll */}
+            <div
+              ref={scrollRef}
+              onScroll={handleScroll}
+              className="flex gap-3 overflow-x-auto px-4 pb-3"
+              style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}
+            >
+              {similarPlaces.map(sp => (
+                <SimilarCard
+                  key={sp.id}
+                  place={sp}
+                  isSaved={savedSimilarIds.has(sp.id)}
+                  onSave={() => handleSaveSimilar(sp.id)}
+                />
+              ))}
+            </div>
+
+            {/* Pagination dots */}
+            <div className="flex justify-center gap-1.5 mt-1">
+              {[0, 1, 2].map(dot => (
+                <div
+                  key={dot}
+                  className={`rounded-full transition-all duration-200 ${
+                    activeDot === dot ? 'w-4 h-1.5 bg-[#f08c21]' : 'w-1.5 h-1.5 bg-[#131936]/20'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── Friends who've been ───────────────────────────────────────────── */}
+        <div className="px-4 pt-6">
+          <div className="bg-white rounded-2xl p-4">
+            <h2 className="font-syne font-bold text-[#131936] text-[16px] mb-3">
+              Your friends who&apos;ve been
+            </h2>
+            {friendVisitors.length > 0 ? (
+              <div className="flex items-center gap-3">
+                {/* Avatar stack */}
+                <div className="flex items-center">
+                  {friendVisitors.slice(0, 5).map((friend, i) => (
+                    <div
+                      key={friend.id}
+                      className="rounded-full border-2 border-[#fff9f0]"
+                      style={{ marginLeft: i === 0 ? 0 : -8, zIndex: 5 - i, position: 'relative' }}
+                    >
+                      <Avatar
+                        avatarUrl={friend.avatar_url}
+                        username={friend.username}
+                        size={36}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-nunito text-[13px] text-[#131936]/70">
+                    {friendVisitors.length} friend{friendVisitors.length !== 1 ? 's' : ''} have visited {place.country}
+                  </p>
+                  <Link href="/plan" className="font-nunito text-[13px] text-[#f08c21] font-medium">
+                    See trip notes →
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <p className="font-nunito text-[13px] text-[#131936]/40">
+                Be the first of your friends to go
+              </p>
+            )}
+          </div>
+        </div>
+
+      </div>
+
+      {/* ── Fixed bottom CTA ─────────────────────────────────────────────────── */}
+      {/*
+        Sits above the AppShell bottom nav (h-16 = 64px) on mobile,
+        at the true bottom on desktop where the sidebar replaces the nav.
+      */}
+      <div
+        className="fixed bottom-16 lg:bottom-0 left-0 right-0 bg-[#fff9f0] border-t border-[#fcd99a]/50 px-4 py-3 z-40"
+        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)' }}
+      >
+        <div className="max-w-[480px] mx-auto flex items-center gap-2">
+          {/* Save / saved button */}
+          <button
+            onClick={isSaved ? handleRemove : handleSave}
+            className={`flex-1 h-12 rounded-full font-syne font-bold text-[14px] transition-colors ${
+              isSaved ? 'bg-[#f08c21] text-[#131936]' : 'bg-[#131936] text-white'
+            }`}
+          >
+            {isSaved ? 'Saved ✦' : '+ Add to my Someday'}
+          </button>
+
+          {/* Share */}
+          <button
+            onClick={handleShare}
+            className="w-12 h-12 rounded-full bg-white border border-[#fcd99a] flex items-center justify-center shrink-0"
+            aria-label="Share"
+          >
+            <Share2 size={18} className="text-[#131936]" />
+          </button>
+
+          {/* Explore */}
+          <Link
+            href={`/discover?type=${encodeURIComponent(place.type)}`}
+            className="w-12 h-12 rounded-full bg-[#f08c21] flex items-center justify-center shrink-0"
+            aria-label="Explore similar"
+          >
+            <Compass size={18} className="text-[#131936]" />
+          </Link>
+        </div>
+      </div>
+
+    </div>
+  )
+}
+
+// ─── Similar place card ───────────────────────────────────────────────────────
+
+function SimilarCard({
+  place,
+  isSaved,
+  onSave,
+}: {
+  place: Place
+  isSaved: boolean
+  onSave: () => void
+}) {
+  return (
+    <div
+      className="relative w-36 h-48 rounded-2xl overflow-hidden shrink-0"
+      style={{ scrollSnapAlign: 'start' }}
+    >
+      {/* Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#f08c21] to-[#fcd99a]" />
+      {place.image_url && (
+        <Image
+          src={place.image_url}
+          alt={place.name}
+          fill
+          sizes="144px"
+          className="object-cover"
+        />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+
+      {/* Full-card link (z-0) */}
+      <Link
+        href={`/places/${place.id}`}
+        className="absolute inset-0 z-0"
+        aria-label={`View ${place.name}`}
+      />
+
+      {/* Top-left similarity badge */}
+      <div className="absolute top-2 left-2 z-10 pointer-events-none">
+        <span className="font-nunito text-[11px] font-bold text-white bg-black/30 rounded-full px-2 py-0.5">
+          +{Math.round(place.popularity)}%
+        </span>
+      </div>
+
+      {/* Top-right heart button */}
+      <div className="absolute top-1 right-1 z-10 w-11 h-11 flex items-center justify-center">
+        <button
+          onClick={e => { e.preventDefault(); onSave() }}
+          disabled={isSaved}
+          className="w-7 h-7 rounded-full bg-white/90 flex items-center justify-center"
+          aria-label={isSaved ? 'Saved' : 'Save to list'}
+        >
+          <Heart
+            size={13}
+            className={isSaved ? 'text-[#f08c21]' : 'text-[#131936]'}
+            fill={isSaved ? '#f08c21' : 'transparent'}
+          />
+        </button>
+      </div>
+
+      {/* Bottom text */}
+      <div className="absolute bottom-0 left-0 right-0 p-2 pointer-events-none">
+        <p className="font-syne font-bold text-white text-[13px] leading-tight line-clamp-2">
+          {place.name}
+        </p>
+        <p className="font-nunito text-white/70 text-[11px] mt-0.5">{place.country}</p>
+      </div>
+    </div>
+  )
+}
