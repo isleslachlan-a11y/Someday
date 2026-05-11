@@ -2,7 +2,8 @@
 
 import { useEffect } from 'react'
 import Link from 'next/link'
-import { Bookmark, BookmarkCheck, Heart, MapPin } from 'lucide-react'
+import Image from 'next/image'
+import { Heart, MapPin } from 'lucide-react'
 import { logEvent } from '@/lib/events'
 import type { Place } from '@/lib/types'
 
@@ -34,33 +35,52 @@ export default function HomeHeroCard({ place, isAdded, onAdd, onRemove, userId }
         background: 'linear-gradient(135deg, #f08c21 0%, #f5b05a 50%, #fcd99a 100%)',
       }}
     >
+      {/* Unsplash photo */}
+      {place.image_url && (
+        <Image
+          src={place.image_url}
+          alt={place.name}
+          fill
+          sizes="(max-width: 480px) 100vw, 480px"
+          className="object-cover"
+          priority
+        />
+      )}
+
+      {/* Gradient overlay for text legibility */}
+      {place.image_url && (
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/10" />
+      )}
+
       {/* Full-card navigation — sits beneath interactive elements */}
       <Link
-        href={`/experience/${place.id}`}
+        href={`/places/${place.id}`}
         className="absolute inset-0 z-0"
         aria-label={`View ${place.name}`}
       />
 
+      {/* Heart button — absolutely positioned, above the Link */}
+      <div className="absolute top-2 right-2 z-10 w-11 h-11 flex items-center justify-center pointer-events-auto">
+        <button
+          onClick={isAdded ? onRemove : onAdd}
+          className="w-7 h-7 rounded-full bg-white flex items-center justify-center"
+          aria-label={isAdded ? 'Remove from list' : 'Save to list'}
+        >
+          <Heart
+            size={14}
+            className={isAdded ? 'text-[#f08c21]' : 'text-[#131936]'}
+            fill={isAdded ? '#f08c21' : 'transparent'}
+          />
+        </button>
+      </div>
+
       {/* All content — pointer-events-none so the Link above handles body taps */}
       <div className="absolute inset-0 p-4 flex flex-col justify-between pointer-events-none">
         {/* Top row */}
-        <div className="flex items-start justify-between">
+        <div className="flex items-start">
           <span className="px-3 py-1 rounded-full bg-white text-[#f08c21] text-[11px] font-nunito font-semibold leading-none flex items-center">
             ✦ Trending this week
           </span>
-
-          {/* Bookmark toggle — re-enable pointer events */}
-          <button
-            onClick={isAdded ? onRemove : onAdd}
-            className="w-10 h-10 rounded-full bg-white flex items-center justify-center pointer-events-auto shrink-0"
-            aria-label={isAdded ? 'Remove from list' : 'Save to list'}
-          >
-            {isAdded ? (
-              <BookmarkCheck size={18} className="text-[#f08c21]" fill="#f08c21" />
-            ) : (
-              <Bookmark size={18} className="text-[#131936]" />
-            )}
-          </button>
         </div>
 
         {/* Bottom row */}
@@ -70,24 +90,15 @@ export default function HomeHeroCard({ place, isAdded, onAdd, onRemove, userId }
               {place.name}
             </h2>
             {location && (
-              <p className="flex items-center gap-1 text-[#fcd99a] font-nunito mt-0.5" style={{ fontSize: 13 }}>
+              <p className="flex items-center gap-1 text-white/80 font-nunito mt-0.5" style={{ fontSize: 13 }}>
                 <MapPin size={12} className="shrink-0" />
                 <span className="truncate">{location}</span>
               </p>
             )}
-
-            {/* CTA button */}
-            <button
-              onClick={isAdded ? onRemove : onAdd}
-              className="pointer-events-auto mt-2 px-4 py-1.5 rounded-full bg-white text-[#131936] font-nunito font-semibold"
-              style={{ fontSize: 13, minHeight: 36 }}
-            >
-              {isAdded ? '✓ Saved to Someday' : '+ Add to Someday'}
-            </button>
           </div>
 
           {/* Saves count */}
-          <div className="flex items-center gap-1 text-white font-nunito shrink-0" style={{ fontSize: 12 }}>
+          <div className="flex items-center gap-1 text-white/80 font-nunito shrink-0" style={{ fontSize: 12 }}>
             <Heart size={12} />
             <span>{formatCount(place.popularity)} saves</span>
           </div>

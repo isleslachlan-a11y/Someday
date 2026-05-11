@@ -165,35 +165,10 @@ export default function HomeContent({
 
       {/* ── Sticky top bar ────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-30 bg-[#fff9f0] border-b border-[#fcd99a]/50">
-        <div className="max-w-[480px] mx-auto px-4 h-14 flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center gap-2">
-            <div
-              className="w-8 h-8 rounded-full bg-[#131936] flex items-center justify-center shrink-0"
-              aria-hidden
-            >
-              <span className="text-[#f08c21] text-[14px] leading-none">★</span>
-            </div>
-            <span className="font-syne font-bold text-[#131936] text-[18px]">someday</span>
-          </div>
-
-          {/* Right: bell + avatar */}
-          <div className="flex items-center gap-1">
-            {/* Bell — no badge (notifications table not yet built) */}
-            <Link
-              href="/notifications"
-              aria-label="Notifications"
-              className="flex items-center justify-center w-11 h-11 rounded-full"
-            >
-              <Bell size={20} className="text-[#131936]" strokeWidth={1.75} />
-            </Link>
-
-            {/* Profile avatar */}
-            <Link
-              href="/profile"
-              aria-label="Your profile"
-              className="flex items-center justify-center w-11 h-11"
-            >
+        <div className="max-w-[480px] mx-auto px-4 h-14 grid grid-cols-3 items-center">
+          {/* Left: profile avatar */}
+          <div className="flex items-center">
+            <Link href="/profile" aria-label="Your profile" className="flex items-center justify-center w-11 h-11">
               {profile.avatar_url ? (
                 <Image
                   src={profile.avatar_url}
@@ -207,6 +182,24 @@ export default function HomeContent({
                   <span className="font-syne font-bold text-[#f08c21] text-[13px]">{initials}</span>
                 </div>
               )}
+            </Link>
+          </div>
+
+          {/* Centre: wordmark */}
+          <div className="flex justify-center">
+            <span className="font-syne font-bold text-[#131936] text-[18px] tracking-widest uppercase">
+              SOMEDAY
+            </span>
+          </div>
+
+          {/* Right: bell */}
+          <div className="flex items-center justify-end">
+            <Link
+              href="/notifications"
+              aria-label="Notifications"
+              className="flex items-center justify-center w-11 h-11 rounded-full"
+            >
+              <Bell size={20} className="text-[#131936]" strokeWidth={1.75} />
             </Link>
           </div>
         </div>
