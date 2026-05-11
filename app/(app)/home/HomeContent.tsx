@@ -12,6 +12,26 @@ import HomeHeroCard from '@/components/HomeHeroCard'
 import HomePlaceCard from '@/components/HomePlaceCard'
 import type { Place } from '@/lib/types'
 
+// ─── Search prompts ───────────────────────────────────────────────────────────
+
+const SEARCH_PROMPTS = [
+  "Somewhere with better weather than here…",
+  "A beach where I can ignore my emails…",
+  "Overpriced coffee with an incredible view…",
+  "Somewhere my passport finally earns its keep…",
+  "A place where jetlag is worth it…",
+  "Hot springs. Preferably remote. Definitely Instagram-worthy…",
+  "Somewhere I'll tell people I discovered…",
+  "A market where I'll buy things I don't need…",
+  "Hiking trail, moderate difficulty, stunning payoff…",
+  "Street food that ruins all future street food…",
+  "A city that makes me feel cultured…",
+  "Somewhere my out-of-office actually means something…",
+  "A sunrise worth a 4am alarm…",
+  "Somewhere I'd move to if I wasn't so comfortable…",
+  "Chaos, colour, and really good noodles…",
+]
+
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface Props {
@@ -74,6 +94,41 @@ export default function HomeContent({
   const router = useRouter()
   const [bucketPlaceIds, setBucketPlaceIds] = useState<string[]>(initialBucketPlaceIds)
   const [searchQuery, setSearchQuery] = useState('')
+
+  // ── Typewriter placeholder ────────────────────────────────────────────────
+  const [promptIndex, setPromptIndex] = useState(0)
+  const [displayed, setDisplayed]     = useState('')
+  const [isTyping, setIsTyping]       = useState(true)
+
+  useEffect(() => {
+    setPromptIndex(Math.floor(Math.random() * SEARCH_PROMPTS.length))
+  }, [])
+
+  useEffect(() => {
+    const target = SEARCH_PROMPTS[promptIndex]
+
+    if (isTyping) {
+      if (displayed.length < target.length) {
+        const t = setTimeout(() => {
+          setDisplayed(target.slice(0, displayed.length + 1))
+        }, 45)
+        return () => clearTimeout(t)
+      } else {
+        const t = setTimeout(() => setIsTyping(false), 3000)
+        return () => clearTimeout(t)
+      }
+    } else {
+      if (displayed.length > 0) {
+        const t = setTimeout(() => {
+          setDisplayed(prev => prev.slice(0, -1))
+        }, 22)
+        return () => clearTimeout(t)
+      } else {
+        setPromptIndex(prev => (prev + 1) % SEARCH_PROMPTS.length)
+        setIsTyping(true)
+      }
+    }
+  }, [displayed, isTyping, promptIndex])
 
   // ── Infinite scroll state ─────────────────────────────────────────────────
   const [allGridPlaces, setAllGridPlaces] = useState<Place[]>(gridPlaces)
@@ -210,16 +265,21 @@ export default function HomeContent({
 
         {/* Search bar */}
         <form onSubmit={handleSearchSubmit} className="mb-5">
-          <div className="flex items-center gap-2 bg-white rounded-full border border-[#fcd99a] px-4 h-11">
+          <div className="relative flex items-center gap-2 bg-white rounded-full border border-[#fcd99a] px-4 h-11">
             <Search size={16} className="text-[#f08c21] shrink-0" />
             <input
               type="text"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               onFocus={handleSearchFocus}
-              placeholder="Search bucket-list moments…"
-              className="flex-1 bg-transparent text-[#131936] text-[14px] font-nunito placeholder:text-[#131936]/40 outline-none h-full"
+              className="flex-1 bg-transparent text-[#131936] text-[14px] font-nunito outline-none h-full"
             />
+            {!searchQuery && (
+              <span className="absolute left-10 top-1/2 -translate-y-1/2 text-[#131936]/40 text-[14px] font-nunito pointer-events-none truncate max-w-[calc(100%-3rem)]">
+                {displayed}
+                {isTyping && <span className="animate-pulse ml-0.5">|</span>}
+              </span>
+            )}
           </div>
         </form>
 
