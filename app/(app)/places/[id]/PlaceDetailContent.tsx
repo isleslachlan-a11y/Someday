@@ -4,9 +4,9 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ChevronLeft, ChevronRight, Heart, Share2, Compass } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Heart, Share2, Compass, Locate } from 'lucide-react'
 import toast from 'react-hot-toast'
-import Map, { Marker } from 'react-map-gl/mapbox'
+import Map, { Marker, NavigationControl } from 'react-map-gl/mapbox'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { logEvent } from '@/lib/events'
 import { addPlaceToList, removePlaceByPlaceId } from '@/app/actions/bucketList'
@@ -14,6 +14,13 @@ import Avatar from '@/components/Avatar'
 import type { Place } from '@/lib/types'
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? ''
+
+const PIN_COLOR: Record<string, string> = {
+  city:       '#131936',
+  nature:     '#16a34a',
+  experience: '#f08c21',
+  food:       '#dc2626',
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -76,6 +83,7 @@ export default function PlaceDetailContent({
   const [activeDot, setActiveDot] = useState(0)
   const [savedSimilarIds, setSavedSimilarIds] = useState<Set<string>>(new Set())
   const scrollRef = useRef<HTMLDivElement>(null)
+  const mapRef    = useRef<import('react-map-gl/mapbox').MapRef>(null)
 
   useEffect(() => {
     logEvent(userId, 'page_viewed', { page: 'place_detail', place_id: place.id })
@@ -125,6 +133,17 @@ export default function PlaceDetailContent({
       await navigator.clipboard.writeText(url)
       toast.success('Link copied!')
     }
+  }
+
+  // ── Recentre map ──────────────────────────────────────────────────────────
+
+  function recentreMap() {
+    if (!mapRef.current || !place.lat || !place.lng) return
+    mapRef.current.flyTo({
+      center:   [place.lng, place.lat],
+      zoom:     12,
+      duration: 800,
+    })
   }
 
   // ── Scroll tracking ───────────────────────────────────────────────────────
@@ -219,39 +238,152 @@ export default function PlaceDetailContent({
 
         {/* ── Map ──────────────────────────────────────────────────────────── */}
         <div className="pt-6">
+          <div className="flex items-center justify-between px-4 mb-3">
+            <h2 className="font-syne font-bold text-[#131936] text-[16px]">Where the magic is</h2>
+            {place.lat && place.lng && (
+              <Link
+                href={`/map?lat=${place.lat}&lng=${place.lng}&name=${encodeURIComponent(place.name)}`}
+                className="font-nunito text-[13px] text-[#f08c21]"
+              >
+                Open map →
+              </Link>
+            )}
+          </div>
+
           {place.lat && place.lng ? (
-            <div className="mx-4 rounded-2xl overflow-hidden" style={{ height: 160 }}>
+            <div className="mx-4 rounded-2xl overflow-hidden relative" style={{ height: 280 }}>
               {MAPBOX_TOKEN ? (
-                <Map
-                  initialViewState={{
-                    longitude: place.lng,
-                    latitude:  place.lat,
-                    zoom:      11,
-                  }}
-                  style={{ width: '100%', height: '100%' }}
-                  mapStyle="mapbox://styles/mapbox/light-v11"
-                  mapboxAccessToken={MAPBOX_TOKEN}
-                  interactive={false}
-                  reuseMaps
-                >
-                  <Marker longitude={place.lng} latitude={place.lat} anchor="bottom">
-                    <div
-                      style={{
-                        width:           32,
-                        height:          32,
-                        borderRadius:    '50%',
-                        backgroundColor: '#f08c21',
-                        border:          '2px solid white',
-                        boxShadow:       '0 2px 8px rgba(240,140,33,0.5)',
-                        display:         'flex',
-                        alignItems:      'center',
-                        justifyContent:  'center',
-                      }}
-                    >
-                      <span style={{ fontSize: 14 }}>★</span>
-                    </div>
-                  </Marker>
-                </Map>
+                <>
+                  <Map
+                    ref={mapRef}
+                    initialViewState={{
+                      longitude: place.lng,
+                      latitude:  place.lat,
+                      zoom:      12,
+                    }}
+                    style={{ width: '100%', height: '100%' }}
+                    mapStyle="mapbox://styles/mapbox/light-v11"
+                    mapboxAccessToken={MAPBOX_TOKEN}
+                    interactive={true}
+                    reuseMaps
+                  >
+                    <NavigationControl position="bottom-right" showCompass={false} />
+
+                    {/* Primary place pin */}
+                    <Marker longitude={place.lng} latitude={place.lat} anchor="bottom">
+                      <div
+                        style={{
+                          width:           36,
+                          height:          36,
+                          borderRadius:    '50%',
+                          backgroundColor: '#f08c21',
+                          border:          '3px solid white',
+                          boxShadow:       '0 2px 10px rgba(240,140,33,0.6)',
+                          display:         'flex',
+                          alignItems:      'center',
+                          justifyContent:  'center',
+                          cursor:          'pointer',
+                        }}
+                      >
+                        <span style={{ fontSize: 16, lineHeight: 1 }}>★</span>
+                      </div>
+                    </Marker>
+
+                    {/* Nearby place pins from similarPlaces */}
+                    {similarPlaces
+                      .filter(sp => sp.lat != null && sp.lng != null)
+                      .map(sp => {
+                        const color = PIN_COLOR[sp.type] ?? '#131936'
+                        return (
+                          <Marker
+                            key={sp.id}
+                            longitude={sp.lng!}
+                            latitude={sp.lat!}
+                            anchor="bottom"
+                          >
+                            <Link href={`/places/${sp.id}`} aria-label={sp.name}>
+                              <div
+                                style={{
+                                  width:           28,
+                                  height:          28,
+                                  borderRadius:    '50%',
+                                  backgroundColor: color,
+                                  border:          '2px solid white',
+                                  boxShadow:       `0 2px 6px ${color}66`,
+                                  display:         'flex',
+                                  alignItems:      'center',
+                                  justifyContent:  'center',
+                                  cursor:          'pointer',
+                                }}
+                                title={sp.name}
+                              >
+                                <span style={{ fontSize: 11, color: 'white', lineHeight: 1 }}>
+                                  {sp.type === 'nature'     ? '🌿' :
+                                   sp.type === 'food'       ? '🍜' :
+                                   sp.type === 'experience' ? '✦'  : '●'}
+                                </span>
+                              </div>
+                            </Link>
+                          </Marker>
+                        )
+                      })}
+                  </Map>
+
+                  {/* Recentre button */}
+                  <button
+                    onClick={recentreMap}
+                    aria-label="Re-centre map"
+                    style={{
+                      position:        'absolute',
+                      top:             12,
+                      right:           12,
+                      zIndex:          10,
+                      width:           36,
+                      height:          36,
+                      borderRadius:    '50%',
+                      backgroundColor: 'white',
+                      border:          '1px solid rgba(19,25,54,0.15)',
+                      boxShadow:       '0 2px 6px rgba(0,0,0,0.12)',
+                      display:         'flex',
+                      alignItems:      'center',
+                      justifyContent:  'center',
+                      cursor:          'pointer',
+                    }}
+                  >
+                    <Locate size={16} color="#131936" strokeWidth={1.75} />
+                  </button>
+
+                  {/* Pin legend */}
+                  <div
+                    style={{
+                      position:        'absolute',
+                      bottom:          40,
+                      left:            12,
+                      zIndex:          10,
+                      backgroundColor: 'rgba(255,255,255,0.92)',
+                      borderRadius:    10,
+                      padding:         '6px 10px',
+                      display:         'flex',
+                      flexDirection:   'column',
+                      gap:             4,
+                    }}
+                  >
+                    {[
+                      { color: '#f08c21', emoji: '★',  label: place.name },
+                      { color: '#131936', emoji: '●',  label: 'City' },
+                      { color: '#16a34a', emoji: '🌿', label: 'Nature' },
+                      { color: '#f08c21', emoji: '✦',  label: 'Experience' },
+                      { color: '#dc2626', emoji: '🍜', label: 'Food' },
+                    ].map(({ color, emoji, label }) => (
+                      <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ fontSize: 11, color, lineHeight: 1 }}>{emoji}</span>
+                        <span style={{ fontSize: 10, color: '#131936', fontFamily: 'Nunito, sans-serif', opacity: 0.7 }}>
+                          {label}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </>
               ) : (
                 <div className="w-full h-full bg-[#fcd99a]/30 flex items-center justify-center rounded-2xl">
                   <p className="font-nunito text-[#131936]/30 text-[12px]">Map not configured</p>
@@ -261,7 +393,7 @@ export default function PlaceDetailContent({
           ) : (
             <div
               className="mx-4 rounded-2xl bg-[#fcd99a]/30 flex items-center justify-center"
-              style={{ height: 160 }}
+              style={{ height: 280 }}
             >
               <p className="font-nunito text-[#131936]/30 text-[12px]">No location data</p>
             </div>
