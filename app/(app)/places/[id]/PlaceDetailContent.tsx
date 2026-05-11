@@ -353,36 +353,6 @@ export default function PlaceDetailContent({
                     <Locate size={16} color="#131936" strokeWidth={1.75} />
                   </button>
 
-                  {/* Pin legend */}
-                  <div
-                    style={{
-                      position:        'absolute',
-                      bottom:          40,
-                      left:            12,
-                      zIndex:          10,
-                      backgroundColor: 'rgba(255,255,255,0.92)',
-                      borderRadius:    10,
-                      padding:         '6px 10px',
-                      display:         'flex',
-                      flexDirection:   'column',
-                      gap:             4,
-                    }}
-                  >
-                    {[
-                      { color: '#f08c21', emoji: '★',  label: place.name },
-                      { color: '#131936', emoji: '●',  label: 'City' },
-                      { color: '#16a34a', emoji: '🌿', label: 'Nature' },
-                      { color: '#f08c21', emoji: '✦',  label: 'Experience' },
-                      { color: '#dc2626', emoji: '🍜', label: 'Food' },
-                    ].map(({ color, emoji, label }) => (
-                      <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <span style={{ fontSize: 11, color, lineHeight: 1 }}>{emoji}</span>
-                        <span style={{ fontSize: 10, color: '#131936', fontFamily: 'Nunito, sans-serif', opacity: 0.7 }}>
-                          {label}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
                 </>
               ) : (
                 <div className="w-full h-full bg-[#fcd99a]/30 flex items-center justify-center rounded-2xl">
