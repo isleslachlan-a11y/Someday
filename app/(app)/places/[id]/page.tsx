@@ -35,6 +35,8 @@ export default async function PlaceDetailPage({
 
   const place = placeRaw as unknown as Place
 
+  const isExperienceType = place.type === 'experience' || place.type === 'food'
+
   // Run independent queries in parallel
   const [bucketResult, similarResult, countryPlacesResult, friendshipsResult] =
     await Promise.all([
@@ -44,13 +46,21 @@ export default async function PlaceDetailPage({
         .eq('user_id', user.id)
         .eq('place_id', id)
         .maybeSingle(),
-      supabase
-        .from('places')
-        .select('*')
-        .eq('country', place.country)
-        .neq('id', id)
-        .order('popularity', { ascending: false })
-        .limit(8),
+      isExperienceType
+        ? supabase
+            .from('places')
+            .select('*')
+            .eq('type', place.type)
+            .neq('id', id)
+            .order('popularity', { ascending: false })
+            .limit(8)
+        : supabase
+            .from('places')
+            .select('*')
+            .eq('country', place.country)
+            .neq('id', id)
+            .order('popularity', { ascending: false })
+            .limit(8),
       supabase
         .from('places')
         .select('id')
