@@ -3,12 +3,33 @@
 import { useState, useEffect, useMemo, useTransition } from 'react'
 import { Search, SlidersHorizontal } from 'lucide-react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
+import Link from 'next/link'
 import toast from 'react-hot-toast'
 import BucketListCard from '@/components/BucketListCard'
 import HomePlaceCard from '@/components/HomePlaceCard'
 import { updateListEntry, removeFromList } from '@/app/actions/bucketList'
 import { logEvent } from '@/lib/events'
 import type { ListEntry, FriendBucketItem, BucketListStatus } from '@/lib/types'
+
+// ─── Search prompts ───────────────────────────────────────────────────────────
+
+const SEARCH_PROMPTS = [
+  "Seek and ye shall find…",
+  "Every great trip starts with a search…",
+  "Where in the world are you dreaming of…",
+  "Type a place. Any place. Go on…",
+  "Your next adventure is one search away…",
+  "Lost? Good. That's how the best trips start…",
+  "Search for something incredible…",
+  "Name a place and we'll make it real…",
+  "Even Marco Polo had to start somewhere…",
+  "One search. Infinite possibilities…",
+  "What's calling your name today…",
+  "Your bucket list is waiting to grow…",
+  "Find the place you didn't know you needed…",
+  "Go ahead, dream a little bigger…",
+  "The world is large. Let's find your corner of it…",
+]
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -76,6 +97,35 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
   const [entries, setEntries] = useState<ListEntry[]>(initialEntries)
   const [selectedEntry, setSelectedEntry] = useState<ListEntry | null>(null)
   const [showFilterSheet, setShowFilterSheet] = useState(false)
+
+  // ── Typewriter placeholder ────────────────────────────────────────────────
+  const [promptIndex, setPromptIndex] = useState(() =>
+    Math.floor(Math.random() * SEARCH_PROMPTS.length))
+  const [displayed, setDisplayed]     = useState('')
+  const [isTyping, setIsTyping]       = useState(true)
+
+  useEffect(() => {
+    const target = SEARCH_PROMPTS[promptIndex]
+    if (isTyping) {
+      if (displayed.length < target.length) {
+        const t = setTimeout(() =>
+          setDisplayed(target.slice(0, displayed.length + 1)), 45)
+        return () => clearTimeout(t)
+      } else {
+        const t = setTimeout(() => setIsTyping(false), 3000)
+        return () => clearTimeout(t)
+      }
+    } else {
+      if (displayed.length > 0) {
+        const t = setTimeout(() =>
+          setDisplayed(prev => prev.slice(0, -1)), 22)
+        return () => clearTimeout(t)
+      } else {
+        setPromptIndex(prev => (prev + 1) % SEARCH_PROMPTS.length)
+        setIsTyping(true)
+      }
+    }
+  }, [displayed, isTyping, promptIndex])
 
   useEffect(() => {
     setEntries(initialEntries)
@@ -237,12 +287,18 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
           <span className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none select-none">
             <Search size={15} className="text-[#f08c21]" />
           </span>
+          {!searchInput && (
+            <span className="absolute left-9 top-1/2 -translate-y-1/2 text-[#131936]/40 text-[14px] font-nunito pointer-events-none truncate max-w-[calc(100%-3rem)]">
+              {displayed}
+              {isTyping && <span className="animate-pulse ml-0.5">|</span>}
+            </span>
+          )}
           <input
             type="search"
             value={searchInput}
             onChange={e => setSearchInput(e.target.value)}
-            placeholder="Search your Someday's…"
-            className="w-full rounded-full bg-white border border-[#fcd99a] pl-9 pr-4 py-2.5 text-[14px] text-[#131936] font-nunito placeholder:text-[#131936]/40 focus:outline-none focus:ring-2 focus:ring-[#f08c21]/30 transition"
+            placeholder=""
+            className="w-full rounded-full bg-white border border-[#fcd99a] pl-9 pr-4 py-2.5 text-[14px] text-[#131936] font-nunito focus:outline-none focus:ring-2 focus:ring-[#f08c21]/30 transition"
           />
           {searchInput && (
             <button
@@ -449,6 +505,31 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
           </div>
         </>
       )}
+
+      {/* ── Shooting star footer ──────────────────────────────────────── */}
+      <div className="mt-12 mb-6 flex flex-col items-center gap-3">
+        <div className="relative w-full flex items-center justify-center h-8 overflow-hidden">
+          <div className="flex items-center gap-1">
+            <span className="text-[#fcd99a] text-[10px] opacity-30">·</span>
+            <span className="text-[#fcd99a] text-[10px] opacity-50">·</span>
+            <span className="text-[#fcd99a] text-[12px] opacity-70">·</span>
+            <span className="text-[#f08c21] text-[20px]">★</span>
+            <span className="text-[#fcd99a] text-[12px] opacity-70">·</span>
+            <span className="text-[#fcd99a] text-[10px] opacity-50">·</span>
+            <span className="text-[#fcd99a] text-[10px] opacity-30">·</span>
+          </div>
+        </div>
+        <p className="font-nunito text-[#131936]/40 text-[13px] text-center">
+          Looking for inspiration?
+        </p>
+        <Link
+          href="/discover"
+          className="flex items-center gap-1.5 font-nunito font-semibold text-[#f08c21] text-[14px] hover:opacity-80 transition-opacity"
+        >
+          Explore the world
+          <span className="text-[16px]">→</span>
+        </Link>
+      </div>
     </>
   )
 }
