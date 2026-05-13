@@ -239,6 +239,31 @@ export default function DiscoverContent({
           })}
         </>
       )}
+
+      {/* ── Shooting star footer ──────────────────────────────────────── */}
+      <div className="mt-12 mb-6 flex flex-col items-center gap-3">
+        <div className="relative w-full flex items-center justify-center h-8 overflow-hidden">
+          <div className="flex items-center gap-1">
+            <span className="text-[#fcd99a] text-[10px] opacity-30">·</span>
+            <span className="text-[#fcd99a] text-[10px] opacity-50">·</span>
+            <span className="text-[#fcd99a] text-[12px] opacity-70">·</span>
+            <span className="text-[#f08c21] text-[20px]">★</span>
+            <span className="text-[#fcd99a] text-[12px] opacity-70">·</span>
+            <span className="text-[#fcd99a] text-[10px] opacity-50">·</span>
+            <span className="text-[#fcd99a] text-[10px] opacity-30">·</span>
+          </div>
+        </div>
+        <p className="font-nunito text-[#131936]/40 text-[13px] text-center">
+          See what&apos;s suggested for you
+        </p>
+        <Link
+          href="/home"
+          className="flex items-center gap-1.5 font-nunito font-semibold text-[#f08c21] text-[14px] hover:opacity-80 transition-opacity"
+        >
+          Back to home
+          <span className="text-[16px]">→</span>
+        </Link>
+      </div>
     </div>
   )
 }
@@ -264,8 +289,8 @@ function DiscoverPlaceCard({
     <div
       className={`relative rounded-2xl overflow-hidden ${gridMode ? 'w-full' : 'shrink-0'}`}
       style={{
-        height: 260,
-        ...(gridMode ? {} : { width: 160 }),
+        height: 200,
+        ...(gridMode ? {} : { width: 130 }),
         background: dark ? '#131936' : '#fcd99a',
       }}
     >
@@ -274,7 +299,7 @@ function DiscoverPlaceCard({
           src={place.image_url}
           alt={place.name}
           fill
-          sizes={gridMode ? '(max-width: 480px) 50vw, 240px' : '160px'}
+          sizes={gridMode ? '(max-width: 480px) 50vw, 200px' : '130px'}
           className="object-cover"
         />
       )}

@@ -109,7 +109,7 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
     if (isTyping) {
       if (displayed.length < target.length) {
         const t = setTimeout(() =>
-          setDisplayed(target.slice(0, displayed.length + 1)), 45)
+          setDisplayed(target.slice(0, displayed.length + 1)), 75)
         return () => clearTimeout(t)
       } else {
         const t = setTimeout(() => setIsTyping(false), 3000)
@@ -118,7 +118,7 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
     } else {
       if (displayed.length > 0) {
         const t = setTimeout(() =>
-          setDisplayed(prev => prev.slice(0, -1)), 22)
+          setDisplayed(prev => prev.slice(0, -1)), 35)
         return () => clearTimeout(t)
       } else {
         setPromptIndex(prev => (prev + 1) % SEARCH_PROMPTS.length)

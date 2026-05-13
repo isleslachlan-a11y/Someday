@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { Bell } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import ListFilters from './ListFilters'
 import type { BucketListStatus, ListEntry, FriendBucketItem } from '@/lib/types'
@@ -140,15 +139,7 @@ export default async function ListPage() {
               MY SOMEDAY&apos;S
             </h1>
           </div>
-          <div className="flex items-center justify-end">
-            <Link
-              href="/notifications"
-              aria-label="Notifications"
-              className="flex items-center justify-center w-11 h-11 rounded-full"
-            >
-              <Bell size={20} className="text-[#131936]" strokeWidth={1.75} />
-            </Link>
-          </div>
+          <div />
         </div>
       </header>
 
