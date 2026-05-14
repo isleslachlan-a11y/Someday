@@ -99,8 +99,7 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
   const [showFilterSheet, setShowFilterSheet] = useState(false)
 
   // ── Typewriter placeholder ────────────────────────────────────────────────
-  const [promptIndex, setPromptIndex] = useState(() =>
-    Math.floor(Math.random() * SEARCH_PROMPTS.length))
+  const [promptIndex, setPromptIndex] = useState(0)
   const [displayed, setDisplayed]     = useState('')
   const [isTyping, setIsTyping]       = useState(true)
 
@@ -126,6 +125,10 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
       }
     }
   }, [displayed, isTyping, promptIndex])
+
+  useEffect(() => {
+    setPromptIndex(Math.floor(Math.random() * SEARCH_PROMPTS.length))
+  }, [])
 
   useEffect(() => {
     setEntries(initialEntries)
