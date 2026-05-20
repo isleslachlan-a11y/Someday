@@ -99,9 +99,17 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
   const [showFilterSheet, setShowFilterSheet] = useState(false)
 
   // ── Typewriter placeholder ────────────────────────────────────────────────
-  const [promptIndex, setPromptIndex] = useState(0)
+  const [promptIndex, setPromptIndex] = useState(
+    () => Math.floor(Math.random() * SEARCH_PROMPTS.length)
+  )
   const [displayed, setDisplayed]     = useState('')
   const [isTyping, setIsTyping]       = useState(true)
+
+  // Reset the stream cleanly when the prompt advances
+  useEffect(() => {
+    setDisplayed('')
+    setIsTyping(true)
+  }, [promptIndex])
 
   useEffect(() => {
     const target = SEARCH_PROMPTS[promptIndex]
@@ -121,14 +129,9 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
         return () => clearTimeout(t)
       } else {
         setPromptIndex(prev => (prev + 1) % SEARCH_PROMPTS.length)
-        setIsTyping(true)
       }
     }
-  }, [displayed, isTyping, promptIndex])
-
-  useEffect(() => {
-    setPromptIndex(Math.floor(Math.random() * SEARCH_PROMPTS.length))
-  }, [])
+  }, [displayed, isTyping])
 
   useEffect(() => {
     setEntries(initialEntries)
@@ -297,7 +300,10 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
             </span>
           )}
           <input
+            id="list-search"
+            name="list-search"
             type="search"
+            autoComplete="off"
             value={searchInput}
             onChange={e => setSearchInput(e.target.value)}
             placeholder=""
@@ -721,6 +727,8 @@ function ListItemSheet({
                   Add a note? (optional)
                 </p>
                 <textarea
+                  id="list-completion-note"
+                  name="list-completion-note"
                   rows={2}
                   value={completionNote}
                   onChange={e => setCompletionNote(e.target.value)}
@@ -753,6 +761,8 @@ function ListItemSheet({
                 <span className="normal-case font-normal">(optional)</span>
               </label>
               <input
+                id="list-item-date"
+                name="list-item-date"
                 type="month"
                 value={form.target_date}
                 onChange={e => update('target_date', e.target.value)}
@@ -776,6 +786,8 @@ function ListItemSheet({
                 <span className="normal-case font-normal">(optional)</span>
               </label>
               <textarea
+                id="list-item-notes"
+                name="list-item-notes"
                 rows={3}
                 value={form.notes}
                 onChange={e => update('notes', e.target.value)}
