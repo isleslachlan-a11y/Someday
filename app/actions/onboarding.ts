@@ -25,6 +25,12 @@ export async function completeOnboarding(
 
   if (!user) return { error: 'Not authenticated' }
 
+  // 0. Ensure profiles row exists (user_context has FK dependency on profiles)
+  await supabase.from('profiles').upsert(
+    { id: user.id },
+    { onConflict: 'id', ignoreDuplicates: true }
+  )
+
   // 1. Upsert user_context (conflict on user_id — unique column)
   const { error: contextError } = await supabase.from('user_context').upsert(
     {
@@ -43,38 +49,38 @@ export async function completeOnboarding(
 
   if (contextError) return { error: contextError.message }
 
-  // 2. Insert past trip (non-fatal — skip on error)
-  if (input.pastTripName) {
-    await supabase.from('past_trips').insert({
+  // 2–4. Non-fatal writes — run in parallel
+  await Promise.all([
+    input.pastTripName
+      ? supabase.from('past_trips').insert({
+          user_id: user.id,
+          place_name: input.pastTripName,
+          year: input.pastTripYear ?? null,
+        })
+      : Promise.resolve(),
+
+    input.selectedPlaceIds.length > 0
+      ? supabase.from('bucket_list_items').insert(
+          input.selectedPlaceIds.map(placeId => ({
+            user_id: user.id,
+            place_id: placeId,
+            status: 'wishlist',
+          }))
+        )
+      : Promise.resolve(),
+
+    supabase.from('events').insert({
       user_id: user.id,
-      place_name: input.pastTripName,
-      year: input.pastTripYear ?? null,
-    })
-  }
-
-  // 3. Seed bucket list from selected places (non-fatal — skip on error)
-  if (input.selectedPlaceIds.length > 0) {
-    await supabase.from('bucket_list_items').insert(
-      input.selectedPlaceIds.map(placeId => ({
-        user_id: user.id,
-        place_id: placeId,
-        status: 'wishlist',
-      }))
-    )
-  }
-
-  // 4. Log event
-  await supabase.from('events').insert({
-    user_id: user.id,
-    event_type: 'onboarding_completed',
-    metadata: {
-      travel_style_count: input.travelStyle.length,
-      places_seeded: input.selectedPlaceIds.length,
-      has_past_trip: !!input.pastTripName,
-    },
-    platform: 'web',
-    app_version: process.env.NEXT_PUBLIC_APP_VERSION ?? '0.1.0',
-  })
+      event_type: 'onboarding_completed',
+      metadata: {
+        travel_style_count: input.travelStyle.length,
+        places_seeded: input.selectedPlaceIds.length,
+        has_past_trip: !!input.pastTripName,
+      },
+      platform: 'web',
+      app_version: process.env.NEXT_PUBLIC_APP_VERSION ?? '0.1.0',
+    }),
+  ])
 
   revalidatePath('/home')
   return {}
