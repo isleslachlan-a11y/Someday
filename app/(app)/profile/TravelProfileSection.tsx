@@ -75,36 +75,36 @@ export default function TravelProfileSection({ context }: Props) {
   return (
     <section className="mb-8">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="font-syne font-bold text-white-soft">Travel Profile</h2>
+        <h2 className="font-syne font-bold text-[#131936]">Travel Profile</h2>
         <button
           onClick={() => setShowEdit(true)}
-          className="text-xs font-semibold text-lavender hover:text-white-soft transition-colors"
+          className="text-xs font-semibold text-[#f08c21] hover:text-[#131936] transition-colors"
         >
           {hasAnyData ? 'Edit' : 'Set up'}
         </button>
       </div>
 
       {!hasAnyData ? (
-        <div className="rounded-2xl border border-dashed border-white/15 p-5 text-center">
-          <p className="text-muted text-sm">
+        <div className="rounded-2xl border border-dashed border-[#fcd99a]/50 p-5 text-center">
+          <p className="text-[#131936]/50 text-sm">
             Tell us how you travel.{' '}
             <button
               onClick={() => setShowEdit(true)}
-              className="text-lavender hover:text-white-soft transition-colors"
+              className="text-[#f08c21] hover:text-[#131936] transition-colors"
             >
               Set up your travel profile →
             </button>
           </p>
         </div>
       ) : (
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 space-y-3">
+        <div className="rounded-2xl border border-[#fcd99a]/40 bg-white p-4 space-y-3">
           {/* Travel style tags */}
           {context!.travel_style && context!.travel_style.length > 0 && (
             <div className="flex gap-1.5 flex-wrap">
               {context!.travel_style.map(tag => (
                 <span
                   key={tag}
-                  className="rounded-full bg-violet-accent/10 border border-violet-accent/25 px-3 py-1 text-xs font-semibold text-lavender"
+                  className="rounded-full bg-[#f08c21]/10 border border-[#f08c21]/25 px-3 py-1 text-xs font-semibold text-[#f08c21]"
                 >
                   {tag}
                 </span>
@@ -147,7 +147,7 @@ export default function TravelProfileSection({ context }: Props) {
 
 function Chip({ label }: { label: string }) {
   return (
-    <span className="rounded-full bg-white/5 border border-white/10 px-3 py-1 text-xs font-semibold text-muted">
+    <span className="rounded-full bg-white border border-[#fcd99a]/40 px-3 py-1 text-xs font-semibold text-[#131936]/50">
       {label}
     </span>
   )
@@ -206,20 +206,20 @@ function EditModal({
       <div className="fixed inset-0 bg-black/60 z-40" onClick={onClose} aria-hidden />
 
       {/* Modal sheet */}
-      <div className="fixed inset-x-0 bottom-0 z-50 rounded-t-3xl bg-[#13112a] border-t border-white/10 animate-slide-up max-h-[88dvh] overflow-y-auto">
+      <div className="fixed inset-x-0 bottom-0 z-50 rounded-t-3xl bg-[#fff9f0] border-t border-[#fcd99a]/40 animate-slide-up max-h-[88dvh] overflow-y-auto">
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-2">
-          <div className="w-10 h-1 rounded-full bg-white/20" />
+          <div className="w-10 h-1 rounded-full bg-[#131936]/20" />
         </div>
 
         <div className="px-5 pb-10">
-          <h2 className="font-syne font-bold text-xl text-white-soft mb-6">Travel Profile</h2>
+          <h2 className="font-syne font-bold text-xl text-[#131936] mb-6">Travel Profile</h2>
 
           {/* Travel style */}
           <div className="mb-6">
-            <p className="text-xs text-muted font-semibold uppercase tracking-wider mb-3">
+            <p className="text-xs text-[#131936]/50 font-semibold uppercase tracking-wider mb-3">
               Travel style{' '}
-              <span className="normal-case font-normal tracking-normal text-muted/60">
+              <span className="normal-case font-normal tracking-normal text-[#131936]/30">
                 (up to 5)
               </span>
             </p>
@@ -231,8 +231,8 @@ function EditModal({
                   onClick={() => toggleStyle(tag)}
                   className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
                     travelStyle.includes(tag)
-                      ? 'border-violet-accent/50 bg-violet-accent/15 text-lavender'
-                      : 'border-white/10 bg-white/[0.03] text-muted hover:border-white/25 hover:text-white-soft'
+                      ? 'border-[#f08c21]/50 bg-[#f08c21]/10 text-[#f08c21]'
+                      : 'border-[#fcd99a]/40 bg-white text-[#131936]/50 hover:border-[#fcd99a]/60 hover:text-[#131936]'
                   }`}
                 >
                   {tag}
@@ -243,7 +243,7 @@ function EditModal({
 
           {/* Group preference */}
           <div className="mb-6">
-            <p className="text-xs text-muted font-semibold uppercase tracking-wider mb-3">
+            <p className="text-xs text-[#131936]/50 font-semibold uppercase tracking-wider mb-3">
               I usually travel
             </p>
             <div className="flex gap-2 flex-wrap">
@@ -254,8 +254,8 @@ function EditModal({
                   onClick={() => setGroup(g => g === opt ? '' : opt)}
                   className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
                     group === opt
-                      ? 'border-violet-accent/50 bg-violet-accent/15 text-lavender'
-                      : 'border-white/10 bg-white/[0.03] text-muted hover:border-white/25 hover:text-white-soft'
+                      ? 'border-[#f08c21]/50 bg-[#f08c21]/10 text-[#f08c21]'
+                      : 'border-[#fcd99a]/40 bg-white text-[#131936]/50 hover:border-[#fcd99a]/60 hover:text-[#131936]'
                   }`}
                 >
                   {GROUP_LABEL[opt]}
@@ -266,7 +266,7 @@ function EditModal({
 
           {/* Budget */}
           <div className="mb-6">
-            <p className="text-xs text-muted font-semibold uppercase tracking-wider mb-3">Budget</p>
+            <p className="text-xs text-[#131936]/50 font-semibold uppercase tracking-wider mb-3">Budget</p>
             <div className="flex gap-2 flex-wrap">
               {BUDGET_OPTIONS.map(opt => (
                 <button
@@ -275,8 +275,8 @@ function EditModal({
                   onClick={() => setBudget(b => b === opt ? '' : opt)}
                   className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
                     budget === opt
-                      ? 'border-violet-accent/50 bg-violet-accent/15 text-lavender'
-                      : 'border-white/10 bg-white/[0.03] text-muted hover:border-white/25 hover:text-white-soft'
+                      ? 'border-[#f08c21]/50 bg-[#f08c21]/10 text-[#f08c21]'
+                      : 'border-[#fcd99a]/40 bg-white text-[#131936]/50 hover:border-[#fcd99a]/60 hover:text-[#131936]'
                   }`}
                 >
                   {BUDGET_LABEL[opt]}
@@ -287,7 +287,7 @@ function EditModal({
 
           {/* Comfort zone */}
           <div className="mb-8">
-            <p className="text-xs text-muted font-semibold uppercase tracking-wider mb-3">
+            <p className="text-xs text-[#131936]/50 font-semibold uppercase tracking-wider mb-3">
               Comfort zone
             </p>
             <div className="flex gap-2 flex-wrap">
@@ -298,8 +298,8 @@ function EditModal({
                   onClick={() => setComfort(c => c === opt ? '' : opt)}
                   className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
                     comfort === opt
-                      ? 'border-violet-accent/50 bg-violet-accent/15 text-lavender'
-                      : 'border-white/10 bg-white/[0.03] text-muted hover:border-white/25 hover:text-white-soft'
+                      ? 'border-[#f08c21]/50 bg-[#f08c21]/10 text-[#f08c21]'
+                      : 'border-[#fcd99a]/40 bg-white text-[#131936]/50 hover:border-[#fcd99a]/60 hover:text-[#131936]'
                   }`}
                 >
                   {COMFORT_LABEL[opt]}
@@ -313,7 +313,7 @@ function EditModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-xl border border-white/10 py-3 text-sm font-semibold text-muted hover:text-white-soft hover:border-white/20 transition-colors"
+              className="flex-1 rounded-xl border border-[#fcd99a]/40 py-3 text-sm font-semibold text-[#131936]/50 hover:text-[#131936] hover:border-[#fcd99a]/60 transition-colors"
             >
               Cancel
             </button>
@@ -321,7 +321,7 @@ function EditModal({
               type="button"
               onClick={handleSave}
               disabled={isPending}
-              className="flex-1 rounded-xl bg-violet-accent hover:bg-violet-accent/90 disabled:opacity-50 py-3 text-sm font-syne font-semibold text-white-soft transition-colors"
+              className="flex-1 rounded-xl bg-[#f08c21] hover:bg-[#f08c21]/90 disabled:opacity-50 py-3 text-sm font-syne font-semibold text-[#131936] transition-colors"
             >
               {isPending ? 'Saving…' : 'Save'}
             </button>

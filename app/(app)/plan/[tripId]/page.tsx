@@ -154,18 +154,16 @@ export default async function TripDetailPage({ params, searchParams }: Props) {
   const initialTab = tab === 'chat' ? 'chat' : tab === 'map' ? 'map' : 'experiences'
 
   return (
-    <main className="min-h-screen bg-indigo-deep px-4 py-8">
-      <div className="max-w-3xl mx-auto">
-        <TripDetail
-          trip={trip}
-          tripItems={tripItems}
-          memberProfiles={memberProfiles}
-          myListPlaces={myListPlaces}
-          userId={user.id}
-          initialMessages={initialMessages}
-          initialTab={initialTab as 'experiences' | 'chat' | 'map'}
-        />
-      </div>
+    <main className="min-h-screen bg-[#fff9f0]">
+      <TripDetail
+        trip={trip}
+        tripItems={tripItems}
+        memberProfiles={memberProfiles}
+        myListPlaces={myListPlaces}
+        userId={user.id}
+        initialMessages={initialMessages}
+        initialTab={initialTab as 'experiences' | 'chat' | 'map'}
+      />
     </main>
   )
 }

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
-import { logEvent } from '@/lib/events'
+import { initUserAccount } from '@/app/actions/auth'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -72,18 +72,11 @@ export default function SignupPage() {
       return
     }
 
-    // Insert public profile row
-    const { error: insertError } = await supabase.from('profiles').insert({
-      id: data.user.id,
-      username: cleanUsername,
-    })
-
-    if (insertError) {
-      // Auth user was created but profile insert failed — non-fatal, continue
-      console.error('[signup] profile insert failed:', insertError.message)
+    // Create profile row + log signup event via server action (admin client bypasses RLS)
+    const { error: initError } = await initUserAccount(data.user.id, cleanUsername)
+    if (initError) {
+      console.error('[signup] initUserAccount failed:', initError)
     }
-
-    await logEvent(data.user.id, 'user_signed_up', { username: cleanUsername })
 
     router.push('/onboarding')
     router.refresh()

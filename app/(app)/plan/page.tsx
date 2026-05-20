@@ -81,16 +81,14 @@ export default async function PlanPage() {
   }
 
   return (
-    <main className="min-h-screen bg-indigo-deep px-4 py-8">
-      <div className="max-w-3xl mx-auto">
-        <PlanContent
-          trips={trips}
-          overlaps={overlaps}
-          memberProfiles={memberProfiles}
-          userId={user.id}
-          tripUnreadMap={tripUnreadMap}
-        />
-      </div>
+    <main className="min-h-screen bg-[#fff9f0]">
+      <PlanContent
+        trips={trips}
+        overlaps={overlaps}
+        memberProfiles={memberProfiles}
+        userId={user.id}
+        tripUnreadMap={tripUnreadMap}
+      />
     </main>
   )
 }

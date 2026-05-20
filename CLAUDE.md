@@ -60,8 +60,10 @@ Run `npm run build` after significant changes and fix all errors before committi
 - `lib/messaging.ts` — `getConversations`, `getConversationInfo`, `getOrCreateDM`, `createGroupChat`, `getMessages`, `sendMessage`, `markAsRead`. Server-only.
 - `lib/feed.ts` — `assembleFeed(pageNum)`: builds the home feed array from daily highlight, friend activity, overlaps, and promotional posts. Page 0 includes the daily highlight (deterministic rotation by day of year). Used by `HomeContent.tsx`.
 - `lib/design-tokens.ts` — `TOKENS` object (colors, spacing, touchTarget). Reference before hardcoding any value.
+- `lib/unsplash.ts` — `searchUnsplashImage(query)` and `linkImageToPlace(placeId, query?)`. Server-side only. Used by admin image seeding scripts and `app/actions/unsplash-actions.ts`. Never call client-side.
 - `middleware.ts` — route protection; redirects unauthenticated users to `/login`.
 - `components/AppShell.tsx` — authenticated layout with desktop sidebar + mobile bottom tab bar.
+- `components/ui/UnsplashAttribution.tsx` — **required** on any page/component displaying Unsplash images (API compliance). Shows photographer credit with UTM-tagged links.
 
 ### Route Structure
 
@@ -75,8 +77,11 @@ app/
     messages/     — conversation list; [conversationId]/ for realtime chat view
     plan/         — trip planning; [tripId]/ for trip detail + group chat
     submit/       — nominate a destination for the catalogue
+    places/[id]/  — place detail page (PlaceDetailContent.tsx); warm tangerine palette
+    discover/     — search + filter stub (not yet built)
     profile/      — own profile; [username]/ for public profiles; edit/
     admin/analytics/  — B2B analytics (gated by ADMIN_USER_ID)
+    admin/images/ — image admin for bulk Unsplash linking (gated)
   (auth)/         — public pages: login/, signup/
   onboarding/     — onboarding flow (outside (app) to avoid redirect loop)
   actions/        — Server Actions ('use server'): auth.ts, bucketList.ts, friends.ts, messaging.ts, profile.ts, search.ts, trips.ts, submissions.ts, onboarding.ts
@@ -85,7 +90,7 @@ app/
 
 **Navigation (AppShell):** Home → List → Plan → Map → Profile (bottom bar mobile, left sidebar lg+). Profile icon shows badge for pending friend requests.
 
-Mutations use Server Actions (not API routes). On signup, always insert a row into `profiles` using the returned `user.id`.
+Mutations use Server Actions (not API routes). The one exception is `app/api/places/feed/route.ts` — a GET route used by the home page infinite scroll to paginate places by popularity. On signup, always insert a row into `profiles` using the returned `user.id`.
 
 ### Patterns
 
@@ -108,7 +113,7 @@ Mutations use Server Actions (not API routes). On signup, always insert a row in
 | Table | Purpose | Status |
 |-------|---------|--------|
 | `profiles` | Public user profiles (extends `auth.users`); includes `map_city_preference` | Built |
-| `places` | Curated catalogue of destinations (admin-seeded); includes `lat`, `lng`, `popularity`, `trending`, `image_url`, `vibes` (enum: Adventure/Culture/Foodie/Romantic/Chill/Epic/Peaceful/Wellness), `intensity` (low/medium/high) | Built |
+| `places` | Curated catalogue of destinations (admin-seeded); includes `lat`, `lng`, `popularity`, `trending`, `image_url`, `image_thumb_url`, `unsplash_photo_id`, `unsplash_attribution` (JSONB), `image_keyword`, `vibes` (enum: Adventure/Culture/Foodie/Romantic/Chill/Epic/Peaceful/Wellness), `intensity` (low/medium/high) | Built |
 | `bucket_list_items` | A user's personal bucket list (user → place); includes `completed_at`, `completion_note`, `completion_photo_url` for Strava-style completion tracking | Built |
 | `events` | Every user action — feeds the B2B data product | Built |
 | `user_context` | Per-user flags: `completed_onboarding`, travel preferences | Built |
@@ -162,6 +167,7 @@ When adding new env variables, also add them to Vercel's environment settings.
   const { data, error } = await supabase.from('...').select('*')
   if (error) { toast.error('Something went wrong.'); return; }
   ```
+- **Unsplash compliance:** Any component rendering an Unsplash image must include `<UnsplashAttribution>`. Images are served directly from Unsplash CDN (URLs only stored in DB — never re-host). All Unsplash links must include `?utm_source=someday&utm_medium=referral`.
 
 ## Event Logging
 
@@ -180,6 +186,8 @@ await logEvent(userId, 'item_added', { experience_id, category, country })
 | `item_status_toggled` | `item_id`, `new_status` |
 | `item_completed` | `experience_id`, `category`, `country`, `days_on_list` |
 | `post_created` | `experience_id`, `category` |
+| `place_saved` | `place_id`, `source` (e.g. `'detail_page'`, `'detail_similar'`) |
+| `item_removed` | `place_id`, `source` |
 | `user_followed` | `following_id` |
 | `search_performed` | `query`, `result_count` |
 | `page_viewed` | `page` |
@@ -198,6 +206,10 @@ Tailwind CSS v4 is configured via `tailwind.config.ts` (loaded with `@config` in
 | `text-muted` | `#7A7A9A` | Placeholder/secondary text |
 
 **Typography:** Headings use `font-syne` (Syne — bold, geometric); body uses Nunito (default sans).
+
+**Dual palette:** The app uses two distinct colour contexts:
+- **Dark indigo** (global app chrome, list, profile, home) — tokens above
+- **Warm tangerine/cream** (place-facing surfaces: `places/[id]/`, `discover/`, `HomePlaceCard`) — `#fff9f0` bg, `#f08c21` primary, `#fcd99a` secondary, `#131936` text. These are intentionally hardcoded in those components; do not swap them for the indigo tokens.
 
 ## Phase Build Order
 

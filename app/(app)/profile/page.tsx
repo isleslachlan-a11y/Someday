@@ -49,7 +49,6 @@ export default async function ProfilePage() {
 
   if (!user) redirect('/login')
 
-  // ── Parallel queries ────────────────────────────────────────────────────────
   const [profileResult, itemsResult, contextResult, tripsResult, friends] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', user.id).single(),
 
@@ -80,7 +79,6 @@ export default async function ProfilePage() {
   const profile = profileResult.data as UserProfile | null
   if (!profile) redirect('/login')
 
-  // Transform bucket list items
   const entries: BucketEntry[] = []
   for (const row of itemsResult.data ?? []) {
     const place = row.places as unknown as Record<string, unknown> | null
@@ -127,106 +125,105 @@ export default async function ProfilePage() {
     <>
       <ProfileViewTracker userId={user.id} viewedUserId={user.id} isOwnProfile />
 
-      <main className="min-h-screen bg-indigo-deep px-4 py-8">
-        <div className="max-w-3xl mx-auto">
+      <main className="min-h-screen bg-[#fff9f0]">
 
-          {/* ── Profile header ────────────────────────────────────────────── */}
-          <div className="flex items-start gap-5 mb-8">
-            <Avatar avatarUrl={profile.avatar_url} username={profile.username ?? ''} size={80} />
-            <div className="flex-1 min-w-0">
-              <h1 className="font-syne text-2xl font-bold text-white-soft leading-tight">
-                @{profile.username}
-              </h1>
-              {profile.bio ? (
-                <p className="text-sm text-white-soft/70 mt-1 leading-relaxed">{profile.bio}</p>
-              ) : (
-                <p className="text-sm text-muted mt-1 italic">No bio yet.</p>
-              )}
-              <p className="text-xs text-muted mt-2">
-                Joined{' '}
-                {new Date(profile.created_at).toLocaleDateString('en-AU', {
-                  month: 'long',
-                  year: 'numeric',
-                })}
-              </p>
+        {/* Sticky top bar */}
+        <header className="sticky top-0 z-30 bg-[#fff9f0] border-b border-[#fcd99a]/50">
+          <div className="max-w-[480px] mx-auto px-4 h-14 grid grid-cols-3 items-center">
+            <div />
+            <div className="flex justify-center">
+              <span className="font-syne font-bold text-[#131936] text-[20px] tracking-widest uppercase">
+                PROFILE
+              </span>
             </div>
-            <Link
-              href="/profile/edit"
-              className="shrink-0 rounded-xl border border-white/15 hover:border-violet-accent/40 hover:bg-violet-accent/5 px-4 py-2 text-sm font-semibold text-white-soft/80 transition-colors"
-            >
-              Edit profile
-            </Link>
+            <div className="flex justify-end">
+              <Link
+                href="/profile/edit"
+                className="px-3 py-1.5 rounded-full border border-[#fcd99a] bg-white font-nunito font-medium text-[#131936] text-[13px]"
+              >
+                Edit
+              </Link>
+            </div>
+          </div>
+        </header>
+
+        <div className="max-w-[480px] mx-auto px-4 pt-6 pb-24">
+
+          {/* Avatar + name block */}
+          <div className="flex flex-col items-center text-center mb-6">
+            <Avatar avatarUrl={profile.avatar_url} username={profile.username ?? ''} size={80} />
+            <h1 className="font-syne text-[22px] font-bold text-[#131936] mt-3">
+              @{profile.username}
+            </h1>
+            {profile.bio ? (
+              <p className="font-nunito text-[#131936]/60 text-[14px] mt-1 leading-relaxed max-w-xs">
+                {profile.bio}
+              </p>
+            ) : (
+              <p className="font-nunito text-[#131936]/30 text-[13px] mt-1 italic">
+                No bio yet.
+              </p>
+            )}
+            <p className="font-nunito text-[#131936]/30 text-[12px] mt-1">
+              Joined{' '}
+              {new Date(profile.created_at).toLocaleDateString('en-AU', {
+                month: 'long',
+                year: 'numeric',
+              })}
+            </p>
           </div>
 
-          {/* ── Quick stats — Friends · Places · Trips ───────────────────── */}
-          <div className="grid grid-cols-3 gap-3 mb-8">
-            {/* Friends — opens FriendsSheet */}
+          {/* Stats row */}
+          <div className="grid grid-cols-3 gap-3 mb-6">
             <FriendsSheet initialFriendCount={friendCount} />
-
-            {/* Places — links to list */}
             <Link
               href="/list"
-              className="flex flex-col items-center gap-0.5 rounded-2xl border border-white/10 bg-white/5 px-4 py-5 text-center hover:border-violet-accent/30 hover:bg-white/[0.07] transition-colors"
+              className="flex flex-col items-center gap-0.5 rounded-2xl border border-[#fcd99a]/40 bg-white px-4 py-5 text-center"
             >
-              <p className="font-syne text-3xl font-bold text-lavender">{placeCount}</p>
-              <p className="text-muted text-xs mt-1">Places</p>
+              <p className="font-syne text-[28px] font-bold text-[#f08c21]">{placeCount}</p>
+              <p className="font-nunito text-[#131936]/50 text-[11px] mt-0.5">Places</p>
             </Link>
-
-            {/* Trips — links to plan */}
             <Link
               href="/plan"
-              className="flex flex-col items-center gap-0.5 rounded-2xl border border-white/10 bg-white/5 px-4 py-5 text-center hover:border-violet-accent/30 hover:bg-white/[0.07] transition-colors"
+              className="flex flex-col items-center gap-0.5 rounded-2xl border border-[#fcd99a]/40 bg-white px-4 py-5 text-center"
             >
-              <p className="font-syne text-3xl font-bold text-pink-accent">{tripCount}</p>
-              <p className="text-muted text-xs mt-1">Trips</p>
+              <p className="font-syne text-[28px] font-bold text-[#f08c21]">{tripCount}</p>
+              <p className="font-nunito text-[#131936]/50 text-[11px] mt-0.5">Trips</p>
             </Link>
           </div>
 
-          {/* ── Travel Profile ────────────────────────────────────────────── */}
+          {/* Travel profile section */}
           <TravelProfileSection context={travelContext} />
 
-          {/* ── Past Trips ────────────────────────────────────────────────── */}
+          {/* Past trips section */}
           <PastTripsSection trips={pastTrips} />
 
-          {/* ── Bucket list grid ──────────────────────────────────────────── */}
-          <section>
+          {/* Bucket list grid */}
+          <section className="mt-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-syne text-lg font-bold text-white-soft">Your list</h2>
-              <Link
-                href="/list"
-                className="text-sm text-lavender hover:text-white-soft transition-colors"
-              >
+              <h2 className="font-syne font-bold text-[#131936] text-[17px]">Your list</h2>
+              <Link href="/list" className="font-nunito text-[#f08c21] text-[13px]">
                 Manage →
               </Link>
             </div>
-
             {entries.length === 0 ? (
-              <div className="rounded-2xl border border-white/10 bg-white/5 px-6 py-10 text-center">
-                <p className="text-muted text-sm">Nothing saved yet.</p>
-                <Link
-                  href="/home"
-                  className="inline-block mt-4 text-sm text-lavender hover:text-white-soft transition-colors"
-                >
+              <div className="rounded-2xl border border-[#fcd99a]/40 bg-white px-6 py-10 text-center">
+                <p className="font-nunito text-[#131936]/40 text-[14px]">Nothing saved yet.</p>
+                <Link href="/home" className="inline-block mt-3 font-nunito text-[#f08c21] text-[13px]">
                   Discover places →
                 </Link>
               </div>
             ) : (
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 grid-cols-2">
                 {entries.slice(0, 8).map(entry => (
                   <ProfilePlaceCard key={entry.id} entry={entry} />
                 ))}
               </div>
             )}
-
             {entries.length > 8 && (
-              <p className="text-xs text-muted text-center mt-4">
+              <p className="font-nunito text-[#131936]/40 text-[12px] text-center mt-4">
                 +{entries.length - 8} more —{' '}
-                <Link
-                  href="/list"
-                  className="text-lavender hover:text-white-soft transition-colors"
-                >
-                  see all
-                </Link>
+                <Link href="/list" className="text-[#f08c21]">see all</Link>
               </p>
             )}
           </section>
@@ -237,7 +234,7 @@ export default async function ProfilePage() {
   )
 }
 
-// ─── Profile place card ────────────────────────────────────────────────────────
+// ─── Profile place card ───────────────────────────────────────────────────────
 
 const TYPE_ICON: Record<string, string> = {
   city:       '🏙',
@@ -259,28 +256,20 @@ function ProfilePlaceCard({ entry }: { entry: BucketEntry }) {
     <div
       className={`flex items-center gap-3 rounded-2xl border p-4 transition-colors ${
         isCompleted
-          ? 'border-white/5 bg-white/[0.02] opacity-60'
-          : 'border-white/10 bg-white/5'
+          ? 'border-[#fcd99a]/20 bg-white opacity-60'
+          : 'border-[#fcd99a]/40 bg-white'
       }`}
     >
       <span className="text-xl select-none shrink-0" aria-hidden>
         {TYPE_ICON[entry.place.type] ?? '✦'}
       </span>
       <div className="flex-1 min-w-0">
-        <p className="font-syne text-sm font-semibold text-white-soft truncate">
+        <p className="font-syne text-sm font-semibold text-[#131936] truncate">
           {entry.place.name}
         </p>
-        <p className="text-xs text-muted">{entry.place.country}</p>
+        <p className="text-xs text-[#131936]/50">{entry.place.country}</p>
       </div>
-      <span
-        className={`shrink-0 text-xs font-semibold ${
-          isCompleted
-            ? 'text-pink-accent'
-            : entry.status === 'planning'
-            ? 'text-lavender'
-            : 'text-muted'
-        }`}
-      >
+      <span className="shrink-0 text-xs font-semibold text-[#f08c21]">
         {STATUS_LABEL[entry.status]}
       </span>
     </div>

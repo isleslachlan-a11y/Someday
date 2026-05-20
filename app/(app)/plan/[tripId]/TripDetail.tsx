@@ -160,33 +160,33 @@ export default function TripDetail({
       {/* Back nav */}
       <button
         onClick={() => router.push('/plan')}
-        className="flex items-center gap-1 text-muted hover:text-white-soft text-sm mb-6 transition-colors"
+        className="flex items-center gap-1 text-[#131936]/50 hover:text-[#131936] text-sm mb-6 transition-colors"
       >
         ‹ Plan
       </button>
 
       {/* ── Trip header ──────────────────────────────────────────────────────── */}
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 mb-6">
+      <div className="rounded-2xl border border-[#fcd99a]/40 bg-white p-5 mb-6">
         <div className="flex items-start gap-3 mb-4">
           <span className="text-3xl select-none" aria-hidden>
             {trip.icon}
           </span>
           <div className="flex-1 min-w-0">
-            <h1 className="font-syne text-2xl font-bold text-white-soft leading-snug">
+            <h1 className="font-syne text-2xl font-bold text-[#131936] leading-snug">
               {trip.title}
             </h1>
             {trip.destination && (
-              <p className="text-lavender text-sm mt-0.5">{trip.destination}</p>
+              <p className="text-[#f08c21] text-sm mt-0.5">{trip.destination}</p>
             )}
           </div>
           {countdown && (
-            <span className="shrink-0 rounded-full bg-pink-accent/10 border border-pink-accent/20 px-2.5 py-1 text-xs font-semibold text-pink-accent">
+            <span className="shrink-0 rounded-full bg-pink-accent/10 border border-pink-accent/20 px-2.5 py-1 text-xs font-semibold text-[#f08c21]">
               {countdown}
             </span>
           )}
         </div>
 
-        <p className="text-xs text-muted flex items-center gap-1.5 mb-4">
+        <p className="text-xs text-[#131936]/50 flex items-center gap-1.5 mb-4">
           <span aria-hidden>🗓</span>
           {dateLabel}
         </p>
@@ -202,12 +202,12 @@ export default function TripDetail({
                     avatarUrl={profile.avatar_url}
                     username={profile.username}
                     size={28}
-                    className="ring-1 ring-indigo-deep"
+                    className="ring-1 ring-white"
                   />
                 ) : null
               })}
             </div>
-            <span className="text-xs text-muted">
+            <span className="text-xs text-[#131936]/50">
               {trip.members.length} member{trip.members.length !== 1 ? 's' : ''}
             </span>
           </div>
@@ -215,15 +215,15 @@ export default function TripDetail({
       </div>
 
       {/* ── Tab bar ───────────────────────────────────────────────────────────── */}
-      <div className="flex gap-1 p-1 rounded-xl bg-white/[0.04] border border-white/10 mb-6">
+      <div className="flex gap-1 p-1 rounded-xl bg-white border border-[#fcd99a]/40 mb-6">
         {(['experiences', 'chat', 'map'] as const).map(t => (
           <button
             key={t}
             onClick={() => setActiveTab(t)}
             className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-colors ${
               activeTab === t
-                ? 'bg-violet-accent text-white-soft'
-                : 'text-muted hover:text-white-soft'
+                ? 'bg-[#f08c21] text-[#131936]'
+                : 'text-[#131936]/50 hover:text-[#131936]'
             }`}
           >
             {t === 'experiences' ? 'Experiences' : t === 'chat' ? 'Chat' : 'Map'}
@@ -235,25 +235,25 @@ export default function TripDetail({
       {activeTab === 'experiences' && (
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-syne font-bold text-white-soft">Experiences</h2>
+            <h2 className="font-syne font-bold text-[#131936]">Experiences</h2>
             <button
               onClick={() => setShowAdd(true)}
-              className="text-xs font-semibold text-lavender hover:text-white-soft transition-colors flex items-center gap-1"
+              className="text-xs font-semibold text-[#f08c21] hover:text-[#131936] transition-colors flex items-center gap-1"
             >
               + Add
             </button>
           </div>
 
           {tripItems.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-white/15 p-8 text-center">
+            <div className="rounded-2xl border border-dashed border-[#fcd99a]/50 p-8 text-center">
               <p className="text-3xl mb-3">🌍</p>
-              <p className="text-white-soft font-syne font-bold mb-1">No experiences yet</p>
-              <p className="text-muted text-sm mb-4">
+              <p className="text-[#131936] font-syne font-bold mb-1">No experiences yet</p>
+              <p className="text-[#131936]/50 text-sm mb-4">
                 Add places you want to visit on this trip.
               </p>
               <button
                 onClick={() => setShowAdd(true)}
-                className="rounded-xl bg-violet-accent hover:bg-violet-accent/90 px-4 py-2 text-sm font-syne font-semibold text-white-soft transition-colors"
+                className="rounded-xl bg-[#f08c21] hover:bg-[#f08c21]/90 px-4 py-2 text-sm font-syne font-semibold text-[#131936] transition-colors"
               >
                 Add first experience
               </button>
@@ -287,10 +287,10 @@ export default function TripDetail({
 
       {/* ── Map tab ───────────────────────────────────────────────────────────── */}
       {activeTab === 'map' && (
-        <div className="rounded-2xl overflow-hidden mb-6 h-36 bg-gradient-to-br from-violet-accent/20 via-indigo-deep to-pink-accent/10 border border-white/10 flex items-center justify-center">
+        <div className="rounded-2xl overflow-hidden mb-6 h-36 bg-gradient-to-br from-violet-accent/20 via-indigo-deep to-pink-accent/10 border border-[#fcd99a]/40 flex items-center justify-center">
           <div className="text-center">
             <p className="text-2xl mb-1" aria-hidden>🗺️</p>
-            <p className="text-xs text-muted">Map view — coming soon</p>
+            <p className="text-xs text-[#131936]/50">Map view — coming soon</p>
           </div>
         </div>
       )}
@@ -456,16 +456,16 @@ function TripChatPanel({
   // Empty state — no conversation yet
   if (!conversationId) {
     return (
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center mb-6">
+      <div className="rounded-2xl border border-[#fcd99a]/40 bg-white p-8 text-center mb-6">
         <p className="text-3xl mb-3">💬</p>
-        <p className="font-syne font-bold text-white-soft mb-1">No group chat yet</p>
-        <p className="text-muted text-sm mb-5">
+        <p className="font-syne font-bold text-[#131936] mb-1">No group chat yet</p>
+        <p className="text-[#131936]/50 text-sm mb-5">
           Start a group chat to coordinate with your trip crew.
         </p>
         <button
           onClick={handleCreateChat}
           disabled={isCreatingChat}
-          className="rounded-xl bg-violet-accent hover:bg-violet-accent/90 disabled:opacity-50 px-5 py-2.5 font-syne font-semibold text-white-soft text-sm transition-colors"
+          className="rounded-xl bg-[#f08c21] hover:bg-[#f08c21]/90 disabled:opacity-50 px-5 py-2.5 font-syne font-semibold text-[#131936] text-sm transition-colors"
         >
           {isCreatingChat ? 'Creating…' : 'Start group chat'}
         </button>
@@ -475,10 +475,10 @@ function TripChatPanel({
 
   return (
     <>
-      <div className="rounded-2xl border border-white/10 overflow-hidden flex flex-col h-[400px] md:h-[520px] mb-6">
+      <div className="rounded-2xl border border-[#fcd99a]/40 overflow-hidden flex flex-col h-[400px] md:h-[520px] mb-6">
 
         {/* Member header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.07] shrink-0 bg-white/[0.02]">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-[#fcd99a]/40 shrink-0 bg-white/[0.02]">
           <div className="flex items-center gap-2">
             <div className="flex -space-x-1.5">
               {trip.members.slice(0, 6).map(mid => {
@@ -489,23 +489,23 @@ function TripChatPanel({
                     avatarUrl={p.avatar_url}
                     username={p.username}
                     size={24}
-                    className="ring-1 ring-indigo-deep"
+                    className="ring-1 ring-white"
                   />
                 ) : null
               })}
               {trip.members.length > 6 && (
-                <span className="w-6 h-6 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-[9px] text-muted ring-1 ring-indigo-deep">
+                <span className="w-6 h-6 rounded-full bg-[#fcd99a]/20 border border-[#fcd99a]/60 flex items-center justify-center text-[9px] text-[#131936]/50 ring-1 ring-white">
                   +{trip.members.length - 6}
                 </span>
               )}
             </div>
-            <span className="text-xs text-muted">
+            <span className="text-xs text-[#131936]/50">
               {trip.members.length} member{trip.members.length !== 1 ? 's' : ''}
             </span>
           </div>
           <button
             onClick={() => setShowInvite(true)}
-            className="text-xs font-semibold text-lavender hover:text-white-soft transition-colors"
+            className="text-xs font-semibold text-[#f08c21] hover:text-[#131936] transition-colors"
           >
             + Invite
           </button>
@@ -519,14 +519,14 @@ function TripChatPanel({
         >
           {isLoadingMore && (
             <div className="flex justify-center py-2">
-              <div className="w-5 h-5 border-2 border-violet-accent/30 border-t-violet-accent rounded-full animate-spin" />
+              <div className="w-5 h-5 border-2 border-[#f08c21]/30 border-t-violet-accent rounded-full animate-spin" />
             </div>
           )}
 
           {messages.length === 0 && (
             <div className="flex flex-col items-center justify-center h-full py-8 text-center">
               <p className="text-2xl mb-2">👋</p>
-              <p className="text-muted text-sm">Send the first message!</p>
+              <p className="text-[#131936]/50 text-sm">Send the first message!</p>
             </div>
           )}
 
@@ -553,7 +553,7 @@ function TripChatPanel({
         </div>
 
         {/* Input bar */}
-        <div className="shrink-0 border-t border-white/[0.07] bg-[#130f2a] px-4 py-3">
+        <div className="shrink-0 border-t border-[#fcd99a]/40 bg-[#fff9f0] px-4 py-3">
           <form onSubmit={handleSend} className="flex items-end gap-3">
             <textarea
               value={inputValue}
@@ -566,12 +566,12 @@ function TripChatPanel({
               }}
               placeholder="Message the trip…"
               rows={1}
-              className="flex-1 resize-none rounded-2xl bg-white/[0.06] border border-white/[0.08] text-sm text-white-soft placeholder:text-muted px-4 py-3 focus:outline-none focus:border-violet-accent/40 transition-colors max-h-32 overflow-y-auto leading-relaxed"
+              className="flex-1 resize-none rounded-2xl bg-white border border-[#fcd99a]/40 text-sm text-[#131936] placeholder:text-[#131936]/40 px-4 py-3 focus:outline-none focus:border-[#f08c21]/40 transition-colors max-h-32 overflow-y-auto leading-relaxed"
             />
             <button
               type="submit"
               disabled={!inputValue.trim() || isSending}
-              className="flex items-center justify-center w-11 h-11 rounded-full bg-violet-accent hover:bg-violet-accent/85 text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+              className="flex items-center justify-center w-11 h-11 rounded-full bg-[#f08c21] hover:bg-[#f08c21]/90 text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
               aria-label="Send message"
             >
               <Send size={18} />
@@ -597,9 +597,9 @@ function TripChatPanel({
 function TripInviteMessage({ content }: { content: string }) {
   return (
     <div className="flex items-center gap-3 py-1">
-      <div className="flex-1 border-t border-white/[0.07]" />
-      <span className="text-[11px] text-muted whitespace-nowrap px-1">{content}</span>
-      <div className="flex-1 border-t border-white/[0.07]" />
+      <div className="flex-1 border-t border-[#fcd99a]/40" />
+      <span className="text-[11px] text-[#131936]/50 whitespace-nowrap px-1">{content}</span>
+      <div className="flex-1 border-t border-[#fcd99a]/40" />
     </div>
   )
 }
@@ -631,7 +631,7 @@ function TripMessageBubble({
 
       <div className={`max-w-[72%] flex flex-col gap-0.5 ${isOwn ? 'items-end' : 'items-start'}`}>
         {showAvatar && !isOwn && (
-          <span className="text-[10px] text-muted px-1">
+          <span className="text-[10px] text-[#131936]/50 px-1">
             @{message.sender.username ?? 'unknown'}
           </span>
         )}
@@ -639,14 +639,14 @@ function TripMessageBubble({
         <div
           className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
             isOwn
-              ? 'bg-violet-accent text-white rounded-br-sm'
-              : 'bg-white/[0.07] text-white-soft rounded-bl-sm'
+              ? 'bg-[#f08c21] text-white rounded-br-sm'
+              : 'bg-white text-[#131936] rounded-bl-sm'
           } ${message.id.startsWith('optimistic-') ? 'opacity-60' : ''}`}
         >
           {message.content}
         </div>
 
-        <span className="text-[10px] text-muted px-1">
+        <span className="text-[10px] text-[#131936]/50 px-1">
           {new Date(message.created_at).toLocaleTimeString('en-AU', {
             hour: 'numeric',
             minute: '2-digit',
@@ -703,24 +703,24 @@ function InviteFriendsSheet({
   return (
     <>
       <div className="fixed inset-0 bg-black/60 z-40" onClick={onClose} aria-hidden />
-      <div className="fixed inset-x-0 bottom-0 z-50 rounded-t-3xl bg-[#13112a] border-t border-white/10 animate-slide-up max-h-[75dvh] flex flex-col">
+      <div className="fixed inset-x-0 bottom-0 z-50 rounded-t-3xl bg-[#fff9f0] border-t border-[#fcd99a]/40 animate-slide-up max-h-[75dvh] flex flex-col">
         <div className="flex justify-center pt-3 pb-2 shrink-0">
-          <div className="w-10 h-1 rounded-full bg-white/20" />
+          <div className="w-10 h-1 rounded-full bg-[#131936]/20" />
         </div>
 
         <div className="px-5 pb-3 shrink-0">
-          <h2 className="font-syne font-bold text-xl text-white-soft mb-1">Invite to Trip</h2>
-          <p className="text-muted text-sm">Add friends to this trip and group chat.</p>
+          <h2 className="font-syne font-bold text-xl text-[#131936] mb-1">Invite to Trip</h2>
+          <p className="text-[#131936]/50 text-sm">Add friends to this trip and group chat.</p>
         </div>
 
         <div className="overflow-y-auto flex-1 px-5 pb-8">
           {isLoading ? (
             <div className="flex justify-center py-10">
-              <div className="w-6 h-6 border-2 border-violet-accent/30 border-t-violet-accent rounded-full animate-spin" />
+              <div className="w-6 h-6 border-2 border-[#f08c21]/30 border-t-violet-accent rounded-full animate-spin" />
             </div>
           ) : invitable.length === 0 ? (
             <div className="text-center py-10">
-              <p className="text-muted text-sm">
+              <p className="text-[#131936]/50 text-sm">
                 {friends.length === 0
                   ? 'Add friends first to invite them to trips.'
                   : 'All your friends are already in this trip.'}
@@ -731,7 +731,7 @@ function InviteFriendsSheet({
               {invitable.map(friend => (
                 <div
                   key={friend.id}
-                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3"
+                  className="flex items-center gap-3 rounded-xl border border-[#fcd99a]/40 bg-white px-4 py-3"
                 >
                   <Avatar
                     avatarUrl={friend.avatar_url}
@@ -739,14 +739,14 @@ function InviteFriendsSheet({
                     size={36}
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="text-white-soft text-sm font-semibold truncate">
+                    <p className="text-[#131936] text-sm font-semibold truncate">
                       {friend.username ?? 'user'}
                     </p>
                   </div>
                   <button
                     onClick={() => handleAdd(friend.id)}
                     disabled={adding === friend.id}
-                    className="shrink-0 rounded-lg bg-violet-accent hover:bg-violet-accent/90 disabled:opacity-50 px-3 py-1.5 text-xs font-semibold text-white-soft transition-colors"
+                    className="shrink-0 rounded-lg bg-[#f08c21] hover:bg-[#f08c21]/90 disabled:opacity-50 px-3 py-1.5 text-xs font-semibold text-[#131936] transition-colors"
                   >
                     {adding === friend.id ? '…' : '+ Add'}
                   </button>
@@ -782,16 +782,16 @@ function ExperienceCard({
   const myVote    = item.votes.find(v => v.user_id === userId)?.vote
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+    <div className="rounded-2xl border border-[#fcd99a]/40 bg-white p-4">
       <div className="flex items-start gap-3 mb-3">
         <span className="text-xl select-none mt-0.5" aria-hidden>
           {TYPE_ICON[item.place.type] ?? '✦'}
         </span>
         <div className="flex-1 min-w-0">
-          <h3 className="font-syne font-bold text-white-soft leading-snug">{item.place.name}</h3>
-          <p className="text-xs text-muted">{item.place.country}</p>
+          <h3 className="font-syne font-bold text-[#131936] leading-snug">{item.place.name}</h3>
+          <p className="text-xs text-[#131936]/50">{item.place.country}</p>
           {item.proposed_date && (
-            <p className="text-xs text-muted mt-0.5">
+            <p className="text-xs text-[#131936]/50 mt-0.5">
               📅{' '}
               {new Date(item.proposed_date).toLocaleDateString('en-AU', {
                 day: 'numeric',
@@ -804,7 +804,7 @@ function ExperienceCard({
         {isOwner && !confirmRemove && (
           <button
             onClick={() => setConfirmRemove(true)}
-            className="text-muted hover:text-white-soft text-lg transition-colors"
+            className="text-[#131936]/50 hover:text-[#131936] text-lg transition-colors"
             aria-label="Remove"
           >
             ×
@@ -814,16 +814,16 @@ function ExperienceCard({
 
       {confirmRemove && (
         <div className="flex gap-2 mb-3 text-sm">
-          <span className="text-muted flex-1">Remove this place?</span>
+          <span className="text-[#131936]/50 flex-1">Remove this place?</span>
           <button
             onClick={onRemove}
-            className="text-pink-accent font-semibold hover:text-pink-accent/80 transition-colors"
+            className="text-[#f08c21] font-semibold hover:text-[#f08c21]/80 transition-colors"
           >
             Remove
           </button>
           <button
             onClick={() => setConfirmRemove(false)}
-            className="text-muted hover:text-white-soft transition-colors"
+            className="text-[#131936]/50 hover:text-[#131936] transition-colors"
           >
             Cancel
           </button>
@@ -836,7 +836,7 @@ function ExperienceCard({
           className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold border transition-colors ${
             myVote === true
               ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
-              : 'bg-white/5 border-white/10 text-muted hover:border-white/25 hover:text-white-soft'
+              : 'bg-white border-[#fcd99a]/40 text-[#131936]/50 hover:border-[#fcd99a]/60 hover:text-[#131936]'
           }`}
         >
           👍 {upCount > 0 && <span>{upCount}</span>}
@@ -846,7 +846,7 @@ function ExperienceCard({
           className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold border transition-colors ${
             myVote === false
               ? 'bg-red-500/20 border-red-500/40 text-red-400'
-              : 'bg-white/5 border-white/10 text-muted hover:border-white/25 hover:text-white-soft'
+              : 'bg-white border-[#fcd99a]/40 text-[#131936]/50 hover:border-[#fcd99a]/60 hover:text-[#131936]'
           }`}
         >
           👎 {downCount > 0 && <span>{downCount}</span>}
@@ -942,26 +942,26 @@ function AddExperienceSheet({
   return (
     <>
       <div className="fixed inset-0 bg-black/60 z-40" onClick={onClose} aria-hidden />
-      <div className="fixed inset-x-0 bottom-0 z-50 rounded-t-3xl bg-[#13112a] border-t border-white/10 animate-slide-up max-h-[85dvh] flex flex-col">
+      <div className="fixed inset-x-0 bottom-0 z-50 rounded-t-3xl bg-[#fff9f0] border-t border-[#fcd99a]/40 animate-slide-up max-h-[85dvh] flex flex-col">
         <div className="flex justify-center pt-3 pb-2 shrink-0">
-          <div className="w-10 h-1 rounded-full bg-white/20" />
+          <div className="w-10 h-1 rounded-full bg-[#131936]/20" />
         </div>
 
         <div className="px-5 pb-2 shrink-0">
-          <h2 className="font-syne font-bold text-xl text-white-soft mb-4">Add Experience</h2>
+          <h2 className="font-syne font-bold text-xl text-[#131936] mb-4">Add Experience</h2>
           <input
             autoFocus
             value={query}
             onChange={e => handleQueryChange(e.target.value)}
             placeholder="Search destinations…"
-            className="w-full rounded-xl bg-white/[0.05] border border-white/10 px-4 py-3 text-white-soft placeholder:text-muted text-sm focus:outline-none focus:border-violet-accent/60 transition-colors mb-4"
+            className="w-full rounded-xl bg-white border border-[#fcd99a]/40 px-4 py-3 text-[#131936] placeholder:text-[#131936]/40 text-sm focus:outline-none focus:border-[#f08c21]/60 transition-colors mb-4"
           />
         </div>
 
         <div className="overflow-y-auto flex-1 px-5 pb-8">
           {filteredMyList.length > 0 && (
             <div className="mb-4">
-              <p className="text-xs text-muted font-semibold uppercase tracking-wider mb-2">
+              <p className="text-xs text-[#131936]/50 font-semibold uppercase tracking-wider mb-2">
                 From your list
               </p>
               <div className="space-y-2">
@@ -979,11 +979,11 @@ function AddExperienceSheet({
 
           {query.trim() && (
             <div>
-              <p className="text-xs text-muted font-semibold uppercase tracking-wider mb-2">
+              <p className="text-xs text-[#131936]/50 font-semibold uppercase tracking-wider mb-2">
                 {isSearching ? 'Searching…' : 'All destinations'}
               </p>
               {!isSearching && searchResults.length === 0 && (
-                <p className="text-muted text-sm py-4 text-center">No results for "{query}"</p>
+                <p className="text-[#131936]/50 text-sm py-4 text-center">No results for "{query}"</p>
               )}
               <div className="space-y-2">
                 {searchResults.map(place => (
@@ -1000,7 +1000,7 @@ function AddExperienceSheet({
 
           {!query.trim() && filteredMyList.length === 0 && (
             <div className="text-center py-8">
-              <p className="text-muted text-sm">
+              <p className="text-[#131936]/50 text-sm">
                 Search for a destination above to add it to this trip.
               </p>
             </div>
@@ -1021,18 +1021,18 @@ function PlaceAddRow({
   onAdd: () => void
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+    <div className="flex items-center gap-3 rounded-xl border border-[#fcd99a]/40 bg-white px-4 py-3">
       <span className="text-lg select-none" aria-hidden>
         {TYPE_ICON[place.type] ?? '✦'}
       </span>
       <div className="flex-1 min-w-0">
-        <p className="text-white-soft text-sm font-semibold truncate">{place.name}</p>
-        <p className="text-xs text-muted">{place.country}</p>
+        <p className="text-[#131936] text-sm font-semibold truncate">{place.name}</p>
+        <p className="text-xs text-[#131936]/50">{place.country}</p>
       </div>
       <button
         onClick={onAdd}
         disabled={isAdding}
-        className="shrink-0 rounded-lg bg-violet-accent hover:bg-violet-accent/90 disabled:opacity-50 px-3 py-1.5 text-xs font-semibold text-white-soft transition-colors"
+        className="shrink-0 rounded-lg bg-[#f08c21] hover:bg-[#f08c21]/90 disabled:opacity-50 px-3 py-1.5 text-xs font-semibold text-[#131936] transition-colors"
       >
         {isAdding ? '…' : '+ Add'}
       </button>

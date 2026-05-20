@@ -39,12 +39,12 @@ export default async function AnalyticsDashboardPage() {
   ])
 
   return (
-    <main className="min-h-screen bg-indigo-deep px-4 py-8">
+    <main className="min-h-screen bg-[#fff9f0] px-4 py-8">
       <div className="max-w-4xl mx-auto">
 
         <div className="mb-8">
-          <h1 className="font-syne text-3xl font-bold text-white-soft">Analytics</h1>
-          <p className="text-muted text-sm mt-1">Last 30 days · Internal only</p>
+          <h1 className="font-syne text-3xl font-bold text-[#131936]">Analytics</h1>
+          <p className="text-[#131936]/50 text-sm mt-1">Last 30 days · Internal only</p>
         </div>
 
         {/* ── Top-line stats ──────────────────────────────────────────── */}
@@ -69,10 +69,10 @@ export default async function AnalyticsDashboardPage() {
             <ol className="space-y-2">
               {topDestinations.map((row, i) => (
                 <li key={row.destination} className="flex items-center gap-3">
-                  <span className="text-muted text-sm w-5 text-right">{i + 1}</span>
-                  <div className="flex-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 flex items-center justify-between">
-                    <span className="text-white-soft text-sm font-medium">{row.destination}</span>
-                    <span className="text-lavender text-sm font-semibold tabular-nums">{row.count}</span>
+                  <span className="text-[#131936]/50 text-sm w-5 text-right">{i + 1}</span>
+                  <div className="flex-1 rounded-xl bg-white border border-[#fcd99a]/40 px-4 py-2.5 flex items-center justify-between">
+                    <span className="text-[#131936] text-sm font-medium">{row.destination}</span>
+                    <span className="text-[#f08c21] text-sm font-semibold tabular-nums">{row.count}</span>
                   </div>
                 </li>
               ))}
@@ -91,14 +91,14 @@ export default async function AnalyticsDashboardPage() {
                 const pct = Math.round((row.count / max) * 100)
                 return (
                   <div key={row.category} className="flex items-center gap-3">
-                    <span className="text-muted text-xs w-16 text-right shrink-0">{row.category}</span>
-                    <div className="flex-1 rounded-full bg-white/5 h-2 overflow-hidden">
+                    <span className="text-[#131936]/50 text-xs w-16 text-right shrink-0">{row.category}</span>
+                    <div className="flex-1 rounded-full bg-white h-2 overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-violet-accent"
+                        className="h-full rounded-full bg-[#f08c21]"
                         style={{ width: `${pct}%` }}
                       />
                     </div>
-                    <span className="text-lavender text-xs tabular-nums w-6 text-right">{row.count}</span>
+                    <span className="text-[#f08c21] text-xs tabular-nums w-6 text-right">{row.count}</span>
                   </div>
                 )
               })}
@@ -115,10 +115,10 @@ export default async function AnalyticsDashboardPage() {
 
 function StatCard({ label, value, sub }: { label: string; value: string; sub: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-5">
-      <p className="text-muted text-xs mb-1">{label}</p>
-      <p className="font-syne text-4xl font-bold text-violet-accent">{value}</p>
-      <p className="text-muted text-xs mt-1">{sub}</p>
+    <div className="rounded-2xl border border-[#fcd99a]/40 bg-white px-5 py-5">
+      <p className="text-[#131936]/50 text-xs mb-1">{label}</p>
+      <p className="font-syne text-4xl font-bold text-[#f08c21]">{value}</p>
+      <p className="text-[#131936]/50 text-xs mt-1">{sub}</p>
     </div>
   )
 }
@@ -126,12 +126,12 @@ function StatCard({ label, value, sub }: { label: string; value: string; sub: st
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="mb-8">
-      <h2 className="font-syne text-lg font-bold text-white-soft mb-4">{title}</h2>
+      <h2 className="font-syne text-lg font-bold text-[#131936] mb-4">{title}</h2>
       {children}
     </section>
   )
 }
 
 function Empty() {
-  return <p className="text-muted text-sm">No data yet.</p>
+  return <p className="text-[#131936]/50 text-sm">No data yet.</p>
 }

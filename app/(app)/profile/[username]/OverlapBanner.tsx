@@ -22,7 +22,7 @@ export default function OverlapBanner({ places, username, viewerUserId }: Props)
   const count = places.length
 
   return (
-    <div className="rounded-2xl border border-violet-accent/25 bg-violet-accent/5 p-4 mb-6">
+    <div className="rounded-2xl border border-[#f08c21]/25 bg-[#f08c21]/5 p-4 mb-6">
       {/* Header row */}
       <button
         onClick={() => {
@@ -39,17 +39,17 @@ export default function OverlapBanner({ places, username, viewerUserId }: Props)
         className="w-full flex items-center justify-between gap-3 text-left"
       >
         <div>
-          <p className="text-xs text-lavender font-semibold uppercase tracking-wider mb-0.5">
+          <p className="text-xs text-[#f08c21] font-semibold uppercase tracking-wider mb-0.5">
             ✦ Overlap
           </p>
-          <p className="font-syne font-bold text-white-soft">
+          <p className="font-syne font-bold text-[#131936]">
             {count} place{count !== 1 ? 's' : ''} you both want to visit
           </p>
-          <p className="text-xs text-muted mt-0.5">
+          <p className="text-xs text-[#131936]/50 mt-0.5">
             You and @{username} share {count === 1 ? 'a destination' : 'destinations'}
           </p>
         </div>
-        <span className="shrink-0 text-muted text-lg transition-transform duration-200"
+        <span className="shrink-0 text-[#131936]/50 text-lg transition-transform duration-200"
           style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}>
           ›
         </span>
@@ -61,14 +61,14 @@ export default function OverlapBanner({ places, username, viewerUserId }: Props)
           {places.map(place => (
             <div
               key={place.id}
-              className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5"
+              className="flex items-center gap-3 rounded-xl border border-[#fcd99a]/40 bg-white px-3 py-2.5"
             >
               <span className="text-base select-none" aria-hidden>
                 {TYPE_ICON[place.type] ?? '✦'}
               </span>
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-white-soft truncate">{place.name}</p>
-                <p className="text-xs text-muted">{place.country}</p>
+                <p className="text-sm font-semibold text-[#131936] truncate">{place.name}</p>
+                <p className="text-xs text-[#131936]/50">{place.country}</p>
               </div>
             </div>
           ))}

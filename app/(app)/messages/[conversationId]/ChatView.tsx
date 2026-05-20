@@ -185,10 +185,10 @@ export default function ChatView({ conversation, initialMessages, currentUserId 
   return (
     <>
       {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-3 px-4 h-14 border-b border-white/[0.07] shrink-0 bg-[#130f2a]">
+      <div className="flex items-center gap-3 px-4 h-14 border-b border-[#fcd99a]/40 shrink-0 bg-[#fff9f0]">
         <Link
           href="/messages"
-          className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-white/[0.06] text-muted hover:text-white-soft transition-colors"
+          className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-white text-[#131936]/50 hover:text-[#131936] transition-colors"
           aria-label="Back to messages"
         >
           <ArrowLeft size={20} />
@@ -204,14 +204,14 @@ export default function ChatView({ conversation, initialMessages, currentUserId 
               username={conversation.other_user.username ?? ''}
               size={32}
             />
-            <span className="font-syne font-bold text-white-soft truncate text-sm">{title}</span>
+            <span className="font-syne font-bold text-[#131936] truncate text-sm">{title}</span>
           </Link>
         ) : (
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            <div className="w-8 h-8 rounded-full bg-violet-accent/15 border border-violet-accent/25 flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-full bg-[#f08c21]/10 border border-[#f08c21]/25 flex items-center justify-center shrink-0">
               <span className="text-xs select-none">{conversation.type === 'trip' ? '✈️' : '👥'}</span>
             </div>
-            <span className="font-syne font-bold text-white-soft truncate text-sm">{title}</span>
+            <span className="font-syne font-bold text-[#131936] truncate text-sm">{title}</span>
           </div>
         )}
       </div>
@@ -225,7 +225,7 @@ export default function ChatView({ conversation, initialMessages, currentUserId 
         {/* Load more indicator */}
         {isLoadingMore && (
           <div className="flex justify-center py-2">
-            <div className="w-5 h-5 border-2 border-violet-accent/30 border-t-violet-accent rounded-full animate-spin" />
+            <div className="w-5 h-5 border-2 border-[#f08c21]/30 border-t-violet-accent rounded-full animate-spin" />
           </div>
         )}
 
@@ -250,7 +250,7 @@ export default function ChatView({ conversation, initialMessages, currentUserId 
       </div>
 
       {/* ── Input bar ──────────────────────────────────────────────────────── */}
-      <div className="shrink-0 border-t border-white/[0.07] bg-[#130f2a] px-4 py-3 pb-[calc(12px+env(safe-area-inset-bottom,0px))]">
+      <div className="shrink-0 border-t border-[#fcd99a]/40 bg-[#fff9f0] px-4 py-3 pb-[calc(12px+env(safe-area-inset-bottom,0px))]">
         <form onSubmit={handleSend} className="flex items-end gap-3">
           <textarea
             value={inputValue}
@@ -263,12 +263,12 @@ export default function ChatView({ conversation, initialMessages, currentUserId 
             }}
             placeholder="Message…"
             rows={1}
-            className="flex-1 resize-none rounded-2xl bg-white/[0.06] border border-white/[0.08] text-sm text-white-soft placeholder:text-muted px-4 py-3 focus:outline-none focus:border-violet-accent/40 transition-colors max-h-32 overflow-y-auto leading-relaxed"
+            className="flex-1 resize-none rounded-2xl bg-white border border-[#fcd99a]/40 text-sm text-[#131936] placeholder:text-[#131936]/40 px-4 py-3 focus:outline-none focus:border-[#f08c21]/40 transition-colors max-h-32 overflow-y-auto leading-relaxed"
           />
           <button
             type="submit"
             disabled={!inputValue.trim() || isSending}
-            className="flex items-center justify-center w-11 h-11 rounded-full bg-violet-accent hover:bg-violet-accent/85 text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+            className="flex items-center justify-center w-11 h-11 rounded-full bg-[#f08c21] hover:bg-[#f08c21]/90 text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
             aria-label="Send message"
           >
             <Send size={18} />
@@ -312,7 +312,7 @@ function MessageBubble({
       <div className={`max-w-[72%] ${isOwn ? 'items-end' : 'items-start'} flex flex-col gap-0.5`}>
         {/* Sender name (group, first in a run) */}
         {showAvatar && !isOwn && (
-          <span className="text-[10px] text-muted px-1">
+          <span className="text-[10px] text-[#131936]/50 px-1">
             @{message.sender.username ?? 'unknown'}
           </span>
         )}
@@ -324,8 +324,8 @@ function MessageBubble({
           <div
             className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
               isOwn
-                ? 'bg-violet-accent text-white rounded-br-sm'
-                : 'bg-white/[0.07] text-white-soft rounded-bl-sm'
+                ? 'bg-[#f08c21] text-white rounded-br-sm'
+                : 'bg-white text-[#131936] rounded-bl-sm'
             } ${message.id.startsWith('optimistic-') ? 'opacity-60' : ''}`}
           >
             {message.content}
@@ -333,7 +333,7 @@ function MessageBubble({
         )}
 
         {/* Timestamp */}
-        <span className="text-[10px] text-muted px-1">
+        <span className="text-[10px] text-[#131936]/50 px-1">
           {formatMessageTime(message.created_at)}
           {message.id.startsWith('optimistic-') && ' · sending…'}
         </span>
@@ -354,11 +354,11 @@ function PlaceCard({ message, isOwn }: { message: Message; isOwn: boolean }) {
   return (
     <div
       className={`rounded-2xl overflow-hidden border ${
-        isOwn ? 'border-violet-accent/30' : 'border-white/[0.10]'
-      } bg-white/[0.05] min-w-[200px]`}
+        isOwn ? 'border-[#f08c21]/30' : 'border-white/[0.10]'
+      } bg-white min-w-[200px]`}
     >
       <div className="px-4 py-3">
-        <p className="text-[10px] text-muted font-semibold uppercase tracking-wider mb-1.5">
+        <p className="text-[10px] text-[#131936]/50 font-semibold uppercase tracking-wider mb-1.5">
           📍 Place share
         </p>
         <div className="flex items-center gap-2">
@@ -366,16 +366,16 @@ function PlaceCard({ message, isOwn }: { message: Message; isOwn: boolean }) {
             {TYPE_ICON[placeType] ?? '✦'}
           </span>
           <div className="min-w-0">
-            <p className="text-sm font-syne font-bold text-white-soft truncate">{placeName}</p>
-            {country && <p className="text-xs text-muted">{country}</p>}
+            <p className="text-sm font-syne font-bold text-[#131936] truncate">{placeName}</p>
+            {country && <p className="text-xs text-[#131936]/50">{country}</p>}
           </div>
         </div>
       </div>
       {placeId && (
-        <div className={`border-t ${isOwn ? 'border-violet-accent/20' : 'border-white/[0.07]'}`}>
+        <div className={`border-t ${isOwn ? 'border-[#f08c21]/20' : 'border-[#fcd99a]/40'}`}>
           <Link
             href={`/list/new?place_id=${placeId}`}
-            className="flex items-center justify-center py-2.5 text-xs font-semibold text-lavender hover:text-white-soft transition-colors"
+            className="flex items-center justify-center py-2.5 text-xs font-semibold text-[#f08c21] hover:text-[#131936] transition-colors"
           >
             Add to list →
           </Link>

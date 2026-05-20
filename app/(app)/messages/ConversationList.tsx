@@ -14,14 +14,14 @@ export default function ConversationList({ conversations, currentUserId }: Props
     return (
       <div className="flex flex-col items-center justify-center px-6 py-20 text-center">
         <div className="text-4xl mb-4 select-none">✉️</div>
-        <p className="font-syne font-bold text-white-soft mb-1">No messages yet</p>
-        <p className="text-sm text-muted">Start a conversation with a friend</p>
+        <p className="font-syne font-bold text-[#131936] mb-1">No messages yet</p>
+        <p className="text-sm text-[#131936]/50">Start a conversation with a friend</p>
       </div>
     )
   }
 
   return (
-    <div className="divide-y divide-white/[0.05]">
+    <div className="divide-y divide-[#fcd99a]/20">
       {conversations.map(conv => (
         <ConversationRow
           key={conv.id}
@@ -74,13 +74,13 @@ function ConversationRow({
   return (
     <Link
       href={`/messages/${conv.id}`}
-      className="flex items-center gap-3 px-4 py-4 hover:bg-white/[0.03] active:bg-white/[0.05] transition-colors"
+      className="flex items-center gap-3 px-4 py-4 hover:bg-white active:bg-white transition-colors"
     >
       {/* Avatar */}
       {isDM ? (
         <Avatar avatarUrl={avatarUrl} username={avatarName} size={48} />
       ) : (
-        <div className="w-12 h-12 rounded-full bg-violet-accent/15 border border-violet-accent/25 flex items-center justify-center shrink-0">
+        <div className="w-12 h-12 rounded-full bg-[#f08c21]/10 border border-[#f08c21]/25 flex items-center justify-center shrink-0">
           <span className="text-lg select-none">
             {conv.type === 'trip' ? '✈️' : '👥'}
           </span>
@@ -90,21 +90,21 @@ function ConversationRow({
       {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2 mb-0.5">
-          <p className={`text-sm font-semibold truncate ${hasUnread ? 'text-white' : 'text-white-soft'}`}>
+          <p className={`text-sm font-semibold truncate ${hasUnread ? 'text-white' : 'text-[#131936]'}`}>
             {displayName}
           </p>
           {timeLabel && (
-            <span className={`text-xs shrink-0 ${hasUnread ? 'text-violet-accent' : 'text-muted'}`}>
+            <span className={`text-xs shrink-0 ${hasUnread ? 'text-[#f08c21]' : 'text-[#131936]/50'}`}>
               {timeLabel}
             </span>
           )}
         </div>
         <div className="flex items-center gap-2">
-          <p className={`text-xs truncate flex-1 ${hasUnread ? 'text-white-soft/90' : 'text-muted'}`}>
+          <p className={`text-xs truncate flex-1 ${hasUnread ? 'text-[#131936]/90' : 'text-[#131936]/50'}`}>
             {preview}
           </p>
           {hasUnread && (
-            <span className="shrink-0 w-2 h-2 rounded-full bg-violet-accent" />
+            <span className="shrink-0 w-2 h-2 rounded-full bg-[#f08c21]" />
           )}
         </div>
       </div>

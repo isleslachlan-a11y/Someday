@@ -10,9 +10,9 @@ import { submitPlace } from '@/app/actions/submissions'
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const INPUT_CLASS =
-  'w-full rounded-xl bg-white/[0.05] border border-white/10 px-4 py-3 text-white-soft placeholder:text-muted text-sm focus:outline-none focus:border-violet-accent/60 transition-colors'
+  'w-full rounded-xl bg-white border border-[#fcd99a]/40 px-4 py-3 text-[#131936] placeholder:text-[#131936]/40 text-sm focus:outline-none focus:border-[#f08c21]/60 transition-colors'
 
-const LABEL_CLASS = 'block text-xs text-muted font-semibold uppercase tracking-wider mb-1.5'
+const LABEL_CLASS = 'block text-xs text-[#131936]/50 font-semibold uppercase tracking-wider mb-1.5'
 
 const PLACE_TYPES = [
   { value: 'city',       label: 'City',          icon: '🏙' },
@@ -126,10 +126,10 @@ export default function SubmitForm({ userId }: Props) {
 
   if (submitted) {
     return (
-      <div className="rounded-2xl border border-violet-accent/25 bg-violet-accent/5 p-8 text-center">
+      <div className="rounded-2xl border border-[#f08c21]/25 bg-[#f08c21]/5 p-8 text-center">
         <p className="text-2xl mb-3">✦</p>
-        <p className="font-syne font-bold text-white-soft text-lg mb-2">Submitted</p>
-        <p className="text-muted text-sm mb-6">
+        <p className="font-syne font-bold text-[#131936] text-lg mb-2">Submitted</p>
+        <p className="text-[#131936]/50 text-sm mb-6">
           We'll review it and let you know. Great submissions make it into the database.
         </p>
         <button
@@ -144,7 +144,7 @@ export default function SubmitForm({ userId }: Props) {
             setPhotoFile(null)
             setPhotoPreview(null)
           }}
-          className="text-sm font-semibold text-lavender hover:text-white-soft transition-colors"
+          className="text-sm font-semibold text-[#f08c21] hover:text-[#131936] transition-colors"
         >
           Submit another
         </button>
@@ -160,7 +160,7 @@ export default function SubmitForm({ userId }: Props) {
       {/* Name */}
       <div>
         <label htmlFor="name" className={LABEL_CLASS}>
-          Name <span className="text-pink-accent normal-case font-normal tracking-normal">*</span>
+          Name <span className="text-[#f08c21] normal-case font-normal tracking-normal">*</span>
         </label>
         <input
           id="name"
@@ -184,8 +184,8 @@ export default function SubmitForm({ userId }: Props) {
               onClick={() => setType(prev => prev === opt.value ? '' : opt.value)}
               className={`flex flex-col items-center gap-1.5 rounded-xl border py-3 text-xs font-semibold transition-colors ${
                 type === opt.value
-                  ? 'border-violet-accent/50 bg-violet-accent/15 text-lavender'
-                  : 'border-white/10 bg-white/[0.03] text-muted hover:border-white/25 hover:text-white-soft'
+                  ? 'border-[#f08c21]/50 bg-[#f08c21]/10 text-[#f08c21]'
+                  : 'border-[#fcd99a]/40 bg-white text-[#131936]/50 hover:border-[#fcd99a]/60 hover:text-[#131936]'
               }`}
             >
               <span className="text-lg" aria-hidden>{opt.icon}</span>
@@ -199,7 +199,7 @@ export default function SubmitForm({ userId }: Props) {
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label htmlFor="country" className={LABEL_CLASS}>
-            Country <span className="text-pink-accent normal-case font-normal tracking-normal">*</span>
+            Country <span className="text-[#f08c21] normal-case font-normal tracking-normal">*</span>
           </label>
           <input
             id="country"
@@ -231,7 +231,7 @@ export default function SubmitForm({ userId }: Props) {
       <div>
         <label htmlFor="description" className={LABEL_CLASS}>
           Why it belongs on Someday{' '}
-          <span className="text-pink-accent normal-case font-normal tracking-normal">*</span>
+          <span className="text-[#f08c21] normal-case font-normal tracking-normal">*</span>
         </label>
         <textarea
           id="description"
@@ -260,7 +260,7 @@ export default function SubmitForm({ userId }: Props) {
             {tagsRaw.split(',').map(t => t.trim()).filter(Boolean).map(tag => (
               <span
                 key={tag}
-                className="rounded-full bg-white/5 border border-white/10 px-2 py-0.5 text-xs text-lavender"
+                className="rounded-full bg-white border border-[#fcd99a]/40 px-2 py-0.5 text-xs text-[#f08c21]"
               >
                 {tag}
               </span>
@@ -274,7 +274,7 @@ export default function SubmitForm({ userId }: Props) {
         <span className={LABEL_CLASS}>Photo</span>
 
         {photoPreview ? (
-          <div className="relative rounded-xl overflow-hidden border border-white/10">
+          <div className="relative rounded-xl overflow-hidden border border-[#fcd99a]/40">
             <div className="relative h-44 w-full">
               <Image
                 src={photoPreview}
@@ -286,7 +286,7 @@ export default function SubmitForm({ userId }: Props) {
             <button
               type="button"
               onClick={removePhoto}
-              className="absolute top-2 right-2 rounded-full bg-black/60 text-white-soft hover:bg-black/80 w-7 h-7 flex items-center justify-center text-sm transition-colors"
+              className="absolute top-2 right-2 rounded-full bg-black/60 text-[#131936] hover:bg-black/80 w-7 h-7 flex items-center justify-center text-sm transition-colors"
               aria-label="Remove photo"
             >
               ×
@@ -296,13 +296,13 @@ export default function SubmitForm({ userId }: Props) {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="w-full rounded-xl border border-dashed border-white/15 bg-white/[0.02] hover:border-violet-accent/40 hover:bg-white/[0.04] py-8 text-center transition-colors group"
+            className="w-full rounded-xl border border-dashed border-[#fcd99a]/50 bg-white/[0.02] hover:border-[#f08c21]/40 hover:bg-white py-8 text-center transition-colors group"
           >
             <p className="text-2xl mb-2" aria-hidden>📷</p>
-            <p className="text-sm font-semibold text-muted group-hover:text-white-soft transition-colors">
+            <p className="text-sm font-semibold text-[#131936]/50 group-hover:text-[#131936] transition-colors">
               Add a photo
             </p>
-            <p className="text-xs text-muted mt-0.5">Optional · up to 10 MB</p>
+            <p className="text-xs text-[#131936]/50 mt-0.5">Optional · up to 10 MB</p>
           </button>
         )}
 
@@ -316,7 +316,7 @@ export default function SubmitForm({ userId }: Props) {
       </div>
 
       {/* Disclaimer */}
-      <p className="text-xs text-muted leading-relaxed">
+      <p className="text-xs text-[#131936]/50 leading-relaxed">
         This is a curation submission, not a post. Your suggestion goes to our review queue — it
         won't be visible to other users unless we add it to the database.
       </p>
@@ -325,7 +325,7 @@ export default function SubmitForm({ userId }: Props) {
       <button
         type="submit"
         disabled={isPending}
-        className="w-full rounded-xl bg-violet-accent hover:bg-violet-accent/90 disabled:opacity-50 py-3 font-syne font-semibold text-white-soft text-sm transition-colors"
+        className="w-full rounded-xl bg-[#f08c21] hover:bg-[#f08c21]/90 disabled:opacity-50 py-3 font-syne font-semibold text-[#131936] text-sm transition-colors"
       >
         {isPending ? 'Submitting…' : 'Submit for review'}
       </button>

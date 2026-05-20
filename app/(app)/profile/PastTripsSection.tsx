@@ -23,29 +23,29 @@ export default function PastTripsSection({ trips: initialTrips }: Props) {
   return (
     <section className="mb-8">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="font-syne font-bold text-white-soft">Past Trips</h2>
+        <h2 className="font-syne font-bold text-[#131936]">Past Trips</h2>
         <button
           onClick={() => setShowAdd(true)}
-          className="text-xs font-semibold text-lavender hover:text-white-soft transition-colors"
+          className="text-xs font-semibold text-[#f08c21] hover:text-[#131936] transition-colors"
         >
           + Add
         </button>
       </div>
 
       {trips.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-white/15 p-5 text-center">
-          <p className="text-muted text-sm">
+        <div className="rounded-2xl border border-dashed border-[#fcd99a]/50 p-5 text-center">
+          <p className="text-[#131936]/50 text-sm">
             No past trips recorded.{' '}
             <button
               onClick={() => setShowAdd(true)}
-              className="text-lavender hover:text-white-soft transition-colors"
+              className="text-[#f08c21] hover:text-[#131936] transition-colors"
             >
               Add one →
             </button>
           </p>
         </div>
       ) : (
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] divide-y divide-white/5">
+        <div className="rounded-2xl border border-[#fcd99a]/40 bg-white divide-y divide-[#fcd99a]/20">
           {trips.map(trip => (
             <TripRow
               key={trip.id}
@@ -96,8 +96,8 @@ function TripRow({
     <div className="flex items-center gap-3 px-4 py-3">
       <span className="text-base select-none" aria-hidden>✈️</span>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-white-soft truncate">{trip.place_name}</p>
-        <p className="text-xs text-muted">
+        <p className="text-sm font-semibold text-[#131936] truncate">{trip.place_name}</p>
+        <p className="text-xs text-[#131936]/50">
           {[trip.country, trip.year].filter(Boolean).join(' · ')}
         </p>
       </div>
@@ -107,13 +107,13 @@ function TripRow({
           <button
             onClick={handleDelete}
             disabled={isPending}
-            className="text-pink-accent hover:text-pink-accent/80 font-semibold transition-colors"
+            className="text-[#f08c21] hover:text-[#f08c21]/80 font-semibold transition-colors"
           >
             {isPending ? '…' : 'Remove'}
           </button>
           <button
             onClick={() => setConfirmDelete(false)}
-            className="text-muted hover:text-white-soft transition-colors"
+            className="text-[#131936]/50 hover:text-[#131936] transition-colors"
           >
             Cancel
           </button>
@@ -121,7 +121,7 @@ function TripRow({
       ) : (
         <button
           onClick={() => setConfirmDelete(true)}
-          className="text-muted hover:text-white-soft text-lg transition-colors"
+          className="text-[#131936]/50 hover:text-[#131936] text-lg transition-colors"
           aria-label="Remove trip"
         >
           ×
@@ -147,7 +147,7 @@ function AddTripModal({
   const [year, setYear] = useState('')
 
   const INPUT_CLASS =
-    'w-full rounded-xl bg-white/[0.05] border border-white/10 px-4 py-3 text-white-soft placeholder:text-muted text-sm focus:outline-none focus:border-violet-accent/60 transition-colors'
+    'w-full rounded-xl bg-white border border-[#fcd99a]/40 px-4 py-3 text-[#131936] placeholder:text-[#131936]/40 text-sm focus:outline-none focus:border-[#f08c21]/60 transition-colors'
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -185,17 +185,17 @@ function AddTripModal({
     <>
       <div className="fixed inset-0 bg-black/60 z-40" onClick={onClose} aria-hidden />
 
-      <div className="fixed inset-x-0 bottom-0 z-50 rounded-t-3xl bg-[#13112a] border-t border-white/10 animate-slide-up">
+      <div className="fixed inset-x-0 bottom-0 z-50 rounded-t-3xl bg-[#fff9f0] border-t border-[#fcd99a]/40 animate-slide-up">
         <div className="flex justify-center pt-3 pb-2">
-          <div className="w-10 h-1 rounded-full bg-white/20" />
+          <div className="w-10 h-1 rounded-full bg-[#131936]/20" />
         </div>
 
         <div className="px-5 pb-10">
-          <h2 className="font-syne font-bold text-xl text-white-soft mb-5">Add Past Trip</h2>
+          <h2 className="font-syne font-bold text-xl text-[#131936] mb-5">Add Past Trip</h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs text-muted font-semibold uppercase tracking-wider mb-1.5">
+              <label className="block text-xs text-[#131936]/50 font-semibold uppercase tracking-wider mb-1.5">
                 Destination *
               </label>
               <input
@@ -210,7 +210,7 @@ function AddTripModal({
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-muted font-semibold uppercase tracking-wider mb-1.5">
+                <label className="block text-xs text-[#131936]/50 font-semibold uppercase tracking-wider mb-1.5">
                   Country
                 </label>
                 <input
@@ -221,7 +221,7 @@ function AddTripModal({
                 />
               </div>
               <div>
-                <label className="block text-xs text-muted font-semibold uppercase tracking-wider mb-1.5">
+                <label className="block text-xs text-[#131936]/50 font-semibold uppercase tracking-wider mb-1.5">
                   Year
                 </label>
                 <input
@@ -239,14 +239,14 @@ function AddTripModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 rounded-xl border border-white/10 py-3 text-sm font-semibold text-muted hover:text-white-soft hover:border-white/20 transition-colors"
+                className="flex-1 rounded-xl border border-[#fcd99a]/40 py-3 text-sm font-semibold text-[#131936]/50 hover:text-[#131936] hover:border-[#fcd99a]/60 transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isPending || !placeName.trim()}
-                className="flex-1 rounded-xl bg-violet-accent hover:bg-violet-accent/90 disabled:opacity-50 py-3 text-sm font-syne font-semibold text-white-soft transition-colors"
+                className="flex-1 rounded-xl bg-[#f08c21] hover:bg-[#f08c21]/90 disabled:opacity-50 py-3 text-sm font-syne font-semibold text-[#131936] transition-colors"
               >
                 {isPending ? 'Adding…' : 'Add Trip'}
               </button>

@@ -22,16 +22,22 @@ export default async function MessagesPage() {
   const conversations = await getConversations(user.id)
 
   return (
-    <main className="min-h-screen bg-indigo-deep">
-      {/* ── Header ──────────────────────────────────────────────────────────── */}
-      <div className="sticky top-0 z-10 bg-indigo-deep/95 backdrop-blur-sm border-b border-white/[0.06] safe-top">
-        <div className="flex items-center justify-between px-4 h-14">
-          <h1 className="font-syne text-xl font-bold text-white-soft">Messages</h1>
-          <NewDMSheet />
+    <main className="min-h-screen bg-[#fff9f0]">
+      {/* Sticky header */}
+      <header className="sticky top-0 z-30 bg-[#fff9f0] border-b border-[#fcd99a]/50">
+        <div className="max-w-[480px] mx-auto px-4 h-14 grid grid-cols-3 items-center">
+          <div />
+          <div className="flex justify-center">
+            <span className="font-syne font-bold text-[#131936] text-[20px] tracking-widest uppercase">
+              MESSAGES
+            </span>
+          </div>
+          <div className="flex items-center justify-end">
+            <NewDMSheet />
+          </div>
         </div>
-      </div>
+      </header>
 
-      {/* ── Conversation list ─────────────────────────────────────────────── */}
       <ConversationList
         conversations={conversations}
         currentUserId={user.id}

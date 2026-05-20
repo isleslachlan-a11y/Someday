@@ -33,10 +33,10 @@ export default function MessageButton({ friendId }: Props) {
     <button
       onClick={handleClick}
       disabled={isPending}
-      className="inline-flex items-center gap-2 rounded-xl border border-white/15 hover:border-white/30 px-4 py-2 text-sm font-semibold text-white-soft/80 hover:text-white-soft transition-colors min-h-[44px] disabled:opacity-60"
+      className="inline-flex items-center gap-2 rounded-xl border border-[#fcd99a]/50 hover:border-[#fcd99a]/60 px-4 py-2 text-sm font-semibold text-[#131936]/80 hover:text-[#131936] transition-colors min-h-[44px] disabled:opacity-60"
     >
       {isPending
-        ? <div className="w-4 h-4 border-2 border-white/20 border-t-white/60 rounded-full animate-spin" />
+        ? <div className="w-4 h-4 border-2 border-[#fcd99a]/60 border-t-white/60 rounded-full animate-spin" />
         : <MessageCircle size={16} />
       }
       Message

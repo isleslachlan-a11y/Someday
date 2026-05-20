@@ -137,22 +137,22 @@ export default async function PublicProfilePage({ params }: Props) {
         isOwnProfile={false}
       />
 
-      <main className="min-h-screen bg-indigo-deep px-4 py-8">
+      <main className="min-h-screen bg-[#fff9f0] px-4 py-8">
         <div className="max-w-3xl mx-auto">
 
           {/* ── Profile header ────────────────────────────────────────────── */}
           <div className="flex items-start gap-5 mb-4">
             <Avatar avatarUrl={profile.avatar_url} username={profile.username ?? ''} size={80} />
             <div className="flex-1 min-w-0">
-              <h1 className="font-syne text-2xl font-bold text-white-soft leading-tight">
+              <h1 className="font-syne text-2xl font-bold text-[#131936] leading-tight">
                 @{profile.username}
               </h1>
               {profile.bio ? (
-                <p className="text-sm text-white-soft/70 mt-1 leading-relaxed">{profile.bio}</p>
+                <p className="text-sm text-[#131936]/70 mt-1 leading-relaxed">{profile.bio}</p>
               ) : (
-                <p className="text-sm text-muted mt-1 italic">No bio yet.</p>
+                <p className="text-sm text-[#131936]/50 mt-1 italic">No bio yet.</p>
               )}
-              <p className="text-xs text-muted mt-2">
+              <p className="text-xs text-[#131936]/50 mt-2">
                 Joined{' '}
                 {new Date(profile.created_at).toLocaleDateString('en-AU', {
                   month: 'long',
@@ -173,7 +173,7 @@ export default async function PublicProfilePage({ params }: Props) {
               <MessageButton friendId={profile.id} />
             )}
             {sharedPlaces.length > 0 && (
-              <p className="text-sm text-lavender">
+              <p className="text-sm text-[#f08c21]">
                 You both want to visit {sharedPlaces.length} place{sharedPlaces.length !== 1 ? 's' : ''}
               </p>
             )}
@@ -201,15 +201,15 @@ export default async function PublicProfilePage({ params }: Props) {
 
           {/* ── Bucket list grid ──────────────────────────────────────────── */}
           {entries.length === 0 ? (
-            <div className="rounded-2xl border border-white/10 bg-white/5 px-6 py-16 text-center">
+            <div className="rounded-2xl border border-[#fcd99a]/40 bg-white px-6 py-16 text-center">
               <div className="text-4xl mb-3 select-none">✦</div>
-              <p className="text-muted text-sm">Nothing on their list yet.</p>
+              <p className="text-[#131936]/50 text-sm">Nothing on their list yet.</p>
             </div>
           ) : (
             <>
               {entries.filter(e => e.status !== 'completed').length > 0 && (
                 <section className="mb-6">
-                  <h2 className="font-syne text-base font-bold text-white-soft mb-3">
+                  <h2 className="font-syne text-base font-bold text-[#131936] mb-3">
                     Someday ({entries.filter(e => e.status !== 'completed').length})
                   </h2>
                   <div className="grid gap-3 sm:grid-cols-2">
@@ -224,7 +224,7 @@ export default async function PublicProfilePage({ params }: Props) {
 
               {entries.filter(e => e.status === 'completed').length > 0 && (
                 <section>
-                  <h2 className="font-syne text-base font-bold text-white-soft mb-3">
+                  <h2 className="font-syne text-base font-bold text-[#131936] mb-3">
                     Been there ({entries.filter(e => e.status === 'completed').length})
                   </h2>
                   <div className="grid gap-3 sm:grid-cols-2">
@@ -257,14 +257,14 @@ function StatCard({
   accent: 'violet' | 'lavender' | 'pink'
 }) {
   const colorMap = {
-    violet:  'text-violet-accent',
-    lavender: 'text-lavender',
-    pink:    'text-pink-accent',
+    violet:  'text-[#f08c21]',
+    lavender: 'text-[#f08c21]',
+    pink:    'text-[#f08c21]',
   }
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-5 text-center">
+    <div className="rounded-2xl border border-[#fcd99a]/40 bg-white px-4 py-5 text-center">
       <p className={`font-syne text-3xl font-bold ${colorMap[accent]}`}>{value}</p>
-      <p className="text-muted text-xs mt-1">{label}</p>
+      <p className="text-[#131936]/50 text-xs mt-1">{label}</p>
     </div>
   )
 }
@@ -286,20 +286,20 @@ function PublicPlaceCard({ entry }: { entry: BucketEntry }) {
       className={`flex items-center gap-3 rounded-2xl border p-4 ${
         isCompleted
           ? 'border-white/5 bg-white/[0.02] opacity-60'
-          : 'border-white/10 bg-white/5'
+          : 'border-[#fcd99a]/40 bg-white'
       }`}
     >
       <span className="text-xl select-none shrink-0" aria-hidden>
         {TYPE_ICON[entry.place.type] ?? '✦'}
       </span>
       <div className="flex-1 min-w-0">
-        <p className="font-syne text-sm font-semibold text-white-soft truncate">
+        <p className="font-syne text-sm font-semibold text-[#131936] truncate">
           {entry.place.name}
         </p>
-        <p className="text-xs text-muted">{entry.place.country}</p>
+        <p className="text-xs text-[#131936]/50">{entry.place.country}</p>
       </div>
       {isCompleted && (
-        <span className="ml-auto shrink-0 text-xs text-pink-accent font-semibold">✓</span>
+        <span className="ml-auto shrink-0 text-xs text-[#f08c21] font-semibold">✓</span>
       )}
     </div>
   )

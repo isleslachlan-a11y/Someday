@@ -34,7 +34,7 @@ export default async function ConversationPage({ params }: Props) {
   markAsRead(conversationId).catch(() => {})
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-64px)] lg:h-dvh bg-indigo-deep">
+    <div className="flex flex-col h-[calc(100dvh-64px)] lg:h-dvh bg-[#fff9f0]">
       <ChatView
         conversation={convInfo}
         initialMessages={initialMessages}

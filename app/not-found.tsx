@@ -2,16 +2,22 @@ import Link from 'next/link'
 
 export default function NotFound() {
   return (
-    <main className="min-h-screen bg-indigo-deep flex flex-col items-center justify-center px-4 text-center">
-      <div className="text-5xl text-violet-accent mb-4 select-none">✦</div>
-      <h1 className="font-syne text-4xl font-bold text-white-soft mb-2">404</h1>
-      <p className="text-lavender text-base mb-1">This page doesn&apos;t exist.</p>
-      <p className="text-muted text-sm mb-8">The destination you&apos;re looking for isn&apos;t on the map.</p>
+    <main className="min-h-screen bg-[#fff9f0] flex flex-col items-center justify-center px-4 text-center">
+      <div className="text-[48px] select-none mb-4">★</div>
+      <h1 className="font-syne text-[64px] font-bold text-[#131936] leading-none mb-2">
+        404
+      </h1>
+      <p className="font-syne font-bold text-[#131936] text-[18px] mb-1">
+        Lost at sea.
+      </p>
+      <p className="font-nunito text-[#131936]/50 text-[14px] mb-8 max-w-xs">
+        The destination you&apos;re looking for isn&apos;t on the map.
+      </p>
       <Link
         href="/home"
-        className="rounded-xl bg-violet-accent hover:bg-violet-accent/90 px-6 py-2.5 font-syne font-semibold text-white-soft text-sm transition-colors"
+        className="px-6 py-3 rounded-full bg-[#131936] text-white font-syne font-bold text-[15px] hover:opacity-90 transition-opacity"
       >
-        Take me home
+        Take me home →
       </Link>
     </main>
   )

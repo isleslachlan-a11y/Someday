@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useTransition, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { Plus } from 'lucide-react'
 import toast from 'react-hot-toast'
 import Avatar from '@/components/Avatar'
 import { createTrip } from '@/app/actions/trips'
@@ -38,36 +39,41 @@ export default function PlanContent({ trips, overlaps, memberProfiles, userId, t
 
   return (
     <>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="font-syne text-3xl font-bold text-white-soft">Plan</h1>
-          <p className="text-muted text-sm mt-1">
-            {trips.length > 0
-              ? `${trips.length} trip${trips.length !== 1 ? 's' : ''}`
-              : 'Turn overlaps into adventures'}
-          </p>
+      {/* Sticky top bar */}
+      <header className="sticky top-0 z-30 bg-[#fff9f0] border-b border-[#fcd99a]/50">
+        <div className="max-w-[480px] mx-auto px-4 h-14 grid grid-cols-3 items-center">
+          <div />
+          <div className="flex justify-center">
+            <span className="font-syne font-bold text-[#131936] text-[20px] tracking-widest uppercase">
+              PLAN
+            </span>
+          </div>
+          <div className="flex justify-end">
+            <button
+              onClick={() => setShowCreate(true)}
+              className="flex items-center justify-center w-9 h-9 rounded-full bg-[#f08c21] text-white"
+              aria-label="New trip"
+            >
+              <Plus size={20} strokeWidth={2.5} />
+            </button>
+          </div>
         </div>
-        <button
-          onClick={() => setShowCreate(true)}
-          className="rounded-xl bg-violet-accent hover:bg-violet-accent/90 px-4 py-2.5 font-syne font-semibold text-white-soft text-sm transition-colors"
-        >
-          + Trip
-        </button>
-      </div>
+      </header>
 
-      {/* State A or B */}
-      {trips.length === 0 ? (
-        <OverlapState overlaps={overlaps} userId={userId} onCreateTrip={() => setShowCreate(true)} />
-      ) : (
-        <TripListState
-          trips={trips}
-          memberProfiles={memberProfiles}
-          overlaps={overlaps}
-          tripUnreadMap={tripUnreadMap}
-          onCreateTrip={() => setShowCreate(true)}
-        />
-      )}
+      <div className="max-w-[480px] mx-auto px-4 pt-4 pb-24">
+        {/* State A or B */}
+        {trips.length === 0 ? (
+          <OverlapState overlaps={overlaps} userId={userId} onCreateTrip={() => setShowCreate(true)} />
+        ) : (
+          <TripListState
+            trips={trips}
+            memberProfiles={memberProfiles}
+            overlaps={overlaps}
+            tripUnreadMap={tripUnreadMap}
+            onCreateTrip={() => setShowCreate(true)}
+          />
+        )}
+      </div>
 
       {/* Create trip sheet */}
       {showCreate && <CreateTripSheet onClose={() => setShowCreate(false)} />}
@@ -129,28 +135,28 @@ function OverlapState({
   return (
     <div>
       {/* Explainer */}
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 mb-6">
-        <p className="text-xs text-lavender font-semibold uppercase tracking-wider mb-1">
+      <div className="rounded-2xl border border-[#fcd99a]/40 bg-white p-5 mb-6">
+        <p className="text-xs text-[#f08c21] font-semibold uppercase tracking-wider mb-1">
           ✦ Overlap
         </p>
-        <p className="text-white-soft font-syne font-bold text-lg leading-snug mb-1">
+        <p className="text-[#131936] font-syne font-bold text-lg leading-snug mb-1">
           People you follow who want to go to the same places as you.
         </p>
-        <p className="text-muted text-sm">
+        <p className="text-[#131936]/50 text-sm">
           When you both want the same destination, it's a sign. Start a trip together.
         </p>
       </div>
 
       {/* View toggle */}
-      <div className="flex gap-1 p-1 rounded-xl bg-white/[0.04] border border-white/10 mb-6 w-fit">
+      <div className="flex gap-1 p-1 rounded-xl bg-white border border-[#fcd99a]/40 mb-6 w-fit">
         {(['place', 'friend'] as const).map(t => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors ${
               tab === t
-                ? 'bg-violet-accent text-white-soft'
-                : 'text-muted hover:text-white-soft'
+                ? 'bg-[#f08c21] text-[#131936]'
+                : 'text-[#131936]/50 hover:text-[#131936]'
             }`}
           >
             {t === 'place' ? 'By Place' : 'By Friend'}
@@ -206,15 +212,15 @@ function PlaceOverlapCard({
   onCreateTrip: () => void
 }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 flex items-start gap-4">
+    <div className="rounded-2xl border border-[#fcd99a]/40 bg-white p-4 flex items-start gap-4">
       {/* Icon */}
       <span className="text-2xl select-none mt-0.5" aria-hidden>
         {TYPE_ICON[place.type] ?? '✦'}
       </span>
 
       <div className="flex-1 min-w-0">
-        <h3 className="font-syne font-bold text-white-soft leading-snug">{place.name}</h3>
-        <p className="text-xs text-muted mb-2">{place.country}</p>
+        <h3 className="font-syne font-bold text-[#131936] leading-snug">{place.name}</h3>
+        <p className="text-xs text-[#131936]/50 mb-2">{place.country}</p>
 
         {/* Friends */}
         <div className="flex items-center gap-2">
@@ -225,11 +231,11 @@ function PlaceOverlapCard({
                 avatarUrl={f.avatar_url}
                 username={f.username}
                 size={22}
-                className="ring-1 ring-indigo-deep"
+                className="ring-1 ring-white"
               />
             ))}
           </div>
-          <span className="text-xs text-lavender">
+          <span className="text-xs text-[#f08c21]">
             {friends.length === 1
               ? `${friends[0].username} wants this too`
               : `${friends.length} friends want this too`}
@@ -239,7 +245,7 @@ function PlaceOverlapCard({
 
       <button
         onClick={onCreateTrip}
-        className="shrink-0 rounded-lg bg-violet-accent/15 hover:bg-violet-accent/30 border border-violet-accent/30 px-3 py-1.5 text-xs font-semibold text-lavender transition-colors"
+        className="shrink-0 rounded-lg bg-[#f08c21]/10 hover:bg-[#f08c21]/30 border border-[#f08c21]/30 px-3 py-1.5 text-xs font-semibold text-[#f08c21] transition-colors"
       >
         Plan it
       </button>
@@ -264,20 +270,20 @@ function FriendOverlapCard({
   return (
     <button
       onClick={onSelect}
-      className="w-full text-left rounded-2xl border border-white/10 bg-white/[0.03] hover:border-violet-accent/35 hover:bg-white/[0.05] transition-all p-4 flex items-center gap-4"
+      className="w-full text-left rounded-2xl border border-[#fcd99a]/40 bg-white hover:border-[#f08c21]/35 hover:bg-white transition-all p-4 flex items-center gap-4"
     >
       <Avatar avatarUrl={friend.avatar_url} username={friend.username} size={44} />
       <div className="flex-1 min-w-0">
-        <p className="font-syne font-bold text-white-soft">{friend.username}</p>
-        <p className="text-xs text-muted truncate">
+        <p className="font-syne font-bold text-[#131936]">{friend.username}</p>
+        <p className="text-xs text-[#131936]/50 truncate">
           You both want:{' '}
-          <span className="text-lavender">
+          <span className="text-[#f08c21]">
             {preview.join(', ')}
             {extra > 0 ? ` and ${extra} other${extra !== 1 ? 's' : ''}` : ''}
           </span>
         </p>
       </div>
-      <span className="text-muted text-lg">›</span>
+      <span className="text-[#131936]/50 text-lg">›</span>
     </button>
   )
 }
@@ -300,7 +306,7 @@ function FriendDetail({
       {/* Back */}
       <button
         onClick={onBack}
-        className="flex items-center gap-1 text-muted hover:text-white-soft text-sm mb-6 transition-colors"
+        className="flex items-center gap-1 text-[#131936]/50 hover:text-[#131936] text-sm mb-6 transition-colors"
       >
         ‹ Back
       </button>
@@ -309,8 +315,8 @@ function FriendDetail({
       <div className="flex items-center gap-3 mb-6">
         <Avatar avatarUrl={friend.avatar_url} username={friend.username} size={48} />
         <div>
-          <p className="font-syne font-bold text-white-soft">{friend.username}</p>
-          <p className="text-xs text-muted">
+          <p className="font-syne font-bold text-[#131936]">{friend.username}</p>
+          <p className="text-xs text-[#131936]/50">
             {places.length} shared destination{places.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -320,20 +326,20 @@ function FriendDetail({
         {places.map(place => (
           <div
             key={place.id}
-            className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 flex items-start gap-4"
+            className="rounded-2xl border border-[#fcd99a]/40 bg-white p-4 flex items-start gap-4"
           >
             <span className="text-2xl select-none mt-0.5" aria-hidden>
               {TYPE_ICON[place.type] ?? '✦'}
             </span>
             <div className="flex-1 min-w-0">
-              <h3 className="font-syne font-bold text-white-soft">{place.name}</h3>
-              <p className="text-xs text-muted">{place.country}</p>
+              <h3 className="font-syne font-bold text-[#131936]">{place.name}</h3>
+              <p className="text-xs text-[#131936]/50">{place.country}</p>
               {place.vibes && place.vibes.length > 0 && (
                 <div className="flex gap-1.5 flex-wrap mt-2">
                   {place.vibes.slice(0, 2).map(v => (
                     <span
                       key={v}
-                      className="rounded-full bg-white/5 border border-white/10 px-2 py-0.5 text-xs text-lavender"
+                      className="rounded-full bg-white border border-[#fcd99a]/40 px-2 py-0.5 text-xs text-[#f08c21]"
                     >
                       {v}
                     </span>
@@ -343,7 +349,7 @@ function FriendDetail({
             </div>
             <button
               onClick={onCreateTrip}
-              className="shrink-0 rounded-lg bg-violet-accent/15 hover:bg-violet-accent/30 border border-violet-accent/30 px-3 py-1.5 text-xs font-semibold text-lavender transition-colors"
+              className="shrink-0 rounded-lg bg-[#f08c21]/10 hover:bg-[#f08c21]/30 border border-[#f08c21]/30 px-3 py-1.5 text-xs font-semibold text-[#f08c21] transition-colors"
             >
               Start trip
             </button>
@@ -360,14 +366,14 @@ function EmptyOverlap({ onCreateTrip }: { onCreateTrip: () => void }) {
   return (
     <div className="text-center py-16">
       <p className="text-4xl mb-4">🌍</p>
-      <p className="font-syne font-bold text-white-soft mb-2">No overlaps yet</p>
-      <p className="text-muted text-sm mb-6 max-w-xs mx-auto">
+      <p className="font-syne font-bold text-[#131936] mb-2">No overlaps yet</p>
+      <p className="text-[#131936]/50 text-sm mb-6 max-w-xs mx-auto">
         Follow friends and add places to your list — overlaps appear when you both want the same
         destination.
       </p>
       <button
         onClick={onCreateTrip}
-        className="rounded-xl bg-violet-accent hover:bg-violet-accent/90 px-5 py-2.5 font-syne font-semibold text-white-soft text-sm transition-colors"
+        className="rounded-xl bg-[#f08c21] hover:bg-[#f08c21]/90 px-5 py-2.5 font-syne font-semibold text-[#131936] text-sm transition-colors"
       >
         Start a trip anyway
       </button>
@@ -408,15 +414,15 @@ function TripListState({
 
       {/* Overlap teaser if there are overlaps */}
       {hasOverlaps && (
-        <div className="rounded-2xl border border-violet-accent/20 bg-violet-accent/5 p-4">
-          <p className="text-xs text-lavender font-semibold uppercase tracking-wider mb-1">
+        <div className="rounded-2xl border border-[#f08c21]/20 bg-[#f08c21]/5 p-4">
+          <p className="text-xs text-[#f08c21] font-semibold uppercase tracking-wider mb-1">
             ✦ Overlap
           </p>
-          <p className="text-white-soft text-sm font-syne font-bold mb-1">
+          <p className="text-[#131936] text-sm font-syne font-bold mb-1">
             {Object.keys(overlaps.byPlace).length} destination
             {Object.keys(overlaps.byPlace).length !== 1 ? 's' : ''} shared with friends
           </p>
-          <p className="text-muted text-xs">
+          <p className="text-[#131936]/50 text-xs">
             {Object.values(overlaps.byPlace)
               .slice(0, 2)
               .map(e => e.place.name)
@@ -475,7 +481,7 @@ function TripCard({
   return (
     <button
       onClick={() => router.push(`/plan/${trip.id}`)}
-      className="group w-full text-left rounded-2xl border border-white/10 bg-white/[0.03] hover:border-violet-accent/35 hover:bg-white/[0.05] active:scale-[0.99] transition-all p-4"
+      className="group w-full text-left rounded-2xl border border-[#fcd99a]/40 bg-white hover:border-[#f08c21]/35 hover:bg-white active:scale-[0.99] transition-all p-4"
     >
       <div className="flex items-start gap-3">
         {/* Icon */}
@@ -485,22 +491,22 @@ function TripCard({
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
-            <h3 className="font-syne font-bold text-white-soft leading-snug">{trip.title}</h3>
+            <h3 className="font-syne font-bold text-[#131936] leading-snug">{trip.title}</h3>
             {unreadCount > 0 && (
               <span className="w-2 h-2 rounded-full bg-pink-accent shrink-0" aria-label="Unread messages" />
             )}
             {countdown && (
-              <span className="rounded-full bg-pink-accent/10 border border-pink-accent/20 px-2 py-0.5 text-xs font-semibold text-pink-accent whitespace-nowrap">
+              <span className="rounded-full bg-pink-accent/10 border border-pink-accent/20 px-2 py-0.5 text-xs font-semibold text-[#f08c21] whitespace-nowrap">
                 {countdown}
               </span>
             )}
           </div>
 
           {trip.destination && (
-            <p className="text-sm text-lavender mb-1">{trip.destination}</p>
+            <p className="text-sm text-[#f08c21] mb-1">{trip.destination}</p>
           )}
 
-          <p className="text-xs text-muted mb-3">🗓 {dateLabel}</p>
+          <p className="text-xs text-[#131936]/50 mb-3">🗓 {dateLabel}</p>
 
           {/* Member avatars */}
           {trip.members.length > 0 && (
@@ -514,19 +520,19 @@ function TripCard({
                       avatarUrl={profile.avatar_url}
                       username={profile.username}
                       size={24}
-                      className="ring-1 ring-indigo-deep"
+                      className="ring-1 ring-white"
                     />
                   ) : null
                 })}
               </div>
               {trip.members.length > 4 && (
-                <span className="text-xs text-muted">+{trip.members.length - 4}</span>
+                <span className="text-xs text-[#131936]/50">+{trip.members.length - 4}</span>
               )}
             </div>
           )}
         </div>
 
-        <span className="text-muted text-lg group-hover:text-white-soft transition-colors">›</span>
+        <span className="text-[#131936]/50 text-lg group-hover:text-[#131936] transition-colors">›</span>
       </div>
     </button>
   )
@@ -580,19 +586,19 @@ function CreateTripSheet({ onClose }: { onClose: () => void }) {
       />
 
       {/* Sheet */}
-      <div className="fixed inset-x-0 bottom-0 z-50 rounded-t-3xl bg-[#13112a] border-t border-white/10 animate-slide-up max-h-[90dvh] overflow-y-auto">
+      <div className="fixed inset-x-0 bottom-0 z-50 rounded-t-3xl bg-[#fff9f0] border-t border-[#fcd99a]/40 animate-slide-up max-h-[90dvh] overflow-y-auto">
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-2">
-          <div className="w-10 h-1 rounded-full bg-white/20" />
+          <div className="w-10 h-1 rounded-full bg-[#131936]/20" />
         </div>
 
         <div className="px-5 pb-8">
-          <h2 className="font-syne font-bold text-xl text-white-soft mb-5">New Trip</h2>
+          <h2 className="font-syne font-bold text-xl text-[#131936] mb-5">New Trip</h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Icon picker */}
             <div>
-              <label className="block text-xs text-muted font-semibold uppercase tracking-wider mb-2">
+              <label className="block text-xs text-[#131936]/50 font-semibold uppercase tracking-wider mb-2">
                 Icon
               </label>
               <div className="flex gap-2 flex-wrap">
@@ -603,8 +609,8 @@ function CreateTripSheet({ onClose }: { onClose: () => void }) {
                     onClick={() => setIcon(emoji)}
                     className={`text-2xl w-11 h-11 rounded-xl border transition-colors ${
                       icon === emoji
-                        ? 'border-violet-accent bg-violet-accent/20'
-                        : 'border-white/10 bg-white/[0.03] hover:border-white/25'
+                        ? 'border-[#f08c21] bg-[#f08c21]/20'
+                        : 'border-[#fcd99a]/40 bg-white hover:border-[#fcd99a]/60'
                     }`}
                   >
                     {emoji}
@@ -615,7 +621,7 @@ function CreateTripSheet({ onClose }: { onClose: () => void }) {
 
             {/* Title */}
             <div>
-              <label className="block text-xs text-muted font-semibold uppercase tracking-wider mb-1.5">
+              <label className="block text-xs text-[#131936]/50 font-semibold uppercase tracking-wider mb-1.5">
                 Trip Name *
               </label>
               <input
@@ -623,45 +629,45 @@ function CreateTripSheet({ onClose }: { onClose: () => void }) {
                 onChange={e => setTitle(e.target.value)}
                 placeholder="e.g. Bali with the lads"
                 required
-                className="w-full rounded-xl bg-white/[0.05] border border-white/10 px-4 py-3 text-white-soft placeholder:text-muted text-sm focus:outline-none focus:border-violet-accent/60 transition-colors"
+                className="w-full rounded-xl bg-white border border-[#fcd99a]/40 px-4 py-3 text-[#131936] placeholder:text-[#131936]/40 text-sm focus:outline-none focus:border-[#f08c21]/60 transition-colors"
               />
             </div>
 
             {/* Destination */}
             <div>
-              <label className="block text-xs text-muted font-semibold uppercase tracking-wider mb-1.5">
+              <label className="block text-xs text-[#131936]/50 font-semibold uppercase tracking-wider mb-1.5">
                 Destination
               </label>
               <input
                 value={destination}
                 onChange={e => setDestination(e.target.value)}
                 placeholder="e.g. Bali, Indonesia"
-                className="w-full rounded-xl bg-white/[0.05] border border-white/10 px-4 py-3 text-white-soft placeholder:text-muted text-sm focus:outline-none focus:border-violet-accent/60 transition-colors"
+                className="w-full rounded-xl bg-white border border-[#fcd99a]/40 px-4 py-3 text-[#131936] placeholder:text-[#131936]/40 text-sm focus:outline-none focus:border-[#f08c21]/60 transition-colors"
               />
             </div>
 
             {/* Dates */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-muted font-semibold uppercase tracking-wider mb-1.5">
+                <label className="block text-xs text-[#131936]/50 font-semibold uppercase tracking-wider mb-1.5">
                   Start Date
                 </label>
                 <input
                   type="date"
                   value={startDate}
                   onChange={e => setStartDate(e.target.value)}
-                  className="w-full rounded-xl bg-white/[0.05] border border-white/10 px-3 py-3 text-white-soft text-sm focus:outline-none focus:border-violet-accent/60 transition-colors [color-scheme:dark]"
+                  className="w-full rounded-xl bg-white border border-[#fcd99a]/40 px-3 py-3 text-[#131936] text-sm focus:outline-none focus:border-[#f08c21]/60 transition-colors "
                 />
               </div>
               <div>
-                <label className="block text-xs text-muted font-semibold uppercase tracking-wider mb-1.5">
+                <label className="block text-xs text-[#131936]/50 font-semibold uppercase tracking-wider mb-1.5">
                   End Date
                 </label>
                 <input
                   type="date"
                   value={endDate}
                   onChange={e => setEndDate(e.target.value)}
-                  className="w-full rounded-xl bg-white/[0.05] border border-white/10 px-3 py-3 text-white-soft text-sm focus:outline-none focus:border-violet-accent/60 transition-colors [color-scheme:dark]"
+                  className="w-full rounded-xl bg-white border border-[#fcd99a]/40 px-3 py-3 text-[#131936] text-sm focus:outline-none focus:border-[#f08c21]/60 transition-colors "
                 />
               </div>
             </div>
@@ -671,14 +677,14 @@ function CreateTripSheet({ onClose }: { onClose: () => void }) {
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 rounded-xl border border-white/10 py-3 text-sm font-semibold text-muted hover:text-white-soft hover:border-white/20 transition-colors"
+                className="flex-1 rounded-xl border border-[#fcd99a]/40 py-3 text-sm font-semibold text-[#131936]/50 hover:text-[#131936] hover:border-[#fcd99a]/60 transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isPending || !title.trim()}
-                className="flex-1 rounded-xl bg-violet-accent hover:bg-violet-accent/90 disabled:opacity-50 py-3 text-sm font-syne font-semibold text-white-soft transition-colors"
+                className="flex-1 rounded-xl bg-[#f08c21] hover:bg-[#f08c21]/90 disabled:opacity-50 py-3 text-sm font-syne font-semibold text-[#131936] transition-colors"
               >
                 {isPending ? 'Creating…' : 'Create Trip'}
               </button>

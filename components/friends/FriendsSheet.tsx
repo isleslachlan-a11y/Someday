@@ -198,10 +198,10 @@ export default function FriendsSheet({ initialFriendCount }: Props) {
       {/* Trigger button — rendered inline by the profile page */}
       <button
         onClick={open}
-        className="flex flex-col items-center gap-0.5 rounded-2xl border border-white/10 bg-white/5 px-4 py-5 text-center hover:border-violet-accent/30 hover:bg-white/[0.07] transition-colors cursor-pointer"
+        className="flex flex-col items-center gap-0.5 rounded-2xl border border-[#fcd99a]/40 bg-white px-4 py-5 text-center hover:border-[#f08c21]/30 hover:bg-white transition-colors cursor-pointer"
       >
-        <p className="font-syne text-3xl font-bold text-violet-accent">{friendCount}</p>
-        <p className="text-muted text-xs mt-1">Friends</p>
+        <p className="font-syne text-3xl font-bold text-[#f08c21]">{friendCount}</p>
+        <p className="text-[#131936]/50 text-xs mt-1">Friends</p>
       </button>
 
       {/* Sheet overlay */}
@@ -215,19 +215,19 @@ export default function FriendsSheet({ initialFriendCount }: Props) {
           />
 
           {/* Panel */}
-          <div className="relative w-full max-h-[88vh] lg:w-[400px] lg:max-h-full lg:h-full bg-[#130f2a] rounded-t-3xl lg:rounded-none border-t border-white/[0.07] lg:border-t-0 lg:border-l flex flex-col shadow-2xl">
+          <div className="relative w-full max-h-[88vh] lg:w-[400px] lg:max-h-full lg:h-full bg-[#fff9f0] rounded-t-3xl lg:rounded-none border-t border-[#fcd99a]/40 lg:border-t-0 lg:border-l flex flex-col shadow-2xl">
 
             {/* Drag handle (mobile only) */}
             <div className="lg:hidden flex justify-center pt-3 pb-1 shrink-0">
-              <div className="w-10 h-1 rounded-full bg-white/20" />
+              <div className="w-10 h-1 rounded-full bg-[#131936]/20" />
             </div>
 
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.07] shrink-0">
-              <h2 className="font-syne text-lg font-bold text-white-soft">Friends</h2>
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[#fcd99a]/40 shrink-0">
+              <h2 className="font-syne text-lg font-bold text-[#131936]">Friends</h2>
               <button
                 onClick={close}
-                className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-white/[0.06] text-muted hover:text-white-soft transition-colors"
+                className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-white text-[#131936]/50 hover:text-[#131936] transition-colors"
                 aria-label="Close"
               >
                 <X size={18} />
@@ -235,7 +235,7 @@ export default function FriendsSheet({ initialFriendCount }: Props) {
             </div>
 
             {/* Tabs */}
-            <div className="flex border-b border-white/[0.07] shrink-0">
+            <div className="flex border-b border-[#fcd99a]/40 shrink-0">
               {([
                 { id: 'friends',  label: 'Friends',  Icon: Users },
                 { id: 'requests', label: 'Requests', Icon: UserPlus },
@@ -246,8 +246,8 @@ export default function FriendsSheet({ initialFriendCount }: Props) {
                   onClick={() => setActiveTab(id)}
                   className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-semibold font-nunito transition-colors relative ${
                     activeTab === id
-                      ? 'text-violet-accent'
-                      : 'text-muted hover:text-white-soft'
+                      ? 'text-[#f08c21]'
+                      : 'text-[#131936]/50 hover:text-[#131936]'
                   }`}
                 >
                   <Icon size={14} />
@@ -258,7 +258,7 @@ export default function FriendsSheet({ initialFriendCount }: Props) {
                     </span>
                   )}
                   {activeTab === id && (
-                    <span className="absolute bottom-0 left-4 right-4 h-[2px] bg-violet-accent rounded-full" />
+                    <span className="absolute bottom-0 left-4 right-4 h-[2px] bg-[#f08c21] rounded-full" />
                   )}
                 </button>
               ))}
@@ -323,7 +323,7 @@ function FriendsTab({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-16">
-        <div className="w-6 h-6 border-2 border-violet-accent/30 border-t-violet-accent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-[#f08c21]/30 border-t-violet-accent rounded-full animate-spin" />
       </div>
     )
   }
@@ -332,14 +332,14 @@ function FriendsTab({
     return (
       <div className="px-5 py-12 text-center">
         <div className="text-3xl mb-3 select-none">✦</div>
-        <p className="text-muted text-sm">No friends yet — find people to add</p>
-        <p className="text-muted/60 text-xs mt-1">Search in Discover</p>
+        <p className="text-[#131936]/50 text-sm">No friends yet — find people to add</p>
+        <p className="text-[#131936]/30 text-xs mt-1">Search in Discover</p>
       </div>
     )
   }
 
   return (
-    <div className="divide-y divide-white/[0.05]">
+    <div className="divide-y divide-[#fcd99a]/20">
       {friends.map(friend => {
         const count = overlapCounts[friend.id] ?? 0
         return (
@@ -350,15 +350,15 @@ function FriendsTab({
             >
               <Avatar avatarUrl={friend.avatar_url} username={friend.username ?? ''} size={40} />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white-soft truncate">
+                <p className="text-sm font-semibold text-[#131936] truncate">
                   @{friend.username ?? 'unknown'}
                 </p>
                 {count > 0 ? (
-                  <p className="text-xs text-lavender mt-0.5">
+                  <p className="text-xs text-[#f08c21] mt-0.5">
                     {count} place{count !== 1 ? 's' : ''} in common
                   </p>
                 ) : (
-                  <p className="text-xs text-muted mt-0.5">No overlaps yet</p>
+                  <p className="text-xs text-[#131936]/50 mt-0.5">No overlaps yet</p>
                 )}
               </div>
             </Link>
@@ -371,10 +371,10 @@ function FriendsTab({
               }}
               disabled={messaging === friend.id}
               aria-label={`Message @${friend.username}`}
-              className="flex items-center justify-center w-9 h-9 rounded-full border border-white/15 text-muted hover:text-white-soft hover:border-white/30 transition-colors disabled:opacity-40 shrink-0"
+              className="flex items-center justify-center w-9 h-9 rounded-full border border-[#fcd99a]/50 text-[#131936]/50 hover:text-[#131936] hover:border-[#fcd99a]/60 transition-colors disabled:opacity-40 shrink-0"
             >
               {messaging === friend.id
-                ? <div className="w-4 h-4 border-2 border-violet-accent/30 border-t-violet-accent rounded-full animate-spin" />
+                ? <div className="w-4 h-4 border-2 border-[#f08c21]/30 border-t-violet-accent rounded-full animate-spin" />
                 : <MessageCircle size={16} />
               }
             </button>
@@ -401,7 +401,7 @@ function RequestsTab({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-16">
-        <div className="w-6 h-6 border-2 border-violet-accent/30 border-t-violet-accent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-[#f08c21]/30 border-t-violet-accent rounded-full animate-spin" />
       </div>
     )
   }
@@ -410,13 +410,13 @@ function RequestsTab({
     return (
       <div className="px-5 py-12 text-center">
         <div className="text-3xl mb-3 select-none">✉️</div>
-        <p className="text-muted text-sm">No pending requests</p>
+        <p className="text-[#131936]/50 text-sm">No pending requests</p>
       </div>
     )
   }
 
   return (
-    <div className="divide-y divide-white/[0.05]">
+    <div className="divide-y divide-[#fcd99a]/20">
       {requests.map(req => (
         <div key={req.friendshipId} className="flex items-center gap-3 px-5 py-4">
           <Avatar
@@ -425,10 +425,10 @@ function RequestsTab({
             size={40}
           />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-white-soft truncate">
+            <p className="text-sm font-semibold text-[#131936] truncate">
               @{req.profile.username ?? 'unknown'}
             </p>
-            <p className="text-xs text-muted mt-0.5">
+            <p className="text-xs text-[#131936]/50 mt-0.5">
               {new Date(req.createdAt).toLocaleDateString('en-AU', {
                 day: 'numeric',
                 month: 'short',
@@ -438,13 +438,13 @@ function RequestsTab({
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => onAccept(req.friendshipId)}
-              className="px-3 py-1.5 rounded-lg bg-violet-accent hover:bg-violet-accent/85 text-white text-xs font-semibold transition-colors min-h-[36px]"
+              className="px-3 py-1.5 rounded-lg bg-[#f08c21] hover:bg-[#f08c21]/90 text-white text-xs font-semibold transition-colors min-h-[36px]"
             >
               Accept
             </button>
             <button
               onClick={() => onDecline(req.friendshipId)}
-              className="px-3 py-1.5 rounded-lg border border-white/15 text-white-soft/60 hover:text-white-soft text-xs font-semibold transition-colors min-h-[36px]"
+              className="px-3 py-1.5 rounded-lg border border-[#fcd99a]/50 text-[#131936]/60 hover:text-[#131936] text-xs font-semibold transition-colors min-h-[36px]"
             >
               Decline
             </button>
@@ -479,13 +479,13 @@ function DiscoverTab({
       {/* Search input */}
       <div className="px-5 py-4 border-b border-white/[0.05]">
         <div className="relative">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#131936]/50 pointer-events-none" />
           <input
             type="text"
             placeholder="Search by username…"
             value={searchQuery}
             onChange={e => onSearchChange(e.target.value)}
-            className="w-full h-11 pl-9 pr-4 rounded-xl bg-white/[0.06] border border-white/[0.08] text-sm text-white-soft placeholder:text-muted focus:outline-none focus:border-violet-accent/40 transition-colors"
+            className="w-full h-11 pl-9 pr-4 rounded-xl bg-white border border-[#fcd99a]/40 text-sm text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:border-[#f08c21]/40 transition-colors"
           />
         </div>
       </div>
@@ -510,7 +510,7 @@ function SearchResults({
   if (isSearching) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-5 h-5 border-2 border-violet-accent/30 border-t-violet-accent rounded-full animate-spin" />
+        <div className="w-5 h-5 border-2 border-[#f08c21]/30 border-t-violet-accent rounded-full animate-spin" />
       </div>
     )
   }
@@ -520,7 +520,7 @@ function SearchResults({
   if (results.length === 0) {
     return (
       <div className="px-5 py-10 text-center">
-        <p className="text-muted text-sm">No users found</p>
+        <p className="text-[#131936]/50 text-sm">No users found</p>
       </div>
     )
   }
@@ -540,7 +540,7 @@ function Suggestions({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-5 h-5 border-2 border-violet-accent/30 border-t-violet-accent rounded-full animate-spin" />
+        <div className="w-5 h-5 border-2 border-[#f08c21]/30 border-t-violet-accent rounded-full animate-spin" />
       </div>
     )
   }
@@ -548,7 +548,7 @@ function Suggestions({
   if (!suggestions || suggestions.length === 0) {
     return (
       <div className="px-5 py-10 text-center">
-        <p className="text-muted text-sm">Add more places to your list to discover people</p>
+        <p className="text-[#131936]/50 text-sm">Add more places to your list to discover people</p>
       </div>
     )
   }
@@ -556,7 +556,7 @@ function Suggestions({
   return (
     <>
       <div className="px-5 pt-4 pb-2">
-        <p className="text-xs text-muted font-semibold uppercase tracking-wider">
+        <p className="text-xs text-[#131936]/50 font-semibold uppercase tracking-wider">
           People you may know
         </p>
       </div>
@@ -573,7 +573,7 @@ function UserResultList({ results }: { results: UserSearchResult[] }) {
   }
 
   return (
-    <div className="divide-y divide-white/[0.05]">
+    <div className="divide-y divide-[#fcd99a]/20">
       {results.map(item => {
         const override    = overrides[item.profile.id]
         const status      = override?.status      ?? item.friendshipStatus
@@ -587,11 +587,11 @@ function UserResultList({ results }: { results: UserSearchResult[] }) {
               size={40}
             />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-white-soft truncate">
+              <p className="text-sm font-semibold text-[#131936] truncate">
                 @{item.profile.username ?? 'unknown'}
               </p>
               {item.profile.bio && (
-                <p className="text-xs text-muted mt-0.5 truncate">{item.profile.bio}</p>
+                <p className="text-xs text-[#131936]/50 mt-0.5 truncate">{item.profile.bio}</p>
               )}
             </div>
             <div className="shrink-0">
