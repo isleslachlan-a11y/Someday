@@ -2,33 +2,54 @@ import type { Metadata } from 'next'
 import { Toaster } from 'react-hot-toast'
 
 export const metadata: Metadata = {
-  title: 'Sign in',
+  title: 'Someday',
 }
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-indigo-deep flex flex-col items-center justify-center px-4">
-      {/* Brand header */}
-      <div className="mb-8 text-center select-none">
-        <div className="text-5xl text-violet-accent mb-3">✦</div>
-        <h1 className="font-syne text-3xl font-bold text-white-soft tracking-tight">
-          Someday
-        </h1>
-        <p className="text-lavender text-sm mt-1">Your travel bucket list</p>
-      </div>
+    <div className="min-h-screen bg-[#FFF8F0] flex flex-col items-center justify-center px-4 py-12 relative overflow-hidden">
 
-      {/* Form card */}
-      <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-8">
-        {children}
+      {/* Radial warm glow */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background: 'radial-gradient(ellipse 80% 55% at 50% -5%, #FED7AA 0%, transparent 65%)',
+        }}
+      />
+
+      <div className="relative z-10 w-full max-w-sm">
+
+        {/* Brand header */}
+        <div className="mb-8 text-center select-none">
+          <div className="flex justify-center mb-3">
+            <svg viewBox="0 0 48 48" width="48" height="48" aria-hidden="true">
+              <path
+                d="M24 6L28.1 18.3L41.1 18.4L30.7 26.2L34.6 38.6L24 31L13.4 38.6L17.3 26.2L6.9 18.4L19.9 18.3Z"
+                fill="#F97316"
+              />
+              <circle cx="24" cy="24" r="5" fill="#FED7AA" />
+            </svg>
+          </div>
+          <h1 className="font-syne text-3xl font-bold tracking-tight text-[#1A0A00]">
+            Someday
+          </h1>
+          <p className="font-nunito text-sm text-[#A36B3A] mt-1">Your travel bucket list</p>
+        </div>
+
+        {/* Form card */}
+        <div className="w-full rounded-2xl bg-white border border-[#FDDCB5] p-8 shadow-sm">
+          {children}
+        </div>
+
       </div>
 
       <Toaster
         position="top-center"
         toastOptions={{
           style: {
-            background: 'var(--color-indigo-deep)',
-            color: 'var(--color-white-soft)',
-            border: '1px solid var(--color-violet-accent)',
+            background: '#1A0A00',
+            color: '#FFF8F0',
+            border: '1px solid #F97316',
             fontFamily: 'var(--font-nunito)',
           },
         }}

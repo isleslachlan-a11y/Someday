@@ -27,7 +27,7 @@ npm run build     # Production build — fix all errors before committing
 npm run lint      # Run ESLint
 ```
 
-Seeding and data utilities live in `scripts/`: `seed-experiences.ts` (populates the places catalogue) and `check-events.ts` (validates event logging).
+Seeding and data utilities live in `scripts/`: `seed-experiences.ts` (populates the places catalogue), `check-events.ts` (validates event logging), and `link-images.ts` (bulk-links Unsplash images to places).
 
 Run `npm run build` after significant changes and fix all errors before committing.
 
@@ -78,7 +78,7 @@ app/
     plan/         — trip planning; [tripId]/ for trip detail + group chat
     submit/       — nominate a destination for the catalogue
     places/[id]/  — place detail page (PlaceDetailContent.tsx); warm tangerine palette
-    discover/     — search + filter stub (not yet built)
+    discover/     — search + filter by vibe/intensity/category (built)
     profile/      — own profile; [username]/ for public profiles; edit/
     admin/analytics/  — B2B analytics (gated by ADMIN_USER_ID)
     admin/images/ — image admin for bulk Unsplash linking (gated)
@@ -112,7 +112,7 @@ Mutations use Server Actions (not API routes). The one exception is `app/api/pla
 
 | Table | Purpose | Status |
 |-------|---------|--------|
-| `profiles` | Public user profiles (extends `auth.users`); includes `map_city_preference` | Built |
+| `profiles` | Public user profiles (extends `auth.users`); includes `map_city_preference`, `is_admin` (boolean, gates admin routes) | Built |
 | `places` | Curated catalogue of destinations (admin-seeded); includes `lat`, `lng`, `popularity`, `trending`, `image_url`, `image_thumb_url`, `unsplash_photo_id`, `unsplash_attribution` (JSONB), `image_keyword`, `vibes` (enum: Adventure/Culture/Foodie/Romantic/Chill/Epic/Peaceful/Wellness), `intensity` (low/medium/high) | Built |
 | `bucket_list_items` | A user's personal bucket list (user → place); includes `completed_at`, `completion_note`, `completion_photo_url` for Strava-style completion tracking | Built |
 | `events` | Every user action — feeds the B2B data product | Built |
@@ -127,9 +127,10 @@ Mutations use Server Actions (not API routes). The one exception is `app/api/pla
 | `conversation_members` | Membership + `last_read_at` per conversation | Built |
 | `messages` | Chat messages; realtime enabled | Built |
 | `promotional_posts` | Admin-created promotional content for the home feed; columns: `title`, `body`, `image_url`, `cta_label`, `cta_url`, `place_id`, `active`, `starts_at`, `ends_at`. Public read when active and within time window. | Built |
+| `activities` | Things to do at a specific place (shown on detail pages under "What to do here"); columns: `place_id`, `name`, `description`, `duration`, `category`, `rating` | Built |
 | `posts` | User-created Strava-style completion posts (distinct from `promotional_posts`) | Planned |
 
-Migrations live in `supabase/migrations/`. Key migrations: `003_profiles.sql`, `004_events_platform.sql`, `20260414120000_pivot_schema.sql` (places pivot), `20260414200000_trips_schema.sql`, `20260418_map_columns.sql`, `20260418200000_friendships.sql`, `20260421000000_messaging_schema.sql`, `20260429000000_promotional_posts.sql`, `20260429000001_completion_columns.sql` (adds completion fields to `bucket_list_items`).
+Migrations live in `supabase/migrations/`. Key migrations: `003_profiles.sql`, `004_events_platform.sql`, `20260414120000_pivot_schema.sql` (places pivot), `20260414200000_trips_schema.sql`, `20260418_map_columns.sql`, `20260418200000_friendships.sql`, `20260421000000_messaging_schema.sql`, `20260429000000_promotional_posts.sql`, `20260429000001_completion_columns.sql` (adds completion fields to `bucket_list_items`), `20260512000000_add_is_admin_to_profiles.sql` (adds `is_admin` flag), `20260513000000_create_activities.sql` (activities table).
 
 **Row Level Security:**
 - `profiles` — public read, private write
@@ -146,6 +147,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=
 SUPABASE_SERVICE_ROLE_KEY=       # Server-only — never import client-side
 NEXT_PUBLIC_APP_VERSION=0.1.0    # Written to every event row
 ADMIN_USER_ID=                   # Supabase user UUID — gates /admin/analytics
+NEXT_PUBLIC_ADMIN_EMAIL=         # Email address — gates /admin/images
 NEXT_PUBLIC_MAPBOX_TOKEN=        # Required for the Map tab (mapbox-gl / react-map-gl)
 UNSPLASH_ACCESS_KEY=             # Used by seed scripts only — not required at runtime
 ```

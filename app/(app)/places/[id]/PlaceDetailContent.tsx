@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ChevronLeft, ChevronRight, Heart, Share2, Compass, Locate } from 'lucide-react'
+import { ChevronLeft, Heart, Share2, Compass, Locate } from 'lucide-react'
 import toast from 'react-hot-toast'
 import Map, { Marker, NavigationControl } from 'react-map-gl/mapbox'
 import 'mapbox-gl/dist/mapbox-gl.css'
@@ -30,12 +30,22 @@ export interface FriendVisitor {
   avatar_url: string | null
 }
 
+export interface Activity {
+  id: string
+  name: string
+  description: string | null
+  duration: string | null
+  category: string | null
+  rating: number | null
+}
+
 interface Props {
   place: Place
   userId: string
   initialIsSaved: boolean
   similarPlaces: Place[]
   friendVisitors: FriendVisitor[]
+  activities: Activity[]
 }
 
 // ─── Month logic ──────────────────────────────────────────────────────────────
@@ -76,6 +86,7 @@ export default function PlaceDetailContent({
   initialIsSaved,
   similarPlaces,
   friendVisitors,
+  activities,
 }: Props) {
   const router = useRouter()
   const [isSaved, setIsSaved] = useState(initialIsSaved)
@@ -158,8 +169,7 @@ export default function PlaceDetailContent({
   // ── Derived values ────────────────────────────────────────────────────────
 
   const { peak, shoulder } = getPeakAndShoulder(place.tags)
-  const location = [place.region, place.country].filter(Boolean).join(', ')
-  const activities = (place.tags ?? []).slice(0, 3)
+  const location   = [place.region, place.country].filter(Boolean).join(', ')
   const seasonTags = (place.tags ?? []).slice(0, 2)
 
   return (
@@ -232,6 +242,54 @@ export default function PlaceDetailContent({
               >
                 {descExpanded ? 'Show less' : 'Read more'}
               </button>
+            )}
+          </div>
+        )}
+
+        {/* ── About this place (Hinge fields) ──────────────────────────────── */}
+        {(place.must_do || place.hidden_gem || place.not_for_you || place.best_time || (place.vibe_tags && place.vibe_tags.length > 0)) && (
+          <div className="px-4 pt-6 space-y-2">
+            <h2 className="font-syne font-bold text-[#131936] text-[16px] mb-3">About this place</h2>
+
+            {place.must_do && (
+              <div className="rounded-2xl border border-[#fcd99a] bg-white px-4 py-3">
+                <p className="font-syne font-bold text-[#131936] text-[13px] mb-1">🎯 Must do</p>
+                <p className="font-nunito text-[#131936] text-[15px] leading-snug">{place.must_do}</p>
+              </div>
+            )}
+
+            {place.hidden_gem && (
+              <div className="rounded-2xl border border-[#fcd99a] bg-white px-4 py-3">
+                <p className="font-syne font-bold text-[#131936] text-[13px] mb-1">💎 Local secret</p>
+                <p className="font-nunito text-[#131936] text-[15px] leading-snug">{place.hidden_gem}</p>
+              </div>
+            )}
+
+            {place.not_for_you && (
+              <div className="rounded-2xl border border-[#fcd99a] bg-white px-4 py-3">
+                <p className="font-syne font-bold text-[#131936] text-[13px] mb-1">⚠️ Not for you if</p>
+                <p className="font-nunito text-[#131936] text-[15px] leading-snug">{place.not_for_you}</p>
+              </div>
+            )}
+
+            {place.best_time && (
+              <div className="rounded-2xl border border-[#fcd99a] bg-white px-4 py-3">
+                <p className="font-syne font-bold text-[#131936] text-[13px] mb-1">🗓 Best time</p>
+                <p className="font-nunito text-[#131936] text-[15px] leading-snug">{place.best_time}</p>
+              </div>
+            )}
+
+            {place.vibe_tags && place.vibe_tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 pt-1">
+                {place.vibe_tags.map(vibe => (
+                  <span
+                    key={vibe}
+                    className="px-3 py-1 rounded-full bg-[#fcd99a]/50 border border-[#fcd99a] font-nunito text-[12px] text-[#131936]"
+                  >
+                    {vibe}
+                  </span>
+                ))}
+              </div>
             )}
           </div>
         )}
@@ -370,38 +428,49 @@ export default function PlaceDetailContent({
           )}
         </div>
 
-        {/* ── Top activities ────────────────────────────────────────────────── */}
-        {activities.length > 0 && (
-          <div className="px-4 pt-6">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="font-syne font-bold text-[#131936] text-[16px]">Top activities</h2>
-              <Link
-                href={`/discover?type=${encodeURIComponent(place.type)}`}
-                className="font-nunito text-[13px] text-[#f08c21]"
-              >
-                See all →
-              </Link>
-            </div>
-            <div className="flex flex-col gap-2">
-              {activities.map((tag, i) => (
-                <div key={tag} className="bg-white rounded-2xl p-3 flex flex-row items-center gap-3">
-                  <div className="w-7 h-7 rounded-full bg-[#131936] flex items-center justify-center shrink-0">
-                    <span className="font-bold text-white text-[12px]">{i + 1}</span>
+        {/* ── What to do here ───────────────────────────────────────────────── */}
+        <div className="pt-6 px-4">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-syne font-bold text-[#131936] text-[16px]">What to do here</h2>
+            <span className="font-nunito text-[#131936]/40 text-[12px]">
+              {activities.length} {activities.length === 1 ? 'activity' : 'activities'}
+            </span>
+          </div>
+
+          {activities.length > 0 ? (
+            <div className="space-y-2">
+              {activities.slice(0, 4).map((activity, i) => (
+                <div
+                  key={activity.id}
+                  className="bg-white rounded-2xl p-3 flex items-center gap-3 border border-[#fcd99a]/40"
+                >
+                  <div className="w-9 h-9 rounded-full bg-[#fcd99a]/60 flex items-center justify-center shrink-0">
+                    <span className="font-syne font-bold text-[#131936] text-[14px]">{i + 1}</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-syne font-bold text-[#131936] text-[14px] leading-tight capitalize">
-                      {tag}
+                    <p className="font-syne font-bold text-[#131936] text-[14px] leading-tight">
+                      {activity.name}
                     </p>
-                    <p className="font-nunito text-[11px] text-[#131936]/50 capitalize">
-                      {place.type} · ★ 4.8 · Tap for details
+                    <p className="font-nunito text-[#131936]/50 text-[12px] mt-0.5">
+                      {[activity.category, activity.duration].filter(Boolean).join(' · ')}
                     </p>
                   </div>
-                  <ChevronRight size={16} className="text-[#131936]/30 shrink-0" />
+                  {activity.rating && (
+                    <span className="font-nunito text-[12px] text-[#f08c21] shrink-0">
+                      ★ {activity.rating.toFixed(1)}
+                    </span>
+                  )}
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          ) : (
+            <div className="rounded-2xl bg-[#fcd99a]/20 border border-[#fcd99a]/40 p-6 text-center">
+              <p className="font-nunito text-[#131936]/40 text-[13px]">
+                Activities coming soon for {place.name}
+              </p>
+            </div>
+          )}
+        </div>
 
         {/* ── Best time to visit ────────────────────────────────────────────── */}
         <div className="px-4 pt-6">

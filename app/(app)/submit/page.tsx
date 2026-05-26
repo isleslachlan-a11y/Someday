@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import Link from 'next/link'
 import SubmitForm from './SubmitForm'
 import AdminAddForm from './AdminAddForm'
 import SubmitBackButton from './SubmitBackButton'
@@ -69,9 +70,23 @@ export default async function SubmitPage() {
           </div>
           <div className="flex items-center justify-end">
             {isAdmin ? (
-              <span className="px-2 py-0.5 rounded-full bg-[#f08c21] text-[#131936] font-nunito font-bold text-[10px] uppercase tracking-wider">
-                Admin
-              </span>
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/admin/submissions"
+                  className="font-nunito text-[12px] text-[#f08c21] hover:opacity-80 transition-opacity"
+                >
+                  Submissions →
+                </Link>
+                <Link
+                  href="/admin/places"
+                  className="font-nunito text-[12px] text-[#131936]/50 hover:text-[#131936] transition-colors"
+                >
+                  Places
+                </Link>
+                <span className="px-2 py-0.5 rounded-full bg-[#f08c21] text-[#131936] font-nunito font-bold text-[10px] uppercase tracking-wider">
+                  Admin
+                </span>
+              </div>
             ) : (
               <div className="w-11" />
             )}

@@ -112,6 +112,12 @@ export interface Place {
   /** WGS-84 coordinates — null means no map pin rendered. */
   lat: number | null
   lng: number | null
+  must_do?: string | null
+  hidden_gem?: string | null
+  not_for_you?: string | null
+  best_time?: string | null
+  vibe_tags?: string[] | null
+  submitted_photo_url?: string | null
 }
 
 export const DESTINATION_TYPES = ['city', 'nature'] as const

@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { isDestination, type Place } from '@/lib/types'
 import PlaceViewTracker from './PlaceViewTracker'
-import PlaceDetailContent, { type FriendVisitor } from './PlaceDetailContent'
+import PlaceDetailContent, { type FriendVisitor, type Activity } from './PlaceDetailContent'
 import ExperienceDetailContent from './ExperienceDetailContent'
 
 export const metadata: Metadata = {
@@ -38,7 +38,7 @@ export default async function PlaceDetailPage({
   const isExperienceType = place.type === 'experience' || place.type === 'food'
 
   // Run independent queries in parallel
-  const [bucketResult, similarResult, countryPlacesResult, friendshipsResult] =
+  const [bucketResult, similarResult, countryPlacesResult, friendshipsResult, activitiesResult] =
     await Promise.all([
       supabase
         .from('bucket_list_items')
@@ -71,10 +71,18 @@ export default async function PlaceDetailPage({
         .select('requester_id, addressee_id')
         .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`)
         .eq('status', 'accepted'),
+      isDestination(place)
+        ? supabase
+            .from('activities')
+            .select('*')
+            .eq('place_id', id)
+            .order('rating', { ascending: false })
+        : Promise.resolve({ data: [] as Activity[], error: null }),
     ])
 
   const initialIsSaved = !!bucketResult.data
-  const similarPlaces = (similarResult.data ?? []) as unknown as Place[]
+  const similarPlaces  = (similarResult.data ?? []) as unknown as Place[]
+  const activities     = (activitiesResult.data ?? []) as Activity[]
 
   // Resolve friend IDs from symmetric friendship rows
   const friendIds = (friendshipsResult.data ?? []).map(f =>
@@ -119,6 +127,7 @@ export default async function PlaceDetailPage({
           initialIsSaved={initialIsSaved}
           similarPlaces={similarPlaces}
           friendVisitors={friendVisitors}
+          activities={activities}
         />
       ) : (
         <ExperienceDetailContent

@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
 
   const params = new URLSearchParams({
     query,
-    per_page: '9',
+    per_page: '18',
     orientation: 'landscape',
     content_filter: 'high',
   })

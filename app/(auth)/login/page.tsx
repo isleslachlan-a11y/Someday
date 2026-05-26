@@ -6,12 +6,15 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { logEvent } from '@/lib/events'
 
+const LABEL = 'block font-nunito font-semibold uppercase tracking-wider text-[11px] text-[#A36B3A] mb-1.5'
+const INPUT = 'w-full rounded-lg bg-[#FFFAF5] border border-[#FDDCB5] text-[#1A0A00] placeholder:text-[#A36B3A]/40 px-4 py-2.5 font-nunito text-[14px] focus:outline-none focus:ring-2 focus:ring-[#F97316]/40 transition'
+
 export default function LoginPage() {
   const router = useRouter()
-  const [email, setEmail] = useState('')
+  const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [error, setError]       = useState<string | null>(null)
+  const [loading, setLoading]   = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -30,7 +33,6 @@ export default function LoginPage() {
     if (data.user) {
       await logEvent(data.user.id, 'user_signed_in', {})
 
-      // Route to onboarding if they haven't completed it yet
       const { data: context } = await supabase
         .from('user_context')
         .select('completed_onboarding')
@@ -50,13 +52,13 @@ export default function LoginPage() {
 
   return (
     <>
-      <h2 className="font-syne text-xl font-bold text-white-soft mb-6">Welcome back</h2>
+      <h2 className="font-syne text-[22px] font-bold text-[#1A0A00] mb-6">
+        Welcome back
+      </h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="email" className="block text-sm text-lavender mb-1.5">
-            Email
-          </label>
+          <label htmlFor="email" className={LABEL}>Email</label>
           <input
             id="email"
             type="email"
@@ -65,14 +67,12 @@ export default function LoginPage() {
             value={email}
             onChange={e => setEmail(e.target.value)}
             placeholder="you@example.com"
-            className="w-full rounded-lg bg-white/5 border border-white/10 px-4 py-2.5 text-white-soft placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-violet-accent transition"
+            className={INPUT}
           />
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm text-lavender mb-1.5">
-            Password
-          </label>
+          <label htmlFor="password" className={LABEL}>Password</label>
           <input
             id="password"
             type="password"
@@ -81,28 +81,34 @@ export default function LoginPage() {
             value={password}
             onChange={e => setPassword(e.target.value)}
             placeholder="••••••••"
-            className="w-full rounded-lg bg-white/5 border border-white/10 px-4 py-2.5 text-white-soft placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-violet-accent transition"
+            className={INPUT}
           />
         </div>
 
         {error && (
-          <p role="alert" className="text-pink-accent text-sm">
+          <div
+            role="alert"
+            className="rounded-lg bg-red-50/80 border border-red-200 px-3 py-2.5 font-nunito text-[13px] text-red-600"
+          >
             {error}
-          </p>
+          </div>
         )}
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-lg bg-violet-accent hover:bg-violet-accent/90 disabled:opacity-50 px-4 py-2.5 font-syne font-semibold text-white-soft transition-colors mt-2"
+          className="w-full rounded-lg bg-[#F97316] hover:bg-[#EA6C0A] disabled:opacity-60 px-4 py-2.5 font-syne font-semibold text-white transition-colors mt-2 flex items-center justify-center gap-2"
         >
+          {loading && (
+            <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin shrink-0" />
+          )}
           {loading ? 'Signing in…' : 'Sign in'}
         </button>
       </form>
 
-      <p className="text-center text-sm text-muted mt-6">
+      <p className="text-center font-nunito text-[13px] text-[#A36B3A] mt-6">
         Don&apos;t have an account?{' '}
-        <Link href="/signup" className="text-lavender hover:text-white-soft transition-colors">
+        <Link href="/signup" className="font-semibold text-[#F97316] hover:text-[#EA6C0A] transition-colors">
           Sign up
         </Link>
       </p>
