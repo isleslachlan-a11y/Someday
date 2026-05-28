@@ -8,6 +8,7 @@ interface AdminPlaceInput {
   name: string
   country: string
   region: 'Asia' | 'Europe' | 'Americas' | 'Africa' | 'Oceania' | 'Global'
+  state_province?: string | null
   type: 'city' | 'nature' | 'experience' | 'food'
   description: string
   tags?: string[]
@@ -65,6 +66,7 @@ export async function adminCreatePlace(input: AdminPlaceInput): Promise<{ error?
       name:                 input.name,
       country:              input.country,
       region:               input.region,
+      state_province:       input.state_province ?? null,
       type:                 input.type,
       description:          input.description,
       tags:                 tagNames,
@@ -85,6 +87,7 @@ export async function adminCreatePlace(input: AdminPlaceInput): Promise<{ error?
       best_time:            input.best_time ?? null,
       vibe_tags:            input.vibe_tags ?? [],
       submitted_photo_url:  input.submitted_photo_url ?? null,
+      created_at:           new Date().toISOString(),
     })
     .select('id')
     .single()

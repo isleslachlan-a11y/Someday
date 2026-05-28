@@ -24,14 +24,18 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  const query = req.nextUrl.searchParams.get('q')
+  const query = req.nextUrl.searchParams.get('q') ?? ''
   if (!query) return NextResponse.json({ error: 'Missing query' }, { status: 400 })
+
+  // When fallback=1, use only the first word to broaden results
+  const isFallback = req.nextUrl.searchParams.get('fallback') === '1'
+  const searchQuery = isFallback ? query.split(' ')[0] : query
 
   const accessKey = process.env.UNSPLASH_ACCESS_KEY
   if (!accessKey) return NextResponse.json({ error: 'Unsplash not configured' }, { status: 500 })
 
   const params = new URLSearchParams({
-    query,
+    query: searchQuery,
     per_page: '18',
     orientation: 'landscape',
     content_filter: 'high',

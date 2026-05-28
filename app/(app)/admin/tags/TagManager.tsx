@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { createTag, deleteTag, mergeTag, type TagRecord } from '@/app/actions/adminTags'
+import { createTag, deleteTag, mergeTag, createLabel, deleteLabel, type TagRecord, type LabelRecord } from '@/app/actions/adminTags'
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -22,9 +22,15 @@ type PlaceType = (typeof PLACE_TYPES)[number]
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
+const DIMENSIONS = [
+  'activity', 'landscape', 'culture', 'vibe',
+  'budget', 'season', 'duration', 'trend',
+] as const
+
 interface Props {
   grouped: Record<string, TagRecord[]>
   categories: string[]
+  labels: LabelRecord[]
 }
 
 // ── Create form ───────────────────────────────────────────────────────────────
@@ -39,6 +45,7 @@ function CreateForm({ onCreated, onCancel }: CreateFormProps) {
   const [slug, setSlug]           = useState('')
   const [slugEdited, setSlugEdited] = useState(false)
   const [category, setCategory]   = useState('general')
+  const [dimension, setDimension] = useState('activity')
   const [placeType, setPlaceType] = useState<PlaceType[]>([])
   const [saving, setSaving]       = useState(false)
 
@@ -59,7 +66,7 @@ function CreateForm({ onCreated, onCancel }: CreateFormProps) {
     e.preventDefault()
     if (!name.trim() || !slug.trim()) return
     setSaving(true)
-    const result = await createTag({ name: name.trim(), slug: slug.trim(), category, place_type: placeType })
+    const result = await createTag({ name: name.trim(), slug: slug.trim(), category, dimension, place_type: placeType })
     setSaving(false)
     if (result.error) {
       toast.error(result.error)
@@ -115,6 +122,21 @@ function CreateForm({ onCreated, onCancel }: CreateFormProps) {
         >
           {Object.entries(CATEGORY_LABELS).map(([val, label]) => (
             <option key={val} value={val}>{label}</option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label className="font-nunito text-[11px] text-[#131936]/50 uppercase tracking-wider mb-1 block">
+          Dimension
+        </label>
+        <select
+          value={dimension}
+          onChange={e => setDimension(e.target.value)}
+          className="w-full rounded-xl border border-[#fcd99a] bg-white px-3 py-2 font-nunito text-[14px] text-[#131936] focus:outline-none focus:ring-2 focus:ring-[#f08c21]/30"
+        >
+          {DIMENSIONS.map(d => (
+            <option key={d} value={d}>{d}</option>
           ))}
         </select>
       </div>
@@ -300,9 +322,35 @@ function TagRow({ tag, categoryPeers, onDeleted, onMerged }: TagRowProps) {
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
-export default function TagManager({ grouped: initial, categories }: Props) {
+export default function TagManager({ grouped: initial, categories, labels: initialLabels }: Props) {
   const [grouped, setGrouped] = useState<Record<string, TagRecord[]>>(initial)
   const [showCreate, setShowCreate] = useState(false)
+  const [labels, setLabels] = useState<LabelRecord[]>(initialLabels)
+  const [newLabelName, setNewLabelName] = useState('')
+  const [savingLabel, setSavingLabel] = useState(false)
+  const [deletingLabelId, setDeletingLabelId] = useState<string | null>(null)
+
+  async function handleCreateLabel() {
+    if (!newLabelName.trim()) return
+    setSavingLabel(true)
+    const result = await createLabel({ name: newLabelName.trim() })
+    setSavingLabel(false)
+    if (result.error) { toast.error(result.error); return }
+    if (result.label) {
+      setLabels(prev => [...prev, result.label!].sort((a, b) => a.name.localeCompare(b.name)))
+      setNewLabelName('')
+      toast.success(`Label "${result.label.name}" created`)
+    }
+  }
+
+  async function handleDeleteLabel(id: string, name: string) {
+    setDeletingLabelId(id)
+    const result = await deleteLabel(id)
+    setDeletingLabelId(null)
+    if (result.error) { toast.error(result.error); return }
+    setLabels(prev => prev.filter(l => l.id !== id))
+    toast.success(`"${name}" deleted`)
+  }
 
   const total = Object.values(grouped).reduce((sum, arr) => sum + arr.length, 0)
 
@@ -394,6 +442,61 @@ export default function TagManager({ grouped: initial, categories }: Props) {
           </p>
         </div>
       )}
+
+      {/* ── Display Labels ─────────────────────────────────────────────────── */}
+      <section className="mt-8 pt-6 border-t border-[#fcd99a]/50">
+        <h2 className="font-syne font-bold text-[#131936] text-[15px] mb-1">
+          Display Labels
+        </h2>
+        <p className="font-nunito text-[12px] text-[#131936]/40 mb-4">
+          Proper nouns shown on cards. Not used for scoring.
+        </p>
+
+        {/* Existing labels */}
+        <div className="space-y-2 mb-4">
+          {labels.map(label => (
+            <div
+              key={label.id}
+              className="flex items-center gap-3 bg-white rounded-2xl border border-[#fcd99a]/40 px-3 py-2.5"
+            >
+              <span className="flex-1 font-nunito font-semibold text-[#131936] text-[14px]">
+                {label.name}
+              </span>
+              <span className="font-nunito text-[11px] text-[#131936]/30">
+                {new Date(label.created_at).toLocaleDateString('en-AU', {
+                  day: 'numeric', month: 'short', year: 'numeric',
+                })}
+              </span>
+              <button
+                onClick={() => void handleDeleteLabel(label.id, label.name)}
+                disabled={deletingLabelId === label.id}
+                className="px-2.5 py-1 rounded-xl border border-red-100 bg-red-50 text-red-500 font-nunito text-[12px] font-medium disabled:opacity-50 shrink-0"
+              >
+                {deletingLabelId === label.id ? '…' : 'Delete'}
+              </button>
+            </div>
+          ))}
+        </div>
+
+        {/* New label form */}
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={newLabelName}
+            onChange={e => setNewLabelName(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && void handleCreateLabel()}
+            placeholder="New label e.g. UNESCO Heritage"
+            className="flex-1 rounded-xl border border-[#fcd99a] bg-white px-3 py-2 font-nunito text-[14px] text-[#131936] placeholder:text-[#131936]/30 focus:outline-none focus:ring-2 focus:ring-[#f08c21]/30"
+          />
+          <button
+            onClick={() => void handleCreateLabel()}
+            disabled={savingLabel || !newLabelName.trim()}
+            className="px-4 h-10 rounded-xl bg-[#131936] text-white font-nunito font-semibold text-[13px] disabled:opacity-50 shrink-0"
+          >
+            {savingLabel ? '…' : 'Add'}
+          </button>
+        </div>
+      </section>
     </div>
   )
 }

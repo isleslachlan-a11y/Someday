@@ -118,13 +118,14 @@ export async function GET(req: NextRequest) {
       const region = (REGION_MAP[fallbackCountry] ?? 'Global') as
         'Asia' | 'Europe' | 'Americas' | 'Africa' | 'Oceania' | 'Global'
       return NextResponse.json({
-        name:         fallbackName,
-        country:      fallbackCountry,
-        admin_area:   fallbackRegion,
+        name:           fallbackName,
+        country:        fallbackCountry,
+        admin_area:     fallbackRegion,
+        state_province: fallbackRegion || null,
         region,
-        lat:          fallbackLat ? parseFloat(fallbackLat) : null,
-        lng:          fallbackLng ? parseFloat(fallbackLng) : null,
-        feature_type: fallbackFeatureType,
+        lat:            fallbackLat ? parseFloat(fallbackLat) : null,
+        lng:            fallbackLng ? parseFloat(fallbackLng) : null,
+        feature_type:   fallbackFeatureType,
       })
     }
 
@@ -143,13 +144,14 @@ export async function GET(req: NextRequest) {
     const geometry = (f.geometry ?? {}) as { coordinates?: number[] }
 
     return NextResponse.json({
-      name:         (props.name as string | undefined) ?? fallbackName,
+      name:           (props.name as string | undefined) ?? fallbackName,
       country,
-      admin_area:   adminArea,
+      admin_area:     adminArea,
+      state_province: adminArea || null,
       region,
-      lat:          geometry.coordinates?.[1] ?? null,
-      lng:          geometry.coordinates?.[0] ?? null,
-      feature_type: (props.feature_type as string | undefined) ?? fallbackFeatureType,
+      lat:            geometry.coordinates?.[1] ?? null,
+      lng:            geometry.coordinates?.[0] ?? null,
+      feature_type:   (props.feature_type as string | undefined) ?? fallbackFeatureType,
     })
   }
 

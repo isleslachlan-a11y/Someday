@@ -183,6 +183,7 @@ export default function SubmitForm({ userId }: Props) {
   const [placeName, setPlaceName]         = useState('')
   const [placeCountry, setPlaceCountry]   = useState('')
   const [placeRegion, setPlaceRegion]     = useState('')
+  const [stateProv, setStateProv]         = useState('')
   const [placeType, setPlaceType]         = useState('')
   const [vibes, setVibes]                 = useState<string[]>([])
   const [mustDo, setMustDo]               = useState('')
@@ -192,6 +193,7 @@ export default function SubmitForm({ userId }: Props) {
   const [description, setDescription]     = useState('')
   const [photoFile, setPhotoFile]         = useState<File | null>(null)
   const [photoPreview, setPhotoPreview]   = useState<string | null>(null)
+  const [photoConsent, setPhotoConsent]   = useState(false)
 
   // Taxonomy
   const [allCategories, setAllCategories]     = useState<CategoryItem[]>([])
@@ -293,6 +295,7 @@ export default function SubmitForm({ userId }: Props) {
         name?: string
         country?: string
         region?: string
+        state_province?: string | null
         lat?: number | null
         lng?: number | null
       }
@@ -300,6 +303,7 @@ export default function SubmitForm({ userId }: Props) {
       setPlaceName(data.name ?? s.main_text)
       setPlaceCountry(data.country ?? '')
       setPlaceRegion(data.region ?? '')
+      setStateProv(data.state_province ?? '')
       setResolvedLat(data.lat ?? s.lat ?? null)
       setResolvedLng(data.lng ?? s.lng ?? null)
       setLocationLocked(true)
@@ -312,6 +316,13 @@ export default function SubmitForm({ userId }: Props) {
 
   async function handleSubmit() {
     setSubmitting(true)
+
+    if (photoFile && !photoConsent) {
+      toast.error('Please confirm you have the right to share this photo.')
+      setSubmitting(false)
+      return
+    }
+
     let photo_url: string | null = null
 
     if (photoFile) {
@@ -334,10 +345,11 @@ export default function SubmitForm({ userId }: Props) {
     }
 
     const result = await submitPlace({
-      name:        placeName,
-      type:        placeType,
-      country:     placeCountry,
-      region:      placeRegion,
+      name:           placeName,
+      type:           placeType,
+      country:        placeCountry,
+      region:         placeRegion,
+      state_province: stateProv || null,
       description,
       tags:        [],
       image_url:   photo_url,
@@ -367,6 +379,7 @@ export default function SubmitForm({ userId }: Props) {
     setPlaceName('')
     setPlaceCountry('')
     setPlaceRegion('')
+    setStateProv('')
     setPlaceType('')
     setVibes([])
     setMustDo('')
@@ -376,6 +389,7 @@ export default function SubmitForm({ userId }: Props) {
     setDescription('')
     setPhotoFile(null)
     setPhotoPreview(null)
+    setPhotoConsent(false)
     setLocationLocked(false)
     setResolvedLat(null)
     setResolvedLng(null)
@@ -458,7 +472,7 @@ export default function SubmitForm({ userId }: Props) {
                     {placeName}
                   </p>
                   <p className="font-nunito text-[#131936]/50 text-[12px]">
-                    {[placeCountry, placeRegion].filter(Boolean).join(' · ')}
+                    {stateProv ? `${stateProv}, ${placeCountry}` : placeCountry}
                   </p>
                 </div>
                 <button
@@ -468,6 +482,7 @@ export default function SubmitForm({ userId }: Props) {
                     setPlaceName('')
                     setPlaceCountry('')
                     setPlaceRegion('')
+                    setStateProv('')
                     setResolvedLat(null)
                     setResolvedLng(null)
                   }}
@@ -676,9 +691,25 @@ export default function SubmitForm({ userId }: Props) {
                 }
                 setPhotoFile(file)
                 setPhotoPreview(URL.createObjectURL(file))
+                setPhotoConsent(false)
               }}
               className="hidden"
             />
+
+            {photoFile && (
+              <label className="flex items-start gap-3 mt-4 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={photoConsent}
+                  onChange={e => setPhotoConsent(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 accent-[#f08c21] shrink-0 cursor-pointer"
+                />
+                <span className="font-nunito text-[#131936]/60 text-[13px] leading-relaxed">
+                  This is my own photo or I have the right to share it. I grant
+                  Someday a licence to display it in the app.
+                </span>
+              </label>
+            )}
           </div>
         )
 
@@ -765,7 +796,7 @@ export default function SubmitForm({ userId }: Props) {
   // ── Render ───────────────────────────────────────────────────────────────
 
   if (submitted) {
-    return <SuccessCard placeName={placeName} onReset={resetForm} />
+    return <SuccessCard placeName={placeName} placeType={placeType} onReset={resetForm} />
   }
 
   const card = CARDS[currentStep]
@@ -863,11 +894,14 @@ export default function SubmitForm({ userId }: Props) {
 
 function SuccessCard({
   placeName,
+  placeType,
   onReset,
 }: {
   placeName: string
+  placeType: string
   onReset: () => void
 }) {
+  const isExperienceType = placeType === 'experience' || placeType === 'food'
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center">
       <div className="text-[56px] mb-4">★</div>
@@ -883,6 +917,20 @@ function SuccessCard({
       >
         Submit another place
       </button>
+      {isExperienceType && (
+        <div className="mt-4 p-4 rounded-2xl border border-[#fcd99a] bg-white text-left max-w-xs">
+          <p className="font-syne font-bold text-[#131936] text-[15px] mb-1">
+            Know what to do there?
+          </p>
+          <p className="font-nunito text-[#131936]/50 text-[13px] mb-3">
+            Add specific activities to help others plan their visit.
+          </p>
+          <p className="font-nunito text-[#131936]/40 text-[12px]">
+            Activities are added by our team after your submission is reviewed.
+            You can suggest them in your description above.
+          </p>
+        </div>
+      )}
     </div>
   )
 }

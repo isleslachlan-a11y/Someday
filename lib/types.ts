@@ -96,6 +96,7 @@ export interface Place {
   name: string
   country: string
   region: string | null
+  state_province: string | null
   type: string
   description: string | null
   tags: string[] | null

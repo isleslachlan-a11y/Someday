@@ -8,9 +8,10 @@ import { ChevronLeft, Heart, Share2, Bookmark, MapPin, ChevronRight } from 'luci
 import toast from 'react-hot-toast'
 import { logEvent } from '@/lib/events'
 import { addPlaceToList, removePlaceByPlaceId } from '@/app/actions/bucketList'
+import { parseBestTimeToMonths } from '@/lib/bestTimeParser'
 import Avatar from '@/components/Avatar'
 import type { Place } from '@/lib/types'
-import type { FriendVisitor } from './PlaceDetailContent'
+import type { FriendVisitor, Activity } from './PlaceDetailContent'
 
 // ── Derived value helpers ──────────────────────────────────────────────────────
 
@@ -69,7 +70,10 @@ interface Props {
   userId: string
   initialIsSaved: boolean
   similarPlaces: Place[]
+  statePlaces?: Place[]
+  collectionContext?: { name: string; places: Place[] } | null
   friendVisitors: FriendVisitor[]
+  activities?: Activity[]
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -79,7 +83,10 @@ export default function ExperienceDetailContent({
   userId,
   initialIsSaved,
   similarPlaces,
+  statePlaces = [],
+  collectionContext = null,
   friendVisitors,
+  activities = [],
 }: Props) {
   const router = useRouter()
   const [isSaved, setIsSaved] = useState(initialIsSaved)
@@ -143,16 +150,21 @@ export default function ExperienceDetailContent({
 
   // Derived values
   const duration = getDuration(place.intensity)
-  const bestMonth = getBestMonth(place.tags)
+  const bestMonth = (() => {
+    const parsed = parseBestTimeToMonths(place.best_time)
+    if (parsed) {
+      const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+      return [...parsed.peak].map(m => monthNames[m]).join('–')
+    }
+    return getBestMonth(place.tags)
+  })()
   const cost = getCost(place.popularity)
   const seasonalBadge = getSeasonalBadge(place.tags, place.type)
   const festiveBadge = getFestiveBadge(place.tags, place.vibes)
   const vibe = place.vibes?.[0] ?? place.type
   const vibeLabel = vibe.charAt(0).toUpperCase() + vibe.slice(1)
-  const location = [place.region, place.country].filter(Boolean).join(' · ')
+  const location = place.state_province ? `${place.state_province}, ${place.country}` : place.country
   const steps = (place.tags ?? []).slice(0, 4)
-  const filteredSimilar = similarPlaces.filter(sp => sp.type === place.type)
-  const displaySimilar = filteredSimilar.length > 0 ? filteredSimilar : similarPlaces
   const countryCount = similarPlaces.filter(sp => sp.country === place.country).length
 
   return (
@@ -390,6 +402,43 @@ export default function ExperienceDetailContent({
             </div>
           )}
 
+          {/* ── What to do here (activities) ──────────────────────────────── */}
+          {activities.length > 0 && (
+            <div className="px-5 mt-6">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="font-syne font-bold text-[#131936] text-[17px]">What to do here</h2>
+                <span className="font-nunito text-[#131936]/40 text-[12px]">
+                  {activities.length} {activities.length === 1 ? 'activity' : 'activities'}
+                </span>
+              </div>
+              <div className="space-y-2">
+                {activities.slice(0, 4).map((activity, i) => (
+                  <div
+                    key={activity.id}
+                    className="bg-white rounded-2xl p-3 flex items-center gap-3 border border-[#fcd99a]/40"
+                  >
+                    <div className="w-9 h-9 rounded-full bg-[#fcd99a]/60 flex items-center justify-center shrink-0">
+                      <span className="font-syne font-bold text-[#131936] text-[14px]">{i + 1}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-syne font-bold text-[#131936] text-[14px] leading-tight">
+                        {activity.name}
+                      </p>
+                      <p className="font-nunito text-[#131936]/50 text-[12px] mt-0.5">
+                        {[activity.category, activity.duration].filter(Boolean).join(' · ')}
+                      </p>
+                    </div>
+                    {activity.rating && (
+                      <span className="font-nunito text-[12px] text-[#f08c21] shrink-0">
+                        ★ {activity.rating.toFixed(1)}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* ── Discover country banner ────────────────────────────────────── */}
           <div className="px-5 mt-6">
             <Link
@@ -407,90 +456,93 @@ export default function ExperienceDetailContent({
             </Link>
           </div>
 
-          {/* ── Explore similar ────────────────────────────────────────────── */}
-          <div className="mt-6">
-            <div className="flex items-center justify-between px-5 mb-3">
-              <h2 className="font-syne font-bold text-[#131936] text-[17px]">Explore similar</h2>
-              <Link
-                href={`/discover?type=${encodeURIComponent(place.type)}`}
-                className="font-nunito text-[#f08c21] text-[13px]"
+          {/* ── More in {state_province} ──────────────────────────────────────── */}
+          {statePlaces.length > 0 && (
+            <div className="mt-6">
+              <div className="flex items-center justify-between px-5 mb-3">
+                <h2 className="font-syne font-bold text-[#131936] text-[17px]">
+                  More in {place.state_province}
+                </h2>
+                <Link href={`/discover?country=${encodeURIComponent(place.country)}`} className="font-nunito text-[#f08c21] text-[13px]">
+                  Explore →
+                </Link>
+              </div>
+              <div
+                className="flex gap-3 overflow-x-auto pb-3 -mx-5 px-5"
+                style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}
               >
-                See all →
-              </Link>
-            </div>
-
-            {/* Horizontal scroll — bleeds to sheet edges */}
-            <div
-              ref={scrollRef}
-              onScroll={handleScroll}
-              className="flex gap-3 overflow-x-auto pb-3 -mx-5 px-5"
-              style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}
-            >
-              {displaySimilar.map(sp => {
-                const spSaved = savedSimilarIds.has(sp.id)
-                return (
-                  <div
+                {statePlaces.map(sp => (
+                  <ExpSimilarCard
                     key={sp.id}
-                    className="relative w-36 h-48 rounded-2xl overflow-hidden shrink-0"
-                    style={{ scrollSnapAlign: 'start' }}
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#f08c21] to-[#fcd99a]" />
-                    {sp.image_url && (
-                      <Image src={sp.image_url} alt={sp.name} fill sizes="144px" className="object-cover" />
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-
-                    <Link
-                      href={`/places/${sp.id}`}
-                      className="absolute inset-0 z-0"
-                      aria-label={`View ${sp.name}`}
-                    />
-
-                    {/* Top-left badge */}
-                    <div className="absolute top-2 left-2 z-10 pointer-events-none">
-                      <div className="w-7 h-7 rounded-full bg-white/90 flex items-center justify-center">
-                        <span className="text-[#f08c21] text-[11px]">✦</span>
-                      </div>
-                    </div>
-
-                    {/* Top-right heart */}
-                    <div className="absolute top-1 right-1 z-10 w-9 h-9 flex items-center justify-center">
-                      <button
-                        onClick={e => { e.preventDefault(); void handleSaveSimilar(sp.id) }}
-                        disabled={spSaved}
-                        className="w-7 h-7 rounded-full bg-white/90 flex items-center justify-center"
-                        aria-label={spSaved ? 'Saved' : 'Save'}
-                      >
-                        <Heart
-                          size={13}
-                          className={spSaved ? 'text-[#f08c21]' : 'text-[#131936]'}
-                          fill={spSaved ? '#f08c21' : 'transparent'}
-                        />
-                      </button>
-                    </div>
-
-                    {/* Bottom text */}
-                    <div className="absolute bottom-0 left-0 right-0 p-2 pointer-events-none">
-                      <p className="font-syne font-bold text-white text-[13px] leading-tight line-clamp-2">{sp.name}</p>
-                      <p className="font-nunito text-white/70 text-[11px] mt-0.5">{sp.country}</p>
-                    </div>
-                  </div>
-                )
-              })}
+                    place={sp}
+                    isSaved={savedSimilarIds.has(sp.id)}
+                    onSave={() => void handleSaveSimilar(sp.id)}
+                  />
+                ))}
+              </div>
             </div>
+          )}
 
-            {/* Pagination dots */}
-            <div className="flex justify-center gap-1.5 mt-2">
-              {[0, 1, 2].map(dot => (
-                <div
-                  key={dot}
-                  className={`rounded-full transition-all duration-200 ${
-                    activeDot === dot ? 'w-4 h-1.5 bg-[#f08c21]' : 'w-1.5 h-1.5 bg-[#131936]/20'
-                  }`}
-                />
-              ))}
+          {/* ── More like this (same category) ────────────────────────────────── */}
+          {similarPlaces.length > 0 && (
+            <div className="mt-6">
+              <div className="flex items-center justify-between px-5 mb-3">
+                <h2 className="font-syne font-bold text-[#131936] text-[17px]">More like this</h2>
+                <Link href={`/discover?type=${encodeURIComponent(place.type)}`} className="font-nunito text-[#f08c21] text-[13px]">
+                  See all →
+                </Link>
+              </div>
+              <div
+                ref={scrollRef}
+                onScroll={handleScroll}
+                className="flex gap-3 overflow-x-auto pb-3 -mx-5 px-5"
+                style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}
+              >
+                {similarPlaces.map(sp => (
+                  <ExpSimilarCard
+                    key={sp.id}
+                    place={sp}
+                    isSaved={savedSimilarIds.has(sp.id)}
+                    onSave={() => void handleSaveSimilar(sp.id)}
+                  />
+                ))}
+              </div>
+              <div className="flex justify-center gap-1.5 mt-2">
+                {[0, 1, 2].map(dot => (
+                  <div
+                    key={dot}
+                    className={`rounded-full transition-all duration-200 ${
+                      activeDot === dot ? 'w-4 h-1.5 bg-[#f08c21]' : 'w-1.5 h-1.5 bg-[#131936]/20'
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* ── More from {collection} ─────────────────────────────────────────── */}
+          {collectionContext && collectionContext.places.length > 0 && (
+            <div className="mt-6">
+              <div className="px-5 mb-3">
+                <h2 className="font-syne font-bold text-[#131936] text-[17px]">
+                  More from {collectionContext.name}
+                </h2>
+              </div>
+              <div
+                className="flex gap-3 overflow-x-auto pb-3 -mx-5 px-5"
+                style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}
+              >
+                {collectionContext.places.map(sp => (
+                  <ExpSimilarCard
+                    key={sp.id}
+                    place={sp}
+                    isSaved={savedSimilarIds.has(sp.id)}
+                    onSave={() => void handleSaveSimilar(sp.id)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
 
         </div>
       </div>
@@ -534,6 +586,59 @@ export default function ExperienceDetailContent({
         </div>
       </div>
 
+    </div>
+  )
+}
+
+// ─── Similar place card ───────────────────────────────────────────────────────
+
+function ExpSimilarCard({
+  place,
+  isSaved,
+  onSave,
+}: {
+  place: Place
+  isSaved: boolean
+  onSave: () => void
+}) {
+  return (
+    <div
+      className="relative w-36 h-48 rounded-2xl overflow-hidden shrink-0"
+      style={{ scrollSnapAlign: 'start' }}
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-[#f08c21] to-[#fcd99a]" />
+      {place.image_url && (
+        <Image src={place.image_url} alt={place.name} fill sizes="144px" className="object-cover" />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+
+      <Link href={`/places/${place.id}`} className="absolute inset-0 z-0" aria-label={`View ${place.name}`} />
+
+      <div className="absolute top-2 left-2 z-10 pointer-events-none">
+        <div className="w-7 h-7 rounded-full bg-white/90 flex items-center justify-center">
+          <span className="text-[#f08c21] text-[11px]">✦</span>
+        </div>
+      </div>
+
+      <div className="absolute top-1 right-1 z-10 w-9 h-9 flex items-center justify-center">
+        <button
+          onClick={e => { e.preventDefault(); onSave() }}
+          disabled={isSaved}
+          className="w-7 h-7 rounded-full bg-white/90 flex items-center justify-center"
+          aria-label={isSaved ? 'Saved' : 'Save'}
+        >
+          <Heart
+            size={13}
+            className={isSaved ? 'text-[#f08c21]' : 'text-[#131936]'}
+            fill={isSaved ? '#f08c21' : 'transparent'}
+          />
+        </button>
+      </div>
+
+      <div className="absolute bottom-0 left-0 right-0 p-2 pointer-events-none">
+        <p className="font-syne font-bold text-white text-[13px] leading-tight line-clamp-2">{place.name}</p>
+        <p className="font-nunito text-white/70 text-[11px] mt-0.5">{place.country}</p>
+      </div>
     </div>
   )
 }

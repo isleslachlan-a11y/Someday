@@ -5,12 +5,12 @@ import Image from 'next/image'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import { adminCreatePlace } from '@/app/actions/adminPlaces'
+import type { UnsplashAttribution } from '@/lib/types'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 type PlaceType = 'city' | 'nature' | 'experience' | 'food'
 type Region    = 'Asia' | 'Europe' | 'Americas' | 'Africa' | 'Oceania' | 'Global'
-type Intensity = 'low' | 'medium' | 'high'
 
 interface Category {
   id: string
@@ -65,8 +65,7 @@ const PLACE_TYPES: { value: PlaceType; label: string; icon: string }[] = [
   { value: 'food',       label: 'Food',        icon: '🍜' },
 ]
 
-const REGIONS: Region[]        = ['Asia', 'Europe', 'Americas', 'Africa', 'Oceania', 'Global']
-const INTENSITIES: Intensity[] = ['low', 'medium', 'high']
+const REGIONS: Region[] = ['Asia', 'Europe', 'Americas', 'Africa', 'Oceania', 'Global']
 const VIBES_OPTIONS = [
   'Adventure', 'Culture', 'Foodie', 'Romantic',
   'Chill', 'Epic', 'Peaceful', 'Wellness',
@@ -76,6 +75,12 @@ const ACTIVITY_CATEGORIES = [
   'nature', 'shopping', 'nightlife', 'wellness',
 ]
 const IMAGE_PAGE_SIZE = 9
+
+const CARD_VIBE_OPTIONS = [
+  'Adventure', 'Romantic', 'Foodie', 'Chill',
+  'Epic', 'Peaceful', 'Cultural', 'Wellness',
+  'Off-grid', 'Party',
+]
 
 const TAG_CATEGORY_LABELS: Record<string, string> = {
   vibe:         'Vibe',
@@ -269,14 +274,13 @@ interface Props {
 
 export default function AdminAddForm({ userId: _userId }: Props) {
   const [form, setForm] = useState({
-    name:        '',
-    type:        'city' as PlaceType,
-    country:     '',
-    region:      'Europe' as Region,
-    description: '',
-    intensity:   'medium' as Intensity,
-    popularity:  50,
-    vibes:       [] as string[],
+    name:           '',
+    type:           'city' as PlaceType,
+    country:        '',
+    region:         'Europe' as Region,
+    state_province: '',
+    description:    '',
+    vibes:          [] as string[],
   })
 
   // Hinge / place card fields
@@ -316,6 +320,17 @@ export default function AdminAddForm({ userId: _userId }: Props) {
   const [imageQuery, setImageQuery]                 = useState('')
   const [imageSearchLoading, setImageSearchLoading] = useState(false)
   const [selectedImage, setSelectedImage]           = useState<UnsplashResult | null>(null)
+
+  // Image tabs — upload and URL fallbacks
+  const [imageTab, setImageTab]                 = useState<'unsplash' | 'upload' | 'url'>('unsplash')
+  const [uploadFile, setUploadFile]             = useState<File | null>(null)
+  const [uploadPreview, setUploadPreview]       = useState<string | null>(null)
+  const [uploadConsent, setUploadConsent]       = useState(false)
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null)
+  const [uploading, setUploading]               = useState(false)
+  const adminFileInputRef                       = useRef<HTMLInputElement>(null)
+  const [manualImageUrl, setManualImageUrl]     = useState('')
+  const [manualImageValid, setManualImageValid] = useState(false)
 
   // Submission
   const [saving, setSaving]               = useState(false)
@@ -425,6 +440,7 @@ export default function AdminAddForm({ userId: _userId }: Props) {
         name?: string
         country?: string
         region?: string
+        state_province?: string | null
         lat?: number | null
         lng?: number | null
         feature_type?: string | null
@@ -432,9 +448,10 @@ export default function AdminAddForm({ userId: _userId }: Props) {
       if (data.error) { toast.error('Could not load place details.'); return }
       setForm(prev => ({
         ...prev,
-        name:    data.name ?? s.main_text,
-        country: data.country ?? '',
-        region:  (data.region ?? 'Global') as Region,
+        name:           data.name ?? s.main_text,
+        country:        data.country ?? '',
+        region:         (data.region ?? 'Global') as Region,
+        state_province: data.state_province ?? '',
       }))
       setResolvedLat(data.lat ?? null)
       setResolvedLng(data.lng ?? null)
@@ -458,9 +475,47 @@ export default function AdminAddForm({ userId: _userId }: Props) {
     setImagePage(0)
     setSelectedImage(null)
     try {
+      // Stage 1: exact query
       const res = await fetch(`/api/unsplash/search?q=${encodeURIComponent(imageQuery.trim())}`)
       const data = await res.json() as { results?: UnsplashResult[] }
-      setAllImageResults(data.results ?? [])
+      const results = data.results ?? []
+
+      if (results.length >= 3) {
+        setAllImageResults(results)
+        return
+      }
+
+      // Stage 2: fallback to country name
+      if (form.country) {
+        const fallbackRes = await fetch(
+          `/api/unsplash/search?q=${encodeURIComponent(form.country)}&fallback=1`
+        )
+        const fallbackData = await fallbackRes.json() as { results?: UnsplashResult[] }
+        const fallbackResults = fallbackData.results ?? []
+        if (fallbackResults.length > 0) {
+          setAllImageResults(fallbackResults)
+          toast(`Showing results for ${form.country} instead.`, {
+            icon: '🌍',
+            style: {
+              background: '#fff9f0', color: '#131936',
+              border: '1px solid #fcd99a',
+              fontFamily: 'Nunito, sans-serif', fontSize: '14px',
+            },
+          })
+          return
+        }
+      }
+
+      // Stage 3: no results — switch to upload tab
+      setImageTab('upload')
+      toast('No images found — try uploading a photo instead.', {
+        icon: '📷',
+        style: {
+          background: '#fff9f0', color: '#131936',
+          border: '1px solid #fcd99a',
+          fontFamily: 'Nunito, sans-serif', fontSize: '14px',
+        },
+      })
     } catch {
       toast.error('Image search failed.')
     } finally {
@@ -472,6 +527,30 @@ export default function AdminAddForm({ userId: _userId }: Props) {
     setSelectedImage(prev => prev?.id === img.id ? null : img)
   }
 
+  async function handleAdminUpload() {
+    if (!uploadFile || !uploadConsent) return
+    setUploading(true)
+    try {
+      const supabase = createClient()
+      const ext = uploadFile.name.split('.').pop() ?? 'jpg'
+      const path = `places/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+      const { error } = await supabase.storage
+        .from('place-images')
+        .upload(path, uploadFile, { upsert: false })
+      if (error) {
+        toast.error('Upload failed. Please try again.')
+        return
+      }
+      const { data: { publicUrl } } = supabase.storage
+        .from('place-images')
+        .getPublicUrl(path)
+      setUploadedImageUrl(publicUrl)
+      toast.success('Photo uploaded ✦')
+    } finally {
+      setUploading(false)
+    }
+  }
+
   async function handleSubmit() {
     if (!form.name.trim() || !form.country.trim()) {
       setError('Name and country are required.')
@@ -480,22 +559,42 @@ export default function AdminAddForm({ userId: _userId }: Props) {
     setSaving(true)
     setError(null)
 
+    // Determine image source based on active tab
+    let finalImageUrl: string | null = null
+    let finalImageThumbUrl: string | null = null
+    let finalUnsplashId: string | null = null
+    let finalAttribution: UnsplashAttribution | null = null
+
+    if (imageTab === 'unsplash' && selectedImage) {
+      finalImageUrl      = selectedImage.image_url
+      finalImageThumbUrl = selectedImage.image_thumb_url
+      finalUnsplashId    = selectedImage.id
+      finalAttribution   = selectedImage.attribution
+    } else if (imageTab === 'upload' && uploadedImageUrl) {
+      finalImageUrl      = uploadedImageUrl
+      finalImageThumbUrl = uploadedImageUrl
+    } else if (imageTab === 'url' && manualImageUrl && manualImageValid) {
+      finalImageUrl      = manualImageUrl
+      finalImageThumbUrl = manualImageUrl
+    }
+
     const result = await adminCreatePlace({
       name:                 form.name.trim(),
       country:              form.country.trim(),
       region:               form.region,
+      state_province:       form.state_province.trim() || null,
       type:                 form.type,
       description:          form.description.trim(),
       tag_ids:              selectedTags,
       vibes:                form.vibes,
-      intensity:            form.intensity,
-      popularity:           form.popularity,
+      intensity:            'medium',
+      popularity:           1,
       lat:                  resolvedLat,
       lng:                  resolvedLng,
-      image_url:            selectedImage?.image_url ?? null,
-      image_thumb_url:      selectedImage?.image_thumb_url ?? null,
-      unsplash_photo_id:    selectedImage?.id ?? null,
-      unsplash_attribution: selectedImage?.attribution ?? null,
+      image_url:            finalImageUrl,
+      image_thumb_url:      finalImageThumbUrl,
+      unsplash_photo_id:    finalUnsplashId,
+      unsplash_attribution: finalAttribution,
       must_do:              hingeFields.must_do.trim() || null,
       hidden_gem:           hingeFields.hidden_gem.trim() || null,
       not_for_you:          hingeFields.not_for_you.trim() || null,
@@ -544,7 +643,7 @@ export default function AdminAddForm({ userId: _userId }: Props) {
       setSavedPlaceName(form.name)
       setForm({
         name: '', type: 'city', country: '', region: 'Europe',
-        description: '', intensity: 'medium', popularity: 50, vibes: [],
+        state_province: '', description: '', vibes: [],
       })
       setHingeFields({ must_do: '', hidden_gem: '', not_for_you: '', best_time: '', vibe_tags: [] })
       setSelectedTags([])
@@ -554,6 +653,13 @@ export default function AdminAddForm({ userId: _userId }: Props) {
       setSelectedImage(null)
       setAllImageResults([])
       setImageQuery('')
+      setImageTab('unsplash')
+      setUploadFile(null)
+      setUploadPreview(null)
+      setUploadedImageUrl(null)
+      setUploadConsent(false)
+      setManualImageUrl('')
+      setManualImageValid(false)
       setLocationLocked(false)
       setTypeLocked(false)
       setResolvedLat(null)
@@ -684,7 +790,7 @@ export default function AdminAddForm({ userId: _userId }: Props) {
           {locationLocked ? (
             <div className="flex items-center gap-2 flex-wrap">
               <span className="px-3 py-1.5 rounded-full bg-[#fcd99a]/50 border border-[#fcd99a] font-nunito text-[13px] text-[#131936]">
-                🌍 {form.country}
+                🌍 {form.state_province ? `${form.state_province}, ${form.country}` : form.country}
               </span>
               <span className="px-3 py-1.5 rounded-full bg-[#fcd99a]/50 border border-[#fcd99a] font-nunito text-[13px] text-[#131936]">
                 {form.region}
@@ -818,9 +924,12 @@ export default function AdminAddForm({ userId: _userId }: Props) {
         </div>
 
         <div>
-          <p className="font-nunito text-[12px] text-[#131936]/50 mb-2">Card vibes</p>
+          <p className="font-nunito text-[12px] text-[#131936]/50 mb-1">Card vibe tags</p>
+          <p className="font-nunito text-[12px] text-[#131936]/40 mb-2">
+            Shown on the public card. Can differ from internal vibes above.
+          </p>
           <div className="flex flex-wrap gap-2">
-            {VIBES_OPTIONS.map(vibe => (
+            {CARD_VIBE_OPTIONS.map(vibe => (
               <button
                 key={vibe}
                 type="button"
@@ -837,41 +946,6 @@ export default function AdminAddForm({ userId: _userId }: Props) {
       {/* ── Section 3: Details ──────────────────────────────────────────────── */}
       <div className="space-y-4">
         <p className={SECTION_HEADING}>Details</p>
-
-        {/* Intensity */}
-        <div>
-          <p className="font-nunito text-[12px] text-[#131936]/50 mb-2">Intensity</p>
-          <div className="flex gap-2">
-            {INTENSITIES.map(i => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => setField('intensity', i)}
-                className={`${pillClass(form.intensity === i)} capitalize`}
-              >
-                {i}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Popularity */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <p className="font-nunito text-[12px] text-[#131936]/50">Popularity</p>
-            <span className="font-nunito font-semibold text-[#f08c21] text-[13px]">
-              {form.popularity}/100
-            </span>
-          </div>
-          <input
-            type="range"
-            min={1}
-            max={100}
-            value={form.popularity}
-            onChange={e => setField('popularity', Number(e.target.value))}
-            className="w-full accent-[#f08c21]"
-          />
-        </div>
 
         {/* ── Taxonomy: Categories ── */}
         {allCategories.length > 0 && (
@@ -1010,90 +1084,229 @@ export default function AdminAddForm({ userId: _userId }: Props) {
       <div>
         <p className={SECTION_HEADING}>Image</p>
 
-        <div className="flex gap-2 mb-3">
-          <input
-            id="unsplash-search"
-            name="unsplash-search"
-            value={imageQuery}
-            onChange={e => setImageQuery(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && void searchImages()}
-            placeholder="Search Unsplash…"
-            className="flex-1 rounded-full border border-[#fcd99a] bg-white px-4 py-2.5 font-nunito text-[14px] text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:ring-2 focus:ring-[#f08c21]/30"
-          />
-          <button
-            type="button"
-            onClick={() => void searchImages()}
-            disabled={imageSearchLoading}
-            className="px-4 py-2.5 rounded-full bg-[#f08c21] text-[#131936] font-nunito font-semibold text-[13px] shrink-0 disabled:opacity-50"
-          >
-            {imageSearchLoading ? '…' : 'Search'}
-          </button>
+        {/* Tab switcher */}
+        <div className="flex gap-1 p-1 bg-[#fcd99a]/20 rounded-2xl mb-4">
+          {(['unsplash', 'upload', 'url'] as const).map(key => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setImageTab(key)}
+              className={`flex-1 py-2 rounded-xl font-nunito text-[13px] font-medium transition-all ${
+                imageTab === key
+                  ? 'bg-white text-[#131936] shadow-sm'
+                  : 'text-[#131936]/50 hover:text-[#131936]'
+              }`}
+            >
+              {key === 'unsplash' ? '🔍 Unsplash' : key === 'upload' ? '📷 Upload' : '🔗 URL'}
+            </button>
+          ))}
         </div>
 
-        {visibleImages.length > 0 && (
+        {/* ── Unsplash tab ─────────────────────────────────────────────────── */}
+        {imageTab === 'unsplash' && (
           <>
-            <div className="grid grid-cols-3 gap-2 mb-3">
-              {visibleImages.map(img => (
-                <button
-                  key={img.id}
-                  type="button"
-                  onClick={() => selectImage(img)}
-                  className={`relative aspect-video rounded-xl overflow-hidden border-2 transition-all ${
-                    selectedImage?.id === img.id
-                      ? 'border-[#f08c21] scale-[0.97]'
-                      : 'border-transparent'
-                  }`}
-                >
-                  <Image
-                    src={img.image_thumb_url}
-                    alt={img.attribution.photographer_name}
-                    fill
-                    sizes="33vw"
-                    className="object-cover"
-                  />
-                  {selectedImage?.id === img.id && (
-                    <div className="absolute inset-0 bg-[#f08c21]/20 flex items-center justify-center">
-                      <span className="text-white text-[20px]">✓</span>
-                    </div>
-                  )}
-                </button>
-              ))}
-            </div>
-            {hasMore && (
+            <div className="flex gap-2 mb-3">
+              <input
+                id="unsplash-search"
+                name="unsplash-search"
+                value={imageQuery}
+                onChange={e => setImageQuery(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && void searchImages()}
+                placeholder="Search Unsplash…"
+                className="flex-1 rounded-full border border-[#fcd99a] bg-white px-4 py-2.5 font-nunito text-[14px] text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:ring-2 focus:ring-[#f08c21]/30"
+              />
               <button
                 type="button"
-                onClick={() => setImagePage(p => p + 1)}
-                className="w-full py-2 font-nunito text-[13px] text-[#f08c21] hover:opacity-80 transition-opacity"
+                onClick={() => void searchImages()}
+                disabled={imageSearchLoading}
+                className="px-4 py-2.5 rounded-full bg-[#f08c21] text-[#131936] font-nunito font-semibold text-[13px] shrink-0 disabled:opacity-50"
               >
-                Show more images ({allImageResults.length - visibleImages.length} more)
+                {imageSearchLoading ? '…' : 'Search'}
               </button>
+            </div>
+
+            {visibleImages.length > 0 && (
+              <>
+                <div className="grid grid-cols-3 gap-2 mb-3">
+                  {visibleImages.map(img => (
+                    <button
+                      key={img.id}
+                      type="button"
+                      onClick={() => selectImage(img)}
+                      className={`relative aspect-video rounded-xl overflow-hidden border-2 transition-all ${
+                        selectedImage?.id === img.id
+                          ? 'border-[#f08c21] scale-[0.97]'
+                          : 'border-transparent'
+                      }`}
+                    >
+                      <Image
+                        src={img.image_thumb_url}
+                        alt={img.attribution.photographer_name}
+                        fill
+                        sizes="33vw"
+                        className="object-cover"
+                      />
+                      {selectedImage?.id === img.id && (
+                        <div className="absolute inset-0 bg-[#f08c21]/20 flex items-center justify-center">
+                          <span className="text-white text-[20px]">✓</span>
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+                {hasMore && (
+                  <button
+                    type="button"
+                    onClick={() => setImagePage(p => p + 1)}
+                    className="w-full py-2 font-nunito text-[13px] text-[#f08c21] hover:opacity-80 transition-opacity"
+                  >
+                    Show more images ({allImageResults.length - visibleImages.length} more)
+                  </button>
+                )}
+              </>
+            )}
+
+            {selectedImage && (
+              <div className="rounded-2xl overflow-hidden border border-[#fcd99a] mb-2 mt-3">
+                <div className="relative h-40">
+                  <Image src={selectedImage.image_url} alt="Selected" fill sizes="480px" className="object-cover" />
+                </div>
+                <p className="font-nunito text-[#131936]/40 text-[10px] px-3 py-1.5">
+                  Photo by{' '}
+                  <a href={selectedImage.attribution.photographer_url} target="_blank" rel="noopener noreferrer" className="text-[#f08c21]">
+                    {selectedImage.attribution.photographer_name}
+                  </a>
+                  {' '}on Unsplash
+                </p>
+              </div>
             )}
           </>
         )}
 
-        {selectedImage && (
-          <div className="rounded-2xl overflow-hidden border border-[#fcd99a] mb-2 mt-3">
-            <div className="relative h-40">
-              <Image
-                src={selectedImage.image_url}
-                alt="Selected"
-                fill
-                sizes="480px"
-                className="object-cover"
-              />
-            </div>
-            <p className="font-nunito text-[#131936]/40 text-[10px] px-3 py-1.5">
-              Photo by{' '}
-              <a
-                href={selectedImage.attribution.photographer_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#f08c21]"
+        {/* ── Upload tab ───────────────────────────────────────────────────── */}
+        {imageTab === 'upload' && (
+          <div className="space-y-3">
+            {!uploadPreview ? (
+              <button
+                type="button"
+                onClick={() => adminFileInputRef.current?.click()}
+                className="w-full rounded-2xl border-2 border-dashed border-[#fcd99a] bg-white py-12 flex flex-col items-center gap-3 hover:border-[#f08c21]/60 transition-colors"
               >
-                {selectedImage.attribution.photographer_name}
-              </a>
-              {' '}on Unsplash
-            </p>
+                <span className="text-[36px]">📷</span>
+                <p className="font-syne font-bold text-[#131936]/50 text-[14px]">Upload a place photo</p>
+                <p className="font-nunito text-[#131936]/30 text-[12px]">JPG, PNG or WebP · up to 10 MB</p>
+              </button>
+            ) : (
+              <div className="relative rounded-2xl overflow-hidden border border-[#fcd99a]">
+                <div className="relative h-48">
+                  <Image src={uploadPreview} alt="Upload preview" fill className="object-cover" />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUploadFile(null)
+                    setUploadPreview(null)
+                    setUploadedImageUrl(null)
+                    setUploadConsent(false)
+                  }}
+                  className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center text-[14px]"
+                >×</button>
+              </div>
+            )}
+
+            {uploadFile && (
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={uploadConsent}
+                  onChange={e => setUploadConsent(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 accent-[#f08c21] shrink-0 cursor-pointer"
+                />
+                <span className="font-nunito text-[#131936]/60 text-[13px] leading-relaxed">
+                  This photo is licensed for use (own work, Creative Commons, or licensed stock).
+                  I confirm Someday may display it in the app.
+                </span>
+              </label>
+            )}
+
+            {uploadFile && uploadConsent && !uploadedImageUrl && (
+              <button
+                type="button"
+                onClick={() => void handleAdminUpload()}
+                disabled={uploading}
+                className="w-full h-11 rounded-full bg-[#131936] text-white font-syne font-bold text-[14px] disabled:opacity-50"
+              >
+                {uploading ? 'Uploading…' : 'Use this photo'}
+              </button>
+            )}
+
+            {uploadedImageUrl && (
+              <p className="font-nunito text-[12px] text-[#16a34a] flex items-center gap-1">
+                ✓ Photo uploaded — will be used as the place image
+              </p>
+            )}
+
+            <input
+              ref={adminFileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={e => {
+                const file = e.target.files?.[0]
+                if (!file) return
+                if (file.size > 10 * 1024 * 1024) { toast.error('Photo must be under 10 MB.'); return }
+                setUploadFile(file)
+                setUploadPreview(URL.createObjectURL(file))
+                setUploadedImageUrl(null)
+                setUploadConsent(false)
+              }}
+              className="hidden"
+            />
+          </div>
+        )}
+
+        {/* ── URL tab ──────────────────────────────────────────────────────── */}
+        {imageTab === 'url' && (
+          <div className="space-y-3">
+            <div>
+              <label className="font-nunito text-[12px] text-[#131936]/50 mb-1 block">
+                Direct image URL
+              </label>
+              <input
+                type="url"
+                value={manualImageUrl}
+                onChange={e => { setManualImageUrl(e.target.value); setManualImageValid(false) }}
+                placeholder="https://example.com/photo.jpg"
+                className={INPUT_CLASS}
+              />
+              <p className="font-nunito text-[11px] text-[#131936]/40 mt-1.5 leading-relaxed">
+                Only use images you have permission to use (own work, Creative Commons, or licensed
+                stock). Do not paste images from Google, travel blogs, or image searches.
+              </p>
+            </div>
+
+            {manualImageUrl && !manualImageValid && (
+              <button
+                type="button"
+                onClick={() => setManualImageValid(true)}
+                className="font-nunito text-[13px] text-[#f08c21]"
+              >
+                Preview image →
+              </button>
+            )}
+
+            {manualImageValid && manualImageUrl && (
+              <div className="rounded-2xl overflow-hidden border border-[#fcd99a]">
+                <div className="relative h-40">
+                  <Image
+                    src={manualImageUrl}
+                    alt="Manual URL preview"
+                    fill
+                    className="object-cover"
+                    onError={() => { toast.error('Could not load image from that URL.'); setManualImageValid(false) }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

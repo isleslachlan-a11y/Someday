@@ -35,6 +35,7 @@ export async function createTag(data: {
   name: string
   slug: string
   category: string
+  dimension?: string
   place_type: string[]
 }): Promise<{ error?: string; tag?: TagRecord }> {
   const { error: authErr } = await requireAdmin()
@@ -47,6 +48,7 @@ export async function createTag(data: {
       name:       data.name,
       slug:       data.slug,
       category:   data.category,
+      dimension:  data.dimension ?? data.category,
       place_type: data.place_type,
     })
     .select('id, name, slug, category, place_type, places_count, created_at')
@@ -76,6 +78,44 @@ export async function deleteTag(tagId: string): Promise<{ error?: string }> {
   }
 
   const { error } = await admin.from('tags').delete().eq('id', tagId)
+  if (error) return { error: error.message }
+
+  revalidatePath('/admin/tags')
+  return {}
+}
+
+export interface LabelRecord {
+  id: string
+  name: string
+  slug: string
+  created_at: string
+}
+
+export async function createLabel(input: {
+  name: string
+}): Promise<{ error?: string; label?: LabelRecord }> {
+  const { error: authErr } = await requireAdmin()
+  if (authErr) return { error: authErr }
+
+  const slug = input.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+  const admin = createAdminClient()
+  const { data: label, error } = await admin
+    .from('place_labels')
+    .insert({ name: input.name.trim(), slug })
+    .select('id, name, slug, created_at')
+    .single()
+
+  if (error) return { error: error.message }
+  revalidatePath('/admin/tags')
+  return { label: label as LabelRecord }
+}
+
+export async function deleteLabel(id: string): Promise<{ error?: string }> {
+  const { error: authErr } = await requireAdmin()
+  if (authErr) return { error: authErr }
+
+  const admin = createAdminClient()
+  const { error } = await admin.from('place_labels').delete().eq('id', id)
   if (error) return { error: error.message }
 
   revalidatePath('/admin/tags')

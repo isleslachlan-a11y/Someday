@@ -25,7 +25,7 @@ function formatCount(n: number): string {
 
 export default function HomePlaceCard({ place, isAdded, onAdd, onRemove, index }: Props) {
   const dark = isDark(index)
-  const location = [place.region, place.country].filter(Boolean).join(', ')
+  const location = place.state_province ? `${place.state_province}, ${place.country}` : place.country
 
   return (
     <div

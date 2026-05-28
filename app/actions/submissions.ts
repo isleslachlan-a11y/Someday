@@ -17,6 +17,7 @@ export interface SubmitPlaceData {
   type: string
   country: string
   region: string
+  state_province?: string | null
   description: string
   tags: string[]
   image_url: string | null
@@ -41,6 +42,7 @@ export async function submitPlace(data: SubmitPlaceData): Promise<{ error?: stri
     type: data.type || null,
     country: data.country.trim() || null,
     region: data.region || null,
+    state_province: data.state_province ?? null,
     description: data.description.trim() || null,
     tags: (data.tagIds && data.tagIds.length > 0) ? data.tagIds : (data.tags.length > 0 ? data.tags : null),
     image_url: data.image_url,

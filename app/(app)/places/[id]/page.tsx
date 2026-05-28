@@ -35,86 +35,151 @@ export default async function PlaceDetailPage({
 
   const place = placeRaw as unknown as Place
 
-  const isExperienceType = place.type === 'experience' || place.type === 'food'
+  // Phase 1: taxonomy lookups to power smarter similar sections
+  const [primaryCatResult, labelResult] = await Promise.all([
+    admin
+      .from('experiences_categories')
+      .select('category_id')
+      .eq('experience_id', id)
+      .eq('is_primary', true)
+      .maybeSingle(),
+    admin
+      .from('experiences_labels')
+      .select('label_id, place_labels(id, name)')
+      .eq('experience_id', id)
+      .limit(1)
+      .maybeSingle(),
+  ])
 
-  // Run independent queries in parallel
-  const [bucketResult, similarResult, countryPlacesResult, friendshipsResult, activitiesResult] =
-    await Promise.all([
-      supabase
-        .from('bucket_list_items')
-        .select('place_id')
-        .eq('user_id', user.id)
-        .eq('place_id', id)
-        .maybeSingle(),
-      isExperienceType
-        ? supabase
-            .from('places')
-            .select('*')
-            .eq('type', place.type)
-            .neq('id', id)
-            .order('popularity', { ascending: false })
-            .limit(8)
-        : supabase
-            .from('places')
-            .select('*')
-            .eq('country', place.country)
-            .neq('id', id)
-            .order('popularity', { ascending: false })
-            .limit(8),
-      supabase
-        .from('places')
-        .select('id')
-        .eq('country', place.country)
-        .limit(100),
-      admin
-        .from('friendships')
-        .select('requester_id, addressee_id')
-        .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`)
-        .eq('status', 'accepted'),
-      isDestination(place)
-        ? supabase
-            .from('activities')
-            .select('*')
-            .eq('place_id', id)
-            .order('rating', { ascending: false })
-        : Promise.resolve({ data: [] as Activity[], error: null }),
-    ])
+  const primaryCategoryId =
+    (primaryCatResult.data as { category_id: string } | null)?.category_id ?? null
+  const labelRow = labelResult.data as {
+    label_id: string
+    place_labels: { id: string; name: string } | null
+  } | null
+  const collectionLabel = labelRow?.place_labels ?? null
+
+  // Phase 2: all independent data queries in parallel
+  const [
+    bucketResult, countryPlacesResult, friendshipsResult, activitiesResult,
+    catExpIdsResult, colExpIdsResult,
+  ] = await Promise.all([
+    supabase
+      .from('bucket_list_items')
+      .select('place_id')
+      .eq('user_id', user.id)
+      .eq('place_id', id)
+      .maybeSingle(),
+    supabase
+      .from('places')
+      .select('id')
+      .eq('country', place.country)
+      .limit(100),
+    admin
+      .from('friendships')
+      .select('requester_id, addressee_id')
+      .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`)
+      .eq('status', 'accepted'),
+    supabase
+      .from('activities')
+      .select('*')
+      .eq('place_id', id)
+      .order('rating', { ascending: false }),
+    primaryCategoryId
+      ? admin
+          .from('experiences_categories')
+          .select('experience_id')
+          .eq('category_id', primaryCategoryId)
+          .neq('experience_id', id)
+          .limit(8)
+      : Promise.resolve({ data: null as null }),
+    collectionLabel
+      ? admin
+          .from('experiences_labels')
+          .select('experience_id')
+          .eq('label_id', collectionLabel.id)
+          .neq('experience_id', id)
+          .limit(8)
+      : Promise.resolve({ data: null as null }),
+  ])
 
   const initialIsSaved = !!bucketResult.data
-  const similarPlaces  = (similarResult.data ?? []) as unknown as Place[]
-  const activities     = (activitiesResult.data ?? []) as Activity[]
+  const activities = (activitiesResult.data ?? []) as Activity[]
 
-  // Resolve friend IDs from symmetric friendship rows
-  const friendIds = (friendshipsResult.data ?? []).map(f =>
-    f.requester_id === user.id ? f.addressee_id : f.requester_id
+  const catIds = ((catExpIdsResult.data ?? []) as { experience_id: string }[]).map(
+    r => r.experience_id,
+  )
+  const colIds = ((colExpIdsResult.data ?? []) as { experience_id: string }[]).map(
+    r => r.experience_id,
   )
 
+  const friendIds = (friendshipsResult.data ?? []).map(f =>
+    f.requester_id === user.id ? f.addressee_id : f.requester_id,
+  )
+  const countryPlaceIds = (countryPlacesResult.data ?? []).map(p => p.id)
+
+  // Phase 3: place lookups + friend visitor check in parallel
+  const [
+    statePlacesResult, categoryPlacesResult, collectionPlacesResult, visitedItemsResult,
+  ] = await Promise.all([
+    place.state_province
+      ? admin
+          .from('places')
+          .select('*')
+          .eq('state_province', place.state_province)
+          .neq('id', id)
+          .order('popularity', { ascending: false })
+          .limit(8)
+      : Promise.resolve({ data: null as null }),
+    catIds.length > 0
+      ? admin
+          .from('places')
+          .select('*')
+          .in('id', catIds)
+          .order('popularity', { ascending: false })
+      : Promise.resolve({ data: null as null }),
+    colIds.length > 0
+      ? admin
+          .from('places')
+          .select('*')
+          .in('id', colIds)
+          .order('popularity', { ascending: false })
+      : Promise.resolve({ data: null as null }),
+    friendIds.length > 0 && countryPlaceIds.length > 0
+      ? admin
+          .from('bucket_list_items')
+          .select('user_id')
+          .in('user_id', friendIds)
+          .in('place_id', countryPlaceIds)
+      : Promise.resolve({ data: null as null }),
+  ])
+
+  const statePlaces = (statePlacesResult.data ?? []) as unknown as Place[]
+  const categoryPlaces = (categoryPlacesResult.data ?? []) as unknown as Place[]
+  const collectionPlacesArr = (collectionPlacesResult.data ?? []) as unknown as Place[]
+  const collectionContext =
+    collectionLabel && collectionPlacesArr.length > 0
+      ? { name: collectionLabel.name, places: collectionPlacesArr }
+      : null
+
   let friendVisitors: FriendVisitor[] = []
+  const visitedUserIds = [
+    ...new Set(
+      ((visitedItemsResult.data ?? []) as { user_id: string }[]).map(i => i.user_id),
+    ),
+  ]
+  if (visitedUserIds.length > 0) {
+    const { data: profiles } = await admin
+      .from('profiles')
+      .select('id, username, avatar_url')
+      .in('id', visitedUserIds)
+      .limit(5)
 
-  if (friendIds.length > 0 && (countryPlacesResult.data ?? []).length > 0) {
-    const countryPlaceIds = countryPlacesResult.data!.map(p => p.id)
-
-    const { data: visitedItems } = await admin
-      .from('bucket_list_items')
-      .select('user_id')
-      .in('user_id', friendIds)
-      .in('place_id', countryPlaceIds)
-
-    const visitedUserIds = [...new Set((visitedItems ?? []).map(i => i.user_id))]
-
-    if (visitedUserIds.length > 0) {
-      const { data: profiles } = await admin
-        .from('profiles')
-        .select('id, username, avatar_url')
-        .in('id', visitedUserIds)
-        .limit(5)
-
-      friendVisitors = (profiles ?? []).map(p => ({
-        id: p.id,
-        username: (p.username as string | null) ?? 'user',
-        avatar_url: p.avatar_url as string | null,
-      }))
-    }
+    friendVisitors = (profiles ?? []).map(p => ({
+      id: p.id,
+      username: (p.username as string | null) ?? 'user',
+      avatar_url: p.avatar_url as string | null,
+    }))
   }
 
   return (
@@ -125,7 +190,9 @@ export default async function PlaceDetailPage({
           place={place}
           userId={user.id}
           initialIsSaved={initialIsSaved}
-          similarPlaces={similarPlaces}
+          similarPlaces={categoryPlaces}
+          statePlaces={statePlaces}
+          collectionContext={collectionContext}
           friendVisitors={friendVisitors}
           activities={activities}
         />
@@ -134,8 +201,11 @@ export default async function PlaceDetailPage({
           place={place}
           userId={user.id}
           initialIsSaved={initialIsSaved}
-          similarPlaces={similarPlaces}
+          similarPlaces={categoryPlaces}
+          statePlaces={statePlaces}
+          collectionContext={collectionContext}
           friendVisitors={friendVisitors}
+          activities={activities}
         />
       )}
     </>

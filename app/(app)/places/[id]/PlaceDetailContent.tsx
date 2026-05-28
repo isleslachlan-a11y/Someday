@@ -10,6 +10,7 @@ import Map, { Marker, NavigationControl } from 'react-map-gl/mapbox'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { logEvent } from '@/lib/events'
 import { addPlaceToList, removePlaceByPlaceId } from '@/app/actions/bucketList'
+import { parseBestTimeToMonths } from '@/lib/bestTimeParser'
 import Avatar from '@/components/Avatar'
 import type { Place } from '@/lib/types'
 
@@ -44,6 +45,8 @@ interface Props {
   userId: string
   initialIsSaved: boolean
   similarPlaces: Place[]
+  statePlaces?: Place[]
+  collectionContext?: { name: string; places: Place[] } | null
   friendVisitors: FriendVisitor[]
   activities: Activity[]
 }
@@ -85,6 +88,8 @@ export default function PlaceDetailContent({
   userId,
   initialIsSaved,
   similarPlaces,
+  statePlaces = [],
+  collectionContext = null,
   friendVisitors,
   activities,
 }: Props) {
@@ -168,8 +173,12 @@ export default function PlaceDetailContent({
 
   // ── Derived values ────────────────────────────────────────────────────────
 
-  const { peak, shoulder } = getPeakAndShoulder(place.tags)
-  const location   = [place.region, place.country].filter(Boolean).join(', ')
+  const { peak, shoulder } = (() => {
+    const parsed = parseBestTimeToMonths(place.best_time)
+    if (parsed) return parsed
+    return getPeakAndShoulder(place.tags)
+  })()
+  const location   = place.state_province ? `${place.state_province}, ${place.country}` : place.country
   const seasonTags = (place.tags ?? []).slice(0, 2)
 
   return (
@@ -520,12 +529,12 @@ export default function PlaceDetailContent({
           </div>
         </div>
 
-        {/* ── More like {country} ───────────────────────────────────────────── */}
-        {similarPlaces.length > 0 && (
+        {/* ── More in {state_province} ──────────────────────────────────────── */}
+        {statePlaces.length > 0 && (
           <div className="pt-6">
             <div className="flex items-center justify-between px-4 mb-3">
               <h2 className="font-syne font-bold text-[#131936] text-[16px]">
-                More like {place.country}
+                More in {place.state_province}
               </h2>
               <Link
                 href={`/discover?country=${encodeURIComponent(place.country)}`}
@@ -534,8 +543,36 @@ export default function PlaceDetailContent({
                 Explore →
               </Link>
             </div>
+            <div
+              className="flex gap-3 overflow-x-auto px-4 pb-3"
+              style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}
+            >
+              {statePlaces.map(sp => (
+                <SimilarCard
+                  key={sp.id}
+                  place={sp}
+                  isSaved={savedSimilarIds.has(sp.id)}
+                  onSave={() => handleSaveSimilar(sp.id)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
-            {/* Horizontal scroll */}
+        {/* ── More like this (same category) ────────────────────────────────── */}
+        {similarPlaces.length > 0 && (
+          <div className="pt-6">
+            <div className="flex items-center justify-between px-4 mb-3">
+              <h2 className="font-syne font-bold text-[#131936] text-[16px]">
+                More like this
+              </h2>
+              <Link
+                href={`/discover?type=${encodeURIComponent(place.type)}`}
+                className="font-nunito text-[13px] text-[#f08c21]"
+              >
+                Explore →
+              </Link>
+            </div>
             <div
               ref={scrollRef}
               onScroll={handleScroll}
@@ -551,8 +588,6 @@ export default function PlaceDetailContent({
                 />
               ))}
             </div>
-
-            {/* Pagination dots */}
             <div className="flex justify-center gap-1.5 mt-1">
               {[0, 1, 2].map(dot => (
                 <div
@@ -560,6 +595,30 @@ export default function PlaceDetailContent({
                   className={`rounded-full transition-all duration-200 ${
                     activeDot === dot ? 'w-4 h-1.5 bg-[#f08c21]' : 'w-1.5 h-1.5 bg-[#131936]/20'
                   }`}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── More from {collection} ─────────────────────────────────────────── */}
+        {collectionContext && collectionContext.places.length > 0 && (
+          <div className="pt-6">
+            <div className="px-4 mb-3">
+              <h2 className="font-syne font-bold text-[#131936] text-[16px]">
+                More from {collectionContext.name}
+              </h2>
+            </div>
+            <div
+              className="flex gap-3 overflow-x-auto px-4 pb-3"
+              style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}
+            >
+              {collectionContext.places.map(sp => (
+                <SimilarCard
+                  key={sp.id}
+                  place={sp}
+                  isSaved={savedSimilarIds.has(sp.id)}
+                  onSave={() => handleSaveSimilar(sp.id)}
                 />
               ))}
             </div>

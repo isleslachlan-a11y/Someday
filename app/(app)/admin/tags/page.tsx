@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import type { TagRecord } from '@/app/actions/adminTags'
+import type { TagRecord, LabelRecord } from '@/app/actions/adminTags'
 import TagManager from './TagManager'
 
 export const metadata = { title: 'Tag Library' }
@@ -25,13 +25,20 @@ export default async function AdminTagsPage() {
   if (!(profile as { is_admin?: boolean } | null)?.is_admin) redirect('/')
 
   const admin = createAdminClient()
-  const { data: rawTags } = await admin
-    .from('tags')
-    .select('id, name, slug, category, place_type, places_count, created_at')
-    .order('category')
-    .order('name')
+  const [{ data: rawTags }, { data: rawLabels }] = await Promise.all([
+    admin
+      .from('tags')
+      .select('id, name, slug, category, place_type, places_count, created_at')
+      .order('category')
+      .order('name'),
+    admin
+      .from('place_labels')
+      .select('id, slug, name, created_at')
+      .order('name'),
+  ])
 
   const tags = (rawTags ?? []) as TagRecord[]
+  const labels = (rawLabels ?? []) as LabelRecord[]
 
   const grouped: Record<string, TagRecord[]> = {}
   for (const cat of CATEGORIES) grouped[cat] = []
@@ -55,7 +62,7 @@ export default async function AdminTagsPage() {
       </header>
 
       <div className="max-w-[480px] mx-auto px-4 pt-4 pb-24">
-        <TagManager grouped={grouped} categories={CATEGORIES} />
+        <TagManager grouped={grouped} categories={CATEGORIES} labels={labels} />
       </div>
     </main>
   )

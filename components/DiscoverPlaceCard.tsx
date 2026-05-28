@@ -87,7 +87,7 @@ export default function DiscoverPlaceCard({
         )}
         <p className="font-nunito text-white/70 text-[11px] mt-0.5 flex items-center gap-0.5">
           <MapPin size={9} className="shrink-0" />
-          {[place.region, place.country].filter(Boolean).join(', ')}
+          {place.state_province ? `${place.state_province}, ${place.country}` : place.country}
         </p>
       </div>
     </div>

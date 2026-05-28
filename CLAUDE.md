@@ -73,6 +73,8 @@ Required Worker secrets: `AUTH_TOKEN` (shared secret header `X-Auth-Token`), `AN
 - `lib/feed.ts` — `assembleFeed(pageNum)`: builds the home feed array from daily highlight, friend activity, overlaps, and promotional posts. Page 0 includes the daily highlight (deterministic rotation by day of year). Used by `HomeContent.tsx`.
 - `lib/design-tokens.ts` — `TOKENS` object (colors, spacing, touchTarget). Reference before hardcoding any value.
 - `lib/unsplash.ts` — `searchUnsplashImage(query)` and `linkImageToPlace(placeId, query?)`. Server-side only. Used by admin image seeding scripts and `app/actions/unsplash-actions.ts`. Never call client-side.
+- `lib/bestTimeParser.ts` — `parseBestTimeToMonths(bestTime)`: parses a free-text `best_time` string from a `Place` into `{ peak: Set<number>, shoulder: Set<number> }` month sets (0 = January). Used for calendar UI on place detail pages.
+- `lib/recommendations.ts` — `logRecommendationEvent` and `logImpressions`: client-side helpers that call the `log_recommendation_event` RPC to track which recommendations were shown, clicked, saved, or dismissed. Feeds the B2B recommendation signal.
 - `middleware.ts` — route protection; redirects unauthenticated users to `/login`.
 - `components/AppShell.tsx` — authenticated layout with desktop sidebar + mobile bottom tab bar.
 - `components/ui/UnsplashAttribution.tsx` — **required** on any page/component displaying Unsplash images (API compliance). Shows photographer credit with UTM-tagged links.
@@ -99,7 +101,7 @@ app/
     admin/tags/       — manage tags taxonomy (gated by is_admin)
   (auth)/         — public pages: login/, signup/
   onboarding/     — onboarding flow (outside (app) to avoid redirect loop)
-  actions/        — Server Actions ('use server'): auth.ts, bucketList.ts, friends.ts, messaging.ts, profile.ts, search.ts, trips.ts, submissions.ts, onboarding.ts
+  actions/        — Server Actions ('use server'): auth.ts, bucketList.ts, friends.ts, messaging.ts, profile.ts, search.ts, trips.ts, submissions.ts, onboarding.ts, adminCollections.ts, adminTagging.ts, adminTags.ts, adminPlaces.ts, adminSubmissions.ts, unsplash-actions.ts
   page.tsx        — landing page (public)
 ```
 
@@ -128,6 +130,10 @@ On signup, always insert a row into `profiles` using the returned `user.id`.
 
 **Home feed realtime:** `HomeContent.tsx` subscribes to `bucket_list_items` updates via Supabase Realtime. When a friend's item changes to `status === 'completed'`, it surfaces a "New activity" banner. This is the established pattern for realtime UI on the home screen.
 
+**Personalised recommendations:** The `get_recommendations_for_user(p_user_id, p_limit)` Postgres RPC scores unsaved places using a weighted signal: category match (0.35), tag match (0.20), social graph/friends (0.20), trending flag (0.10), momentum/newness (0.15). Cold-start users (0 saves) see popular + new places instead. Impression/interaction tracking flows through `lib/recommendations.ts` → `log_recommendation_event` RPC.
+
+**Admin tagging flow:** `adminTagging.ts` → `savePlaceTags(placeId, categoryIds, primaryCategoryId, tagIds, labelIds)` — atomically replaces all taxonomy assignments for a place. Admin-only (checks `is_admin` profile flag). Used by the tag manager UI at `admin/tags/`.
+
 **No notifications table yet:** There is no `notifications` table in the schema. The bell icon in any UI should be inert or hidden until this is built.
 
 ### Database Tables
@@ -135,7 +141,7 @@ On signup, always insert a row into `profiles` using the returned `user.id`.
 | Table | Purpose | Status |
 |-------|---------|--------|
 | `profiles` | Public user profiles (extends `auth.users`); includes `map_city_preference`, `is_admin` (boolean, gates admin routes) | Built |
-| `places` | Curated catalogue of destinations (admin-seeded); includes `lat`, `lng`, `popularity`, `trending`, `image_url`, `image_thumb_url`, `unsplash_photo_id`, `unsplash_attribution` (JSONB), `image_keyword`, `vibes` (enum: Adventure/Culture/Foodie/Romantic/Chill/Epic/Peaceful/Wellness), `intensity` (low/medium/high) | Built |
+| `places` | Curated catalogue of destinations (admin-seeded); includes `lat`, `lng`, `popularity`, `trending`, `image_url`, `image_thumb_url`, `unsplash_photo_id`, `unsplash_attribution` (JSONB), `image_keyword`, `vibes` (enum: Adventure/Culture/Foodie/Romantic/Chill/Epic/Peaceful/Wellness), `intensity` (low/medium/high), `state_province`, `must_do`, `hidden_gem`, `not_for_you`, `best_time`, `vibe_tags`, `submitted_photo_url` | Built |
 | `bucket_list_items` | A user's personal bucket list (user → place); includes `completed_at`, `completion_note`, `completion_photo_url` for Strava-style completion tracking | Built |
 | `events` | Every user action — feeds the B2B data product | Built |
 | `user_context` | Per-user flags: `completed_onboarding`, travel preferences | Built |
@@ -151,9 +157,18 @@ On signup, always insert a row into `profiles` using the returned `user.id`.
 | `promotional_posts` | Admin-created promotional content for the home feed; columns: `title`, `body`, `image_url`, `cta_label`, `cta_url`, `place_id`, `active`, `starts_at`, `ends_at`. Public read when active and within time window. | Built |
 | `activities` | Things to do at a specific place (shown on detail pages under "What to do here"); columns: `place_id`, `name`, `description`, `duration`, `category`, `rating` | Built |
 | `tags` | Taxonomy tags for places; columns: `id`, `name`, `slug`, `category`, `place_type`, `places_count`. Read via `app/api/tags/route.ts`. | Built |
+| `categories` | Taxonomy categories; columns: `id`, `name`, `slug`, `icon`, `sort_order`. Slugs: `adventure-sport`, `nature-wilderness`, `culture-history`, `city-escapes`, `food-drink`, `wellness-retreat`, `hidden-gems`, `events-festivals`. | Built |
+| `place_labels` | Curated labels (e.g. "UNESCO World Heritage", "Hidden Gem"); columns: `id`, `slug`, `name`. Public read, admin write. | Built |
+| `experiences_categories` | Join: place → category with `is_primary` flag. Used by `get_recommendations_for_user` RPC. | Built |
+| `experiences_tags` | Join: place → tag. Used by recommendations scoring. | Built |
+| `experiences_labels` | Join: place → label. | Built |
+| `collections` | Curated place collections for the Discover tab; columns: `name`, `slug`, `type`, `description`, `is_featured`, `is_active`. Managed via `adminCollections.ts`. | Built |
 | `posts` | User-created Strava-style completion posts (distinct from `promotional_posts`) | Planned |
 
-Migrations live in `supabase/migrations/`. Key migrations: `003_profiles.sql`, `004_events_platform.sql`, `20260414120000_pivot_schema.sql` (places pivot), `20260414200000_trips_schema.sql`, `20260418_map_columns.sql`, `20260418200000_friendships.sql`, `20260421000000_messaging_schema.sql`, `20260429000000_promotional_posts.sql`, `20260429000001_completion_columns.sql` (adds completion fields to `bucket_list_items`), `20260512000000_add_is_admin_to_profiles.sql` (adds `is_admin` flag), `20260513000000_create_activities.sql` (activities table).
+Migrations live in `supabase/migrations/`. Key migrations: `003_profiles.sql`, `004_events_platform.sql`, `20260414120000_pivot_schema.sql` (places pivot), `20260414200000_trips_schema.sql`, `20260418_map_columns.sql`, `20260418200000_friendships.sql`, `20260421000000_messaging_schema.sql`, `20260429000000_promotional_posts.sql`, `20260429000001_completion_columns.sql` (adds completion fields to `bucket_list_items`), `20260512000000_add_is_admin_to_profiles.sql` (adds `is_admin` flag), `20260513000000_create_activities.sql` (activities table), `20260528000002_tagging_schema.sql` (taxonomy: categories+, place_labels, experiences_categories/tags/labels), `20260529000000_place_momentum_rpc.sql` (personalised recommendations RPC), `20260529000001_add_state_province.sql` (state_province on places), `20260529000002_place_images_bucket.sql` (place-images storage bucket).
+
+**Supabase Storage buckets:**
+- `place-images` — public read, admin-only write; 10 MB limit; JPEG/PNG/WebP. For admin-uploaded place photos (distinct from Unsplash CDN images).
 
 **Row Level Security:**
 - `profiles` — public read, private write

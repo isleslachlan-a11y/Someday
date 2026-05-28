@@ -25,7 +25,7 @@ export default function HomeHeroCard({ place, isAdded, onAdd, onRemove, userId }
     logEvent(userId, 'destination_viewed', { place_id: place.id, source: 'home_hero' })
   }, [place.id, userId])
 
-  const location = [place.region, place.country].filter(Boolean).join(', ')
+  const location = place.state_province ? `${place.state_province}, ${place.country}` : place.country
 
   return (
     <div
