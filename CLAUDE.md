@@ -31,6 +31,18 @@ Seeding and data utilities live in `scripts/`: `seed-experiences.ts` (populates 
 
 Run `npm run build` after significant changes and fix all errors before committing.
 
+### Summary Worker (Cloudflare)
+
+`Someday-summary-worker/someday-summary-worker/` is a standalone Cloudflare Worker (separate from the Next.js app) that accepts POST requests with raw session notes and returns a structured Claude-generated summary for the team. It is **not** part of the Next.js build. Development and deployment commands run inside that directory:
+
+```bash
+cd Someday-summary-worker/someday-summary-worker
+npx wrangler dev     # local at http://localhost:8787
+npx wrangler deploy  # push to Cloudflare
+```
+
+Required Worker secrets: `AUTH_TOKEN` (shared secret header `X-Auth-Token`), `ANTHROPIC_API_KEY`.
+
 ## Stack
 
 | Layer | Technology |
@@ -54,7 +66,7 @@ Run `npm run build` after significant changes and fix all errors before committi
 - `lib/supabase.ts` — legacy re-export; prefer importing from `client.ts` or `server.ts` directly.
 - `lib/events.ts` — `logEvent(userId, eventType, metadata)`. B2B data product foundation. Adds `platform`, `app_version`, and `country_code` automatically. Call on every meaningful user action.
 - `lib/analytics.ts` — server-side B2B read functions: `getTopDestinations`, `getCategoryBreakdown`, `getActiveUserCount`, `getConversionRate`. Service-role only — server-side.
-- `lib/types.ts` — shared TypeScript types: `BucketListItem`, `Place`, `UserProfile`, `Event`, `ItemStatus`, `Trip`, `OverlapResult`, `Message`, `ConversationListItem`, `ConversationInfo`, `FriendshipStatus`, `PendingRequest`, `StoryUser`, and the `CATEGORIES` constant.
+- `lib/types.ts` — shared TypeScript types: `Place`, `ListEntry`, `PlaceSnap`, `FriendBucketItem`, `BucketListStatus`, `UserProfile`, `Event`, `Trip`, `TripItem`, `TripItemVote`, `OverlapResult`, `Message`, `ConversationListItem`, `ConversationInfo`, `FeedItem`, `PromoPost`, `FriendActivity`, `StoryUser`, and `CATEGORIES`, `DESTINATION_TYPES`, `EXPERIENCE_TYPES` constants. Also exports `isDestination(place)` and `isExperience(place)` helpers. Note: `BucketListItem` and `ItemStatus` remain in the file for legacy compatibility but the live schema uses `ListEntry` and `BucketListStatus`.
 - `lib/overlaps.ts` — `getOverlaps(userId)`: finds bucket list matches between the user and people they follow. Server-only (uses admin client). Wrapped with React `cache()` — one DB hit per render tree.
 - `lib/friends.ts` — `getFriends`, `getPendingRequests`, `getFriendshipStatus`, `searchUsers`, `sendFriendRequest`, `acceptFriendRequest`, `declineFriendRequest`. Server-only.
 - `lib/messaging.ts` — `getConversations`, `getConversationInfo`, `getOrCreateDM`, `createGroupChat`, `getMessages`, `sendMessage`, `markAsRead`. Server-only.
@@ -80,8 +92,11 @@ app/
     places/[id]/  — place detail page (PlaceDetailContent.tsx); warm tangerine palette
     discover/     — search + filter by vibe/intensity/category (built)
     profile/      — own profile; [username]/ for public profiles; edit/
-    admin/analytics/  — B2B analytics (gated by ADMIN_USER_ID)
-    admin/images/ — image admin for bulk Unsplash linking (gated)
+    admin/analytics/  — B2B analytics (gated by ADMIN_USER_ID env var)
+    admin/images/     — bulk Unsplash image linking (gated by NEXT_PUBLIC_ADMIN_EMAIL)
+    admin/places/     — create/edit curated places (gated by is_admin profile flag)
+    admin/submissions/— review + approve/reject user nominations (gated by is_admin)
+    admin/tags/       — manage tags taxonomy (gated by is_admin)
   (auth)/         — public pages: login/, signup/
   onboarding/     — onboarding flow (outside (app) to avoid redirect loop)
   actions/        — Server Actions ('use server'): auth.ts, bucketList.ts, friends.ts, messaging.ts, profile.ts, search.ts, trips.ts, submissions.ts, onboarding.ts
@@ -90,7 +105,14 @@ app/
 
 **Navigation (AppShell):** Home → List → Plan → Map → Profile (bottom bar mobile, left sidebar lg+). Profile icon shows badge for pending friend requests.
 
-Mutations use Server Actions (not API routes). The one exception is `app/api/places/feed/route.ts` — a GET route used by the home page infinite scroll to paginate places by popularity. On signup, always insert a row into `profiles` using the returned `user.id`.
+Mutations use Server Actions (not API routes). API routes that exist:
+- `app/api/places/feed/route.ts` — GET, home page infinite scroll, paginates places by popularity
+- `app/api/geocode/route.ts` — GET, Mapbox geocoding proxy (`?mode=autocomplete|details`); requires `NEXT_PUBLIC_MAPBOX_TOKEN`
+- `app/api/tags/route.ts` — GET, returns all tags with counts; used by admin place/submission forms
+- `app/api/admin/activities/route.ts` — POST, creates activities for a place; requires `is_admin = true`
+- `app/api/unsplash/search/route.ts` — GET, proxies Unsplash search; server-only, requires `UNSPLASH_ACCESS_KEY`
+
+On signup, always insert a row into `profiles` using the returned `user.id`.
 
 ### Patterns
 
@@ -128,6 +150,7 @@ Mutations use Server Actions (not API routes). The one exception is `app/api/pla
 | `messages` | Chat messages; realtime enabled | Built |
 | `promotional_posts` | Admin-created promotional content for the home feed; columns: `title`, `body`, `image_url`, `cta_label`, `cta_url`, `place_id`, `active`, `starts_at`, `ends_at`. Public read when active and within time window. | Built |
 | `activities` | Things to do at a specific place (shown on detail pages under "What to do here"); columns: `place_id`, `name`, `description`, `duration`, `category`, `rating` | Built |
+| `tags` | Taxonomy tags for places; columns: `id`, `name`, `slug`, `category`, `place_type`, `places_count`. Read via `app/api/tags/route.ts`. | Built |
 | `posts` | User-created Strava-style completion posts (distinct from `promotional_posts`) | Planned |
 
 Migrations live in `supabase/migrations/`. Key migrations: `003_profiles.sql`, `004_events_platform.sql`, `20260414120000_pivot_schema.sql` (places pivot), `20260414200000_trips_schema.sql`, `20260418_map_columns.sql`, `20260418200000_friendships.sql`, `20260421000000_messaging_schema.sql`, `20260429000000_promotional_posts.sql`, `20260429000001_completion_columns.sql` (adds completion fields to `bucket_list_items`), `20260512000000_add_is_admin_to_profiles.sql` (adds `is_admin` flag), `20260513000000_create_activities.sql` (activities table).

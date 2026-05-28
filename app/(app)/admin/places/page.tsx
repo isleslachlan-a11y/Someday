@@ -23,12 +23,15 @@ export default async function AdminPlacesPage() {
   if (!profile?.is_admin) redirect('/home')
 
   const admin = createAdminClient()
-  const { data } = await admin
-    .from('places')
-    .select('*')
-    .order('created_at', { ascending: false })
+  const [{ data }, { data: taggedRows }] = await Promise.all([
+    admin.from('places').select('*').order('created_at', { ascending: false }),
+    admin.from('experiences_categories').select('experience_id'),
+  ])
 
   const places = (data ?? []) as unknown as Place[]
+  const taggedCount = new Set(
+    (taggedRows ?? []).map(r => (r as { experience_id: string }).experience_id)
+  ).size
 
   return (
     <main className="min-h-screen bg-[#fff9f0]">
@@ -43,7 +46,7 @@ export default async function AdminPlacesPage() {
         </div>
       </header>
       <div className="max-w-[480px] mx-auto px-4 pt-4 pb-24">
-        <PlaceManager places={places} />
+        <PlaceManager places={places} taggedCount={taggedCount} />
       </div>
     </main>
   )

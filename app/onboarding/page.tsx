@@ -34,14 +34,21 @@ export default async function OnboardingPage() {
 
   if (context?.completed_onboarding === true) redirect('/home')
 
-  // Fetch seed places for step 8 — done server-side so no client fetch needed
-  const { data: placesData } = await supabase
-    .from('places')
-    .select('id, name, country, type, image_keyword')
-    .order('popularity', { ascending: false })
-    .limit(12)
+  // Fetch seed places for step 8 — spread across types for meaningful signal.
+  // Falls back to popularity sort if the RPC is unavailable.
+  const { data: rpcPlaces, error: rpcError } = await supabase.rpc('get_onboarding_places')
 
-  const places = (placesData ?? []) as Place[]
+  let places: Place[]
+  if (rpcError || !rpcPlaces || rpcPlaces.length === 0) {
+    const { data: fallbackData } = await supabase
+      .from('places')
+      .select('id, name, country, type, image_keyword')
+      .order('popularity', { ascending: false })
+      .limit(12)
+    places = (fallbackData ?? []) as Place[]
+  } else {
+    places = rpcPlaces as Place[]
+  }
 
   return (
     <div className="min-h-screen bg-indigo-deep">

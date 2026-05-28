@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import HomeContent from './HomeContent'
-import type { Place } from '@/lib/types'
+import type { Place, RecommendedPlace } from '@/lib/types'
 
 export const metadata: Metadata = {
   title: 'Home',
@@ -18,10 +18,18 @@ export default async function HomePage() {
 
   if (!user) redirect('/login')
 
-  // Fetch profile and saved place IDs in parallel
-  const [profileResult, bucketResult] = await Promise.all([
+  // Fetch profile, bucket, hero, and personalised recommendations in parallel
+  const [profileResult, bucketResult, heroResult, rpcResult] = await Promise.all([
     supabase.from('profiles').select('username, avatar_url').eq('id', user.id).single(),
     supabase.from('bucket_list_items').select('place_id').eq('user_id', user.id),
+    supabase
+      .from('places')
+      .select('*')
+      .eq('trending', true)
+      .order('popularity', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase.rpc('get_recommendations_for_user', { p_user_id: user.id, p_limit: 12 }),
   ])
 
   const profile = {
@@ -33,26 +41,49 @@ export default async function HomePage() {
     .map(row => row.place_id)
     .filter((id): id is string => !!id)
 
-  // Hero: highest-popularity trending place
-  const { data: heroData } = await supabase
-    .from('places')
-    .select('*')
-    .eq('trending', true)
-    .order('popularity', { ascending: false })
-    .limit(1)
-    .maybeSingle()
+  const heroPlace = heroResult.data as Place | null
 
-  const heroPlace = heroData as Place | null
+  // Build personalised grid from RPC results
+  let gridPlaces: RecommendedPlace[] = []
+  let isPersonalised = false
 
-  // Grid: top places by popularity, only excluding the hero to avoid duplication
-  const excludeIds = heroPlace ? [heroPlace.id] : []
+  const rpcRows = (rpcResult.data ?? []) as Array<{
+    experience_id: string
+    score: number
+    recommendation_source: string
+  }>
 
-  const { data: gridData } =
-    excludeIds.length > 0
+  if (rpcRows.length > 0) {
+    const ids = rpcRows.map(r => r.experience_id)
+    const { data: placesData } = await supabase.from('places').select('*').in('id', ids)
+    if (placesData && placesData.length > 0) {
+      const placeMap = new Map(placesData.map(p => [p.id, p as Place]))
+      const merged = rpcRows
+        .map(r => {
+          const place = placeMap.get(r.experience_id)
+          if (!place) return null
+          return {
+            ...place,
+            recommendation_source: r.recommendation_source,
+            recommendation_score: r.score,
+          } as RecommendedPlace
+        })
+        .filter((p): p is RecommendedPlace => p !== null)
+      if (merged.length > 0) {
+        gridPlaces = merged
+        isPersonalised = true
+      }
+    }
+  }
+
+  // Cold-start fallback — popularity sort
+  if (!isPersonalised) {
+    const heroId = heroPlace?.id
+    const { data: gridData } = heroId
       ? await supabase
           .from('places')
           .select('*')
-          .not('id', 'in', `(${excludeIds.join(',')})`)
+          .neq('id', heroId)
           .order('popularity', { ascending: false })
           .limit(12)
       : await supabase
@@ -60,8 +91,14 @@ export default async function HomePage() {
           .select('*')
           .order('popularity', { ascending: false })
           .limit(12)
+    gridPlaces = (gridData ?? []).map(p => ({
+      ...(p as Place),
+      recommendation_source: 'editorial',
+      recommendation_score: 0,
+    }))
+  }
 
-  const gridPlaces = (gridData ?? []) as Place[]
+  const sessionId = crypto.randomUUID()
 
   return (
     <HomeContent
@@ -70,6 +107,8 @@ export default async function HomePage() {
       heroPlace={heroPlace}
       gridPlaces={gridPlaces}
       initialBucketPlaceIds={initialBucketPlaceIds}
+      isPersonalised={isPersonalised}
+      sessionId={sessionId}
     />
   )
 }

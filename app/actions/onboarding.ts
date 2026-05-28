@@ -76,11 +76,22 @@ export async function completeOnboarding(
         travel_style_count: input.travelStyle.length,
         places_seeded: input.selectedPlaceIds.length,
         has_past_trip: !!input.pastTripName,
+        onboarding_affinity_seeded: true,
+        travel_styles: input.travelStyle,
+        budget: input.budgetRange,
+        comfort_zone: input.comfortZone,
       },
       platform: 'web',
       app_version: process.env.NEXT_PUBLIC_APP_VERSION ?? '0.1.0',
     }),
   ])
+
+  // Seed recommendation affinity from onboarding answers — non-fatal
+  try {
+    await supabase.rpc('seed_onboarding_affinity', { p_user_id: user.id })
+  } catch (err) {
+    console.error('[onboarding] seed_onboarding_affinity failed:', err)
+  }
 
   revalidatePath('/home')
   return {}

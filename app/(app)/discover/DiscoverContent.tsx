@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Search, Heart, MapPin } from 'lucide-react'
+import { Search } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { logEvent } from '@/lib/events'
 import { addPlaceToList, removePlaceByPlaceId } from '@/app/actions/bucketList'
+import DiscoverPlaceCard from '@/components/DiscoverPlaceCard'
 import type { Place } from '@/lib/types'
 
 // ── Category definitions ───────────────────────────────────────────────────────
@@ -30,6 +31,14 @@ const CATEGORIES = [
 
 type PersonProfile = { id: string; username: string; avatar_url: string | null }
 
+export interface DiscoverCollection {
+  id: string
+  slug: string
+  name: string
+  description: string | null
+  type: string
+}
+
 interface Props {
   places: Place[]
   friendProfiles: PersonProfile[]
@@ -37,6 +46,7 @@ interface Props {
   userId: string
   initialSavedIds: string[]
   initialQuery: string
+  collections: DiscoverCollection[]
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -48,7 +58,9 @@ export default function DiscoverContent({
   userId,
   initialSavedIds,
   initialQuery,
+  collections,
 }: Props) {
+  const collectionMap = new Map(collections.map(c => [c.slug, c]))
   const [savedIds, setSavedIds]           = useState<Set<string>>(new Set(initialSavedIds))
   const [searchQuery, setSearchQuery]     = useState(initialQuery)
   const [searchResults, setSearchResults] = useState<Place[] | null>(null)
@@ -212,17 +224,38 @@ export default function DiscoverContent({
             if (categoryPlaces.length < 3) return null
             return (
               <section key={category.id} className="mt-6">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="font-syne font-bold text-[#131936] text-[16px]">
-                    {category.label}
-                  </h2>
-                  <button
-                    onClick={() => setSearchQuery(category.label.toLowerCase())}
-                    className="font-nunito text-[#f08c21] text-[13px]"
-                  >
-                    see all →
-                  </button>
-                </div>
+                {(() => {
+                  const col = collectionMap.get(category.id)
+                  return (
+                    <div className="mb-3">
+                      <div className="flex items-center justify-between">
+                        <h2 className="font-syne font-bold text-[#131936] text-[16px]">
+                          {category.label}
+                        </h2>
+                        {col ? (
+                          <Link
+                            href={`/discover/collections/${col.slug}`}
+                            className="font-nunito text-[#f08c21] text-[13px]"
+                          >
+                            see all →
+                          </Link>
+                        ) : (
+                          <button
+                            onClick={() => setSearchQuery(category.label.toLowerCase())}
+                            className="font-nunito text-[#f08c21] text-[13px]"
+                          >
+                            see all →
+                          </button>
+                        )}
+                      </div>
+                      {col?.description && (
+                        <p className="font-nunito text-[#131936]/50 text-[13px] mt-0.5">
+                          {col.description}
+                        </p>
+                      )}
+                    </div>
+                  )
+                })()}
                 <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-none">
                   {categoryPlaces.slice(0, 6).map((place, index) => (
                     <DiscoverPlaceCard
@@ -268,74 +301,3 @@ export default function DiscoverContent({
   )
 }
 
-// ── Place card ────────────────────────────────────────────────────────────────
-
-function DiscoverPlaceCard({
-  place,
-  isSaved,
-  onSave,
-  index,
-  gridMode = false,
-}: {
-  place: Place
-  isSaved: boolean
-  onSave: () => void
-  index: number
-  gridMode?: boolean
-}) {
-  const dark = index % 4 === 0 || index % 4 === 3
-
-  return (
-    <div
-      className={`relative rounded-2xl overflow-hidden ${gridMode ? 'w-full' : 'shrink-0'}`}
-      style={{
-        height: 200,
-        ...(gridMode ? {} : { width: 130 }),
-        background: dark ? '#131936' : '#fcd99a',
-      }}
-    >
-      {place.image_url && (
-        <Image
-          src={place.image_url}
-          alt={place.name}
-          fill
-          sizes={gridMode ? '(max-width: 480px) 50vw, 200px' : '130px'}
-          className="object-cover"
-        />
-      )}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-
-      <Link
-        href={`/places/${place.id}`}
-        className="absolute inset-0 z-0"
-        aria-label={`View ${place.name}`}
-      />
-
-      {/* Heart button — 44px touch target */}
-      <div className="absolute top-2 right-2 z-10 w-11 h-11 flex items-center justify-center">
-        <button
-          onClick={e => { e.preventDefault(); onSave() }}
-          className="w-7 h-7 rounded-full bg-white flex items-center justify-center"
-          aria-label={isSaved ? 'Remove from list' : 'Save to list'}
-        >
-          <Heart
-            size={14}
-            className={isSaved ? 'text-[#f08c21]' : 'text-[#131936]'}
-            fill={isSaved ? '#f08c21' : 'transparent'}
-          />
-        </button>
-      </div>
-
-      {/* Bottom text */}
-      <div className="absolute bottom-0 left-0 right-0 p-3 pointer-events-none">
-        <p className="font-syne font-bold text-white text-[13px] leading-tight line-clamp-2">
-          {place.name}
-        </p>
-        <p className="font-nunito text-white/70 text-[11px] mt-0.5 flex items-center gap-0.5">
-          <MapPin size={9} className="shrink-0" />
-          {[place.region, place.country].filter(Boolean).join(', ')}
-        </p>
-      </div>
-    </div>
-  )
-}

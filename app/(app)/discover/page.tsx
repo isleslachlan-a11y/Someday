@@ -6,6 +6,7 @@ import { Plus } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import DiscoverContent from './DiscoverContent'
+import type { DiscoverCollection } from './DiscoverContent'
 import type { Place } from '@/lib/types'
 
 export const metadata: Metadata = {
@@ -27,7 +28,7 @@ export default async function DiscoverPage({
   const params = await searchParams
 
   // App uses symmetric friendships, not a follows table
-  const [placesResult, friendshipsResult, bucketResult] = await Promise.all([
+  const [placesResult, friendshipsResult, bucketResult, collectionsResult] = await Promise.all([
     supabase
       .from('places')
       .select('*')
@@ -41,10 +42,16 @@ export default async function DiscoverPage({
       .from('bucket_list_items')
       .select('place_id')
       .eq('user_id', user.id),
+    supabase
+      .from('collections')
+      .select('id, slug, name, description, type')
+      .eq('is_active', true)
+      .order('sort_order'),
   ])
 
   const places = (placesResult.data ?? []) as unknown as Place[]
   const savedPlaceIds = (bucketResult.data ?? []).map(r => r.place_id as string).filter(Boolean)
+  const collections = (collectionsResult.data ?? []) as DiscoverCollection[]
 
   // Resolve friend IDs from symmetric friendship rows
   const friendIds = (friendshipsResult.data ?? []).map(f =>
@@ -110,6 +117,7 @@ export default async function DiscoverPage({
           userId={user.id}
           initialSavedIds={savedPlaceIds}
           initialQuery={params.q ?? ''}
+          collections={collections}
         />
       </Suspense>
     </div>

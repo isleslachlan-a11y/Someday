@@ -123,6 +123,11 @@ export interface Place {
 export const DESTINATION_TYPES = ['city', 'nature'] as const
 export const EXPERIENCE_TYPES  = ['experience', 'food'] as const
 
+export interface RecommendedPlace extends Place {
+  recommendation_source: string
+  recommendation_score: number
+}
+
 export type DestinationType = (typeof DESTINATION_TYPES)[number]
 export type ExperienceType  = (typeof EXPERIENCE_TYPES)[number]
 

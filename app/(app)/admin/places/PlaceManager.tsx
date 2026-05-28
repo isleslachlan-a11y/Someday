@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Search, Trash2, MapPin, ExternalLink } from 'lucide-react'
+import { Search, Trash2, MapPin, ExternalLink, Tag } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { adminDeletePlace } from '@/app/actions/adminPlaces'
 import type { Place } from '@/lib/types'
@@ -20,9 +20,10 @@ type TypeFilter = (typeof TYPE_OPTIONS)[number]
 
 interface Props {
   places: Place[]
+  taggedCount: number
 }
 
-export default function PlaceManager({ places: initialPlaces }: Props) {
+export default function PlaceManager({ places: initialPlaces, taggedCount }: Props) {
   const [places, setPlaces]         = useState<Place[]>(initialPlaces)
   const [search, setSearch]         = useState('')
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
@@ -69,6 +70,10 @@ export default function PlaceManager({ places: initialPlaces }: Props) {
         {filtered.length !== places.length && (
           <span className="text-[#f08c21]"> · {filtered.length} shown</span>
         )}
+        <span className="text-[#131936]/30"> · </span>
+        <span className={taggedCount === places.length ? 'text-[#16a34a]' : 'text-[#f08c21]'}>
+          {taggedCount}/{places.length} tagged
+        </span>
       </p>
 
       {/* Search */}
@@ -163,6 +168,13 @@ export default function PlaceManager({ places: initialPlaces }: Props) {
                       aria-label="View place"
                     >
                       <ExternalLink size={15} className="text-[#131936]/40" />
+                    </Link>
+                    <Link
+                      href={`/admin/places/${place.id}/tag`}
+                      className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#fcd99a]/30 transition-colors"
+                      aria-label="Tag place"
+                    >
+                      <Tag size={15} className="text-[#131936]/40" />
                     </Link>
                     <button
                       onClick={() => setConfirmId(confirmId === place.id ? null : place.id)}

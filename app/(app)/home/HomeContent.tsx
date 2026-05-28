@@ -7,10 +7,11 @@ import { useRouter } from 'next/navigation'
 import { Bell, Search } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { logEvent } from '@/lib/events'
+import { logRecommendationEvent, logImpressions } from '@/lib/recommendations'
 import { addPlaceToList, removePlaceByPlaceId } from '@/app/actions/bucketList'
 import HomeHeroCard from '@/components/HomeHeroCard'
 import HomePlaceCard from '@/components/HomePlaceCard'
-import type { Place } from '@/lib/types'
+import type { Place, RecommendedPlace } from '@/lib/types'
 
 // ─── Search prompts ───────────────────────────────────────────────────────────
 
@@ -38,8 +39,10 @@ interface Props {
   userId: string
   profile: { username: string; avatar_url: string | null }
   heroPlace: Place | null
-  gridPlaces: Place[]
+  gridPlaces: RecommendedPlace[]
   initialBucketPlaceIds: string[]
+  isPersonalised: boolean
+  sessionId: string
 }
 
 // ─── Skeletons ────────────────────────────────────────────────────────────────
@@ -90,6 +93,8 @@ export default function HomeContent({
   heroPlace,
   gridPlaces,
   initialBucketPlaceIds,
+  isPersonalised,
+  sessionId,
 }: Props) {
   const router = useRouter()
   const [bucketPlaceIds, setBucketPlaceIds] = useState<string[]>(initialBucketPlaceIds)
@@ -142,6 +147,15 @@ export default function HomeContent({
     logEvent(userId, 'page_viewed', { page: 'home' })
   }, [userId])
 
+  // ── Impression logging (fires once on mount) ──────────────────────────────
+  const impressionsLogged = useRef(false)
+
+  useEffect(() => {
+    if (impressionsLogged.current) return
+    impressionsLogged.current = true
+    void logImpressions(userId, gridPlaces, sessionId)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── Load more ─────────────────────────────────────────────────────────────
 
   async function loadMore() {
@@ -149,9 +163,15 @@ export default function HomeContent({
     setLoadingMore(true)
     try {
       const offset = (page + 1) * 12
-      const params = new URLSearchParams({ offset: String(offset) })
-      if (heroPlace?.id) params.set('excludeHeroId', heroPlace.id)
-      const res = await fetch(`/api/places/feed?${params}`)
+      let res: Response
+      if (isPersonalised) {
+        const params = new URLSearchParams({ offset: String(offset), sessionId })
+        res = await fetch(`/api/places/recommendations?${params}`)
+      } else {
+        const params = new URLSearchParams({ offset: String(offset) })
+        if (heroPlace?.id) params.set('excludeHeroId', heroPlace.id)
+        res = await fetch(`/api/places/feed?${params}`)
+      }
       const json = await res.json()
       const newPlaces: Place[] = json.places ?? []
       setAllGridPlaces(prev => [...prev, ...newPlaces])
@@ -179,9 +199,21 @@ export default function HomeContent({
 
   // ── Save handlers ─────────────────────────────────────────────────────────
 
-  async function handleAdd(placeId: string, source: string) {
+  async function handleAdd(place: Place, source: string) {
+    const placeId = place.id
     setBucketPlaceIds(prev => (prev.includes(placeId) ? prev : [...prev, placeId]))
     void logEvent(userId, 'place_saved', { place_id: placeId, source })
+    const rec = place as RecommendedPlace
+    if (rec.recommendation_source) {
+      void logRecommendationEvent({
+        userId,
+        experienceId: placeId,
+        eventType: 'saved',
+        recommendationSource: rec.recommendation_source,
+        sessionId,
+        metadata: { source },
+      })
+    }
     const result = await addPlaceToList(placeId)
     if (result.error) {
       setBucketPlaceIds(prev => prev.filter(id => id !== placeId))
@@ -191,9 +223,21 @@ export default function HomeContent({
     }
   }
 
-  async function handleRemove(placeId: string, source: string) {
+  async function handleRemove(place: Place, source: string) {
+    const placeId = place.id
     setBucketPlaceIds(prev => prev.filter(id => id !== placeId))
     void logEvent(userId, 'item_removed', { place_id: placeId, source })
+    const rec = place as RecommendedPlace
+    if (rec.recommendation_source) {
+      void logRecommendationEvent({
+        userId,
+        experienceId: placeId,
+        eventType: 'dismissed',
+        recommendationSource: rec.recommendation_source,
+        sessionId,
+        metadata: { source },
+      })
+    }
     const result = await removePlaceByPlaceId(placeId)
     if (result.error) {
       setBucketPlaceIds(prev => [...prev, placeId])
@@ -288,8 +332,8 @@ export default function HomeContent({
           <HomeHeroCard
             place={heroPlace}
             isAdded={bucketPlaceIds.includes(heroPlace.id)}
-            onAdd={() => handleAdd(heroPlace.id, 'home_hero')}
-            onRemove={() => handleRemove(heroPlace.id, 'home_hero')}
+            onAdd={() => handleAdd(heroPlace, 'home_hero')}
+            onRemove={() => handleRemove(heroPlace, 'home_hero')}
             userId={userId}
           />
         ) : (
@@ -299,11 +343,18 @@ export default function HomeContent({
         {/* Bucket list section */}
         <div className="mt-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-syne font-bold text-[#131936] text-[18px]">For your bucket list</h2>
+            <h2 className="font-syne font-bold text-[#131936] text-[18px]">
+              {isPersonalised ? 'Picked for you' : 'For your bucket list'}
+            </h2>
             <Link href="/list" className="font-nunito text-[13px] text-[#f08c21]">
               See all →
             </Link>
           </div>
+          {isPersonalised && (
+            <p className="font-nunito text-[#131936]/40 text-[11px] -mt-3 mb-4">
+              Based on your travel style
+            </p>
+          )}
 
           {allGridPlaces.length > 0 ? (
             <>
@@ -313,8 +364,8 @@ export default function HomeContent({
                     key={place.id}
                     place={place}
                     isAdded={bucketPlaceIds.includes(place.id)}
-                    onAdd={() => handleAdd(place.id, 'home_grid')}
-                    onRemove={() => handleRemove(place.id, 'home_grid')}
+                    onAdd={() => handleAdd(place, 'home_grid')}
+                    onRemove={() => handleRemove(place, 'home_grid')}
                     index={index % 4}
                   />
                 ))}
