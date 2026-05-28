@@ -51,7 +51,7 @@ export default async function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-indigo-deep">
+    <div className="min-h-screen bg-[#fff9f0]">
       <OnboardingFlow places={places} />
     </div>
   )

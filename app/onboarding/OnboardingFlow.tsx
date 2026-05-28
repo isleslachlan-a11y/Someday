@@ -85,6 +85,15 @@ const TYPE_ICONS: Record<string, string> = {
   food: '🍜',
 }
 
+// ─── Shared styles ────────────────────────────────────────────────────────────
+
+const PILL_BASE = 'rounded-2xl border px-4 py-4 text-left font-nunito font-semibold text-[14px] transition-all active:scale-95'
+const PILL_ON   = 'border-[#f08c21] bg-[#f08c21]/10 text-[#131936]'
+const PILL_OFF  = 'border-[#fcd99a] bg-white text-[#131936]/70 hover:border-[#f08c21]/60 hover:bg-[#fcd99a]/20'
+const PILL_DIS  = 'border-[#fcd99a]/30 bg-[#fcd99a]/10 text-[#131936]/30 cursor-not-allowed opacity-40'
+
+const INPUT_CLS = 'w-full rounded-xl bg-white border border-[#fcd99a] px-4 py-3 font-nunito text-[14px] text-[#131936] placeholder:text-[#131936]/30 focus:outline-none focus:ring-2 focus:ring-[#f08c21]/30 transition'
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function OnboardingFlow({ places }: { places: Place[] }) {
@@ -136,7 +145,6 @@ export default function OnboardingFlow({ places }: { places: Place[] }) {
 
   function advance() {
     if (step === 8) {
-      // Navigate to done screen, then kick off the save
       navigate(9, 'forward')
       save(data)
     } else {
@@ -188,19 +196,18 @@ export default function OnboardingFlow({ places }: { places: Place[] }) {
   const progress = showProgress ? ((step - 1) / 7) * 100 : 0
   const animClass = direction === 'forward' ? 'animate-slide-in-right' : 'animate-slide-in-left'
 
-  // Don't flash step 1 content before localStorage restore
   if (!hydrated) return null
 
   return (
-    <div className="min-h-screen bg-indigo-deep flex flex-col px-6 py-10">
+    <div className="min-h-screen bg-[#fff9f0] flex flex-col px-6 py-10">
       <div className="w-full max-w-[480px] mx-auto flex flex-col flex-1">
 
         {/* Progress bar */}
         {showProgress && (
           <div className="mb-10 shrink-0">
-            <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
+            <div className="h-1 w-full bg-[#fcd99a]/50 rounded-full overflow-hidden">
               <div
-                className="h-full bg-violet-accent rounded-full transition-all duration-500 ease-out"
+                className="h-full bg-[#f08c21] rounded-full transition-all duration-500 ease-out"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -296,16 +303,16 @@ export default function OnboardingFlow({ places }: { places: Place[] }) {
 function StepWelcome({ onNext }: { onNext: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center min-h-[70vh] text-center">
-      <div className="text-5xl mb-8 text-violet-accent select-none">✦</div>
-      <h1 className="font-syne text-4xl font-bold text-white-soft mb-4 leading-tight">
+      <div className="text-5xl mb-8 text-[#f08c21] select-none">✦</div>
+      <h1 className="font-syne text-4xl font-bold text-[#131936] mb-4 leading-tight">
         Welcome to Someday.
       </h1>
-      <p className="text-lavender text-lg mb-14 leading-relaxed">
+      <p className="font-nunito text-[#131936]/60 text-lg mb-14 leading-relaxed">
         Let&apos;s build your travel profile.
       </p>
       <button
         onClick={onNext}
-        className="inline-flex items-center gap-2 rounded-2xl bg-violet-accent hover:bg-violet-accent/90 active:scale-95 px-10 py-4 font-syne font-bold text-white-soft text-lg transition-all"
+        className="inline-flex items-center gap-2 rounded-2xl bg-[#f08c21] hover:bg-[#d97a1b] active:scale-95 px-10 py-4 font-syne font-bold text-white text-lg transition-all"
       >
         Let&apos;s go <span aria-hidden>→</span>
       </button>
@@ -337,10 +344,10 @@ function StepTravelStyle({
   return (
     <div>
       <BackBtn onClick={onBack} />
-      <h2 className="font-syne text-2xl font-bold text-white-soft mt-5 mb-2">
+      <h2 className="font-syne text-2xl font-bold text-[#131936] mt-5 mb-2">
         What kind of traveller are you?
       </h2>
-      <p className="text-muted text-sm mb-8">Pick up to 3.</p>
+      <p className="font-nunito text-[#131936]/40 text-sm mb-8">Pick up to 3.</p>
 
       <div className="grid grid-cols-2 gap-3 mb-10">
         {TRAVEL_STYLE_OPTIONS.map(option => {
@@ -351,13 +358,7 @@ function StepTravelStyle({
               key={option}
               onClick={() => toggle(option)}
               disabled={isDisabled}
-              className={`rounded-2xl border px-4 py-4 text-left text-sm font-semibold transition-all active:scale-95 ${
-                isSelected
-                  ? 'border-violet-accent bg-violet-accent/15 text-white-soft'
-                  : isDisabled
-                  ? 'border-white/5 bg-white/[0.03] text-muted cursor-not-allowed opacity-40'
-                  : 'border-white/10 bg-white/5 text-lavender hover:border-violet-accent/50 hover:bg-white/8'
-              }`}
+              className={`${PILL_BASE} ${isSelected ? PILL_ON : isDisabled ? PILL_DIS : PILL_OFF}`}
             >
               {option}
             </button>
@@ -390,7 +391,7 @@ function StepSingleSelect({
   return (
     <div>
       <BackBtn onClick={onBack} />
-      <h2 className="font-syne text-2xl font-bold text-white-soft mt-5 mb-8">
+      <h2 className="font-syne text-2xl font-bold text-[#131936] mt-5 mb-8">
         {question}
       </h2>
 
@@ -399,11 +400,7 @@ function StepSingleSelect({
           <button
             key={opt.value}
             onClick={() => onChange(opt.value)}
-            className={`w-full rounded-2xl border px-5 py-4 text-left font-semibold transition-all active:scale-[0.98] ${
-              value === opt.value
-                ? 'border-violet-accent bg-violet-accent/15 text-white-soft'
-                : 'border-white/10 bg-white/5 text-lavender hover:border-violet-accent/50 hover:bg-white/8'
-            }`}
+            className={`w-full ${PILL_BASE} px-5 ${value === opt.value ? PILL_ON : PILL_OFF}`}
           >
             {opt.label}
           </button>
@@ -431,7 +428,7 @@ function StepBudget({
   return (
     <div>
       <BackBtn onClick={onBack} />
-      <h2 className="font-syne text-2xl font-bold text-white-soft mt-5 mb-8">
+      <h2 className="font-syne text-2xl font-bold text-[#131936] mt-5 mb-8">
         What&apos;s your travel budget usually like?
       </h2>
 
@@ -440,16 +437,12 @@ function StepBudget({
           <button
             key={opt.value}
             onClick={() => onChange(opt.value)}
-            className={`w-full rounded-2xl border px-5 py-4 text-left transition-all active:scale-[0.98] ${
-              value === opt.value
-                ? 'border-violet-accent bg-violet-accent/15'
-                : 'border-white/10 bg-white/5 hover:border-violet-accent/50 hover:bg-white/8'
-            }`}
+            className={`w-full ${PILL_BASE} px-5 ${value === opt.value ? PILL_ON : PILL_OFF}`}
           >
-            <span className="block font-syne font-semibold text-white-soft">
+            <span className="block font-syne font-semibold text-[14px]">
               {opt.label}
             </span>
-            <span className="block text-sm text-muted mt-0.5">{opt.sub}</span>
+            <span className="block font-nunito text-sm text-[#131936]/40 mt-0.5">{opt.sub}</span>
           </button>
         ))}
       </div>
@@ -479,24 +472,24 @@ function StepPastTrip({
   return (
     <div>
       <BackBtn onClick={onBack} />
-      <h2 className="font-syne text-2xl font-bold text-white-soft mt-5 mb-2">
+      <h2 className="font-syne text-2xl font-bold text-[#131936] mt-5 mb-2">
         Where&apos;s somewhere you&apos;ve already been that you loved?
       </h2>
-      <p className="text-muted text-sm mb-8">Optional — you can add more later.</p>
+      <p className="font-nunito text-[#131936]/40 text-sm mb-8">Optional — you can add more later.</p>
 
       <div className="space-y-4 mb-10">
         <div>
-          <label className="block text-sm text-lavender mb-2">Place name</label>
+          <label className="block font-nunito text-sm text-[#131936]/50 mb-2">Place name</label>
           <input
             type="text"
             value={name}
             onChange={e => onChangeName(e.target.value)}
             placeholder="e.g. Kyoto, Japan"
-            className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-white-soft placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-violet-accent transition"
+            className={INPUT_CLS}
           />
         </div>
         <div>
-          <label className="block text-sm text-lavender mb-2">Year (optional)</label>
+          <label className="block font-nunito text-sm text-[#131936]/50 mb-2">Year (optional)</label>
           <input
             type="number"
             value={year}
@@ -504,7 +497,7 @@ function StepPastTrip({
             placeholder="e.g. 2022"
             min={1950}
             max={new Date().getFullYear()}
-            className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-white-soft placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-violet-accent transition"
+            className={INPUT_CLS}
           />
         </div>
       </div>
@@ -512,7 +505,7 @@ function StepPastTrip({
       <NextBtn onClick={onNext} disabled={false} label="Continue →" />
       <button
         onClick={onNext}
-        className="w-full mt-3 py-2 text-center text-sm text-muted hover:text-lavender transition-colors"
+        className="w-full mt-3 py-2 text-center font-nunito text-sm text-[#131936]/40 hover:text-[#131936]/70 transition-colors"
       >
         I&apos;ll add this later
       </button>
@@ -549,19 +542,19 @@ function StepBucketSeed({
   return (
     <div>
       <BackBtn onClick={onBack} />
-      <h2 className="font-syne text-2xl font-bold text-white-soft mt-5 mb-2">
+      <h2 className="font-syne text-2xl font-bold text-[#131936] mt-5 mb-2">
         Pick at least 3 places you&apos;d love to go someday.
       </h2>
-      <p className="text-muted text-sm mb-8">
+      <p className="font-nunito text-[#131936]/40 text-sm mb-8">
         {remaining > 0
           ? `${remaining} more to go`
           : `${selected.length} selected — looking good!`}
       </p>
 
       {places.length === 0 ? (
-        <div className="rounded-2xl border border-white/10 bg-white/5 px-6 py-10 text-center mb-10">
-          <p className="text-muted text-sm">No places in the catalogue yet.</p>
-          <p className="text-muted text-xs mt-1">You can add destinations from your list later.</p>
+        <div className="rounded-2xl border border-[#fcd99a] bg-[#fcd99a]/10 px-6 py-10 text-center mb-10">
+          <p className="font-nunito text-[#131936]/40 text-sm">No places in the catalogue yet.</p>
+          <p className="font-nunito text-[#131936]/30 text-xs mt-1">You can add destinations from your list later.</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3 mb-10">
@@ -572,23 +565,21 @@ function StepBucketSeed({
                 key={place.id}
                 onClick={() => toggle(place.id)}
                 className={`relative rounded-2xl border p-4 text-left transition-all active:scale-95 ${
-                  isSelected
-                    ? 'border-violet-accent bg-violet-accent/15'
-                    : 'border-white/10 bg-white/5 hover:border-violet-accent/40 hover:bg-white/8'
+                  isSelected ? PILL_ON : PILL_OFF
                 }`}
               >
                 {isSelected && (
-                  <span className="absolute top-3 right-3 text-violet-accent text-xs font-bold">
+                  <span className="absolute top-3 right-3 text-[#f08c21] text-xs font-bold">
                     ✓
                   </span>
                 )}
                 <span className="block text-xl mb-2 select-none" aria-hidden>
                   {TYPE_ICONS[place.type] ?? '✦'}
                 </span>
-                <span className="block font-syne font-semibold text-white-soft text-sm leading-snug">
+                <span className="block font-syne font-semibold text-[#131936] text-sm leading-snug">
                   {place.name}
                 </span>
-                <span className="block text-xs text-muted mt-1">{place.country}</span>
+                <span className="block font-nunito text-xs text-[#131936]/40 mt-1">{place.country}</span>
               </button>
             )
           })}
@@ -618,26 +609,26 @@ function StepDone({
   return (
     <div className="flex flex-col items-center justify-center min-h-[70vh] text-center">
       <div className="text-5xl mb-8 select-none">🌍</div>
-      <h1 className="font-syne text-4xl font-bold text-white-soft mb-4 leading-tight">
+      <h1 className="font-syne text-4xl font-bold text-[#131936] mb-4 leading-tight">
         Your Someday starts now.
       </h1>
 
       {saveFailed ? (
         <>
-          <p className="text-muted text-sm mb-8">Something went wrong saving your profile.</p>
+          <p className="font-nunito text-[#131936]/40 text-sm mb-8">Something went wrong saving your profile.</p>
           <button
             onClick={onRetry}
-            className="inline-flex items-center gap-2 rounded-2xl bg-violet-accent hover:bg-violet-accent/90 active:scale-95 px-8 py-4 font-syne font-bold text-white-soft transition-all"
+            className="inline-flex items-center gap-2 rounded-2xl bg-[#f08c21] hover:bg-[#d97a1b] active:scale-95 px-8 py-4 font-syne font-bold text-white transition-all"
           >
             Try again
           </button>
         </>
       ) : (
         <>
-          <p className="text-lavender text-lg mb-12">
+          <p className="font-nunito text-[#131936]/60 text-lg mb-12">
             {saving ? 'Saving your profile…' : 'Heading in…'}
           </p>
-          <div className="w-8 h-8 border-2 border-violet-accent border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-[#f08c21] border-t-transparent rounded-full animate-spin" />
         </>
       )}
     </div>
@@ -650,7 +641,7 @@ function BackBtn({ onClick }: { onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-1 text-muted hover:text-lavender transition-colors text-sm"
+      className="flex items-center gap-1 font-nunito text-[#131936]/40 hover:text-[#131936]/70 transition-colors text-sm"
     >
       <span aria-hidden>←</span> Back
     </button>
@@ -670,7 +661,7 @@ function NextBtn({
     <button
       onClick={onClick}
       disabled={disabled}
-      className="w-full rounded-2xl bg-violet-accent hover:bg-violet-accent/90 active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed px-6 py-4 font-syne font-bold text-white-soft transition-all"
+      className="w-full rounded-2xl bg-[#f08c21] hover:bg-[#d97a1b] active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed px-6 py-4 font-syne font-bold text-white transition-all"
     >
       {label}
     </button>

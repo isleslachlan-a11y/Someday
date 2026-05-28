@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { initUserAccount } from '@/app/actions/auth'
 
-const LABEL = 'block font-nunito font-semibold uppercase tracking-wider text-[11px] text-[#A36B3A] mb-1.5'
-const INPUT = 'w-full rounded-lg bg-[#FFFAF5] border border-[#FDDCB5] text-[#1A0A00] placeholder:text-[#A36B3A]/40 px-4 py-2.5 font-nunito text-[14px] focus:outline-none focus:ring-2 focus:ring-[#F97316]/40 transition'
+const LABEL = 'block font-nunito font-semibold uppercase tracking-wider text-[11px] text-[#131936]/50 mb-1.5'
+const INPUT = 'w-full rounded-xl bg-white border border-[#fcd99a] text-[#131936] placeholder:text-[#131936]/30 px-4 py-2.5 font-nunito text-[14px] focus:outline-none focus:ring-2 focus:ring-[#f08c21]/30 transition'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -93,22 +93,22 @@ export default function SignupPage() {
   if (showConfirmMessage) {
     return (
       <div className="text-center">
-        <div className="w-12 h-12 rounded-full bg-[#FED7AA]/60 flex items-center justify-center mx-auto mb-4">
-          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#F97316" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <div className="w-12 h-12 rounded-full bg-[#fcd99a]/60 flex items-center justify-center mx-auto mb-4">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#f08c21" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
             <rect x="2" y="4" width="20" height="16" rx="2" />
             <path d="M2 7l10 7 10-7" />
           </svg>
         </div>
-        <h2 className="font-syne text-[20px] font-bold text-[#1A0A00] mb-2">
+        <h2 className="font-syne text-[20px] font-bold text-[#131936] mb-2">
           Check your inbox
         </h2>
-        <p className="font-nunito text-[14px] text-[#A36B3A] leading-relaxed mb-1">
+        <p className="font-nunito text-[14px] text-[#131936]/50 leading-relaxed mb-1">
           We sent a confirmation link to
         </p>
-        <p className="font-nunito font-semibold text-[14px] text-[#1A0A00] mb-4">
+        <p className="font-nunito font-semibold text-[14px] text-[#131936] mb-4">
           {email}
         </p>
-        <p className="font-nunito text-[13px] text-[#A36B3A] leading-relaxed mb-6">
+        <p className="font-nunito text-[13px] text-[#131936]/50 leading-relaxed mb-6">
           Click it to activate your account, then come back here to sign in.
         </p>
         <button
@@ -116,7 +116,7 @@ export default function SignupPage() {
             setShowConfirmMessage(false)
             setLoading(false)
           }}
-          className="font-nunito text-[13px] font-semibold text-[#F97316] hover:text-[#EA6C0A] transition-colors"
+          className="font-nunito text-[13px] font-semibold text-[#f08c21] hover:text-[#d97a1b] transition-colors"
         >
           Wrong email? Go back
         </button>
@@ -128,7 +128,7 @@ export default function SignupPage() {
 
   return (
     <>
-      <h2 className="font-syne text-[22px] font-bold text-[#1A0A00] mb-6">
+      <h2 className="font-syne text-[22px] font-bold text-[#131936] mb-6">
         Create your account
       </h2>
 
@@ -201,7 +201,7 @@ export default function SignupPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-lg bg-[#F97316] hover:bg-[#EA6C0A] disabled:opacity-60 px-4 py-2.5 font-syne font-semibold text-white transition-colors mt-2 flex items-center justify-center gap-2"
+          className="w-full rounded-xl bg-[#f08c21] hover:bg-[#d97a1b] disabled:opacity-60 px-4 py-2.5 font-syne font-semibold text-white transition-colors mt-2 flex items-center justify-center gap-2"
         >
           {loading && (
             <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin shrink-0" />
@@ -210,9 +210,9 @@ export default function SignupPage() {
         </button>
       </form>
 
-      <p className="text-center font-nunito text-[13px] text-[#A36B3A] mt-6">
+      <p className="text-center font-nunito text-[13px] text-[#131936]/50 mt-6">
         Already have an account?{' '}
-        <Link href="/login" className="font-semibold text-[#F97316] hover:text-[#EA6C0A] transition-colors">
+        <Link href="/login" className="font-semibold text-[#f08c21] hover:text-[#d97a1b] transition-colors">
           Sign in
         </Link>
       </p>
