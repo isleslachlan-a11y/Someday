@@ -118,6 +118,10 @@ export interface Place {
   best_time?: string | null
   vibe_tags?: string[] | null
   submitted_photo_url?: string | null
+  // Taxonomy — joined from experiences_* tables, present only when enriched
+  primary_category?: { slug: string; name: string; icon: string } | null
+  display_labels?: string[]
+  top_tags?: string[]
 }
 
 export const DESTINATION_TYPES = ['city', 'nature'] as const

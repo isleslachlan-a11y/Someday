@@ -5,6 +5,25 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import CollectionDetail from './CollectionDetail'
 import type { Place } from '@/lib/types'
 
+type SB = Awaited<ReturnType<typeof createClient>>
+
+async function enrichPlacesWithTaxonomy<T extends Place>(supabase: SB, places: T[]): Promise<T[]> {
+  if (places.length === 0) return places
+  const ids = places.map(p => p.id)
+  const [categoriesResult, tagsResult, labelsResult] = await Promise.all([
+    supabase.from('experiences_categories').select('experience_id, is_primary, categories(slug, name, icon)').in('experience_id', ids).eq('is_primary', true),
+    supabase.from('experiences_tags').select('experience_id, tags(name)').in('experience_id', ids),
+    supabase.from('experiences_labels').select('experience_id, place_labels(name)').in('experience_id', ids),
+  ])
+  return places.map(place => {
+    const primaryCat = (categoriesResult.data ?? []).find(r => (r as { experience_id: string }).experience_id === place.id)
+    const catData = primaryCat ? (primaryCat as unknown as { categories: { slug: string; name: string; icon: string } | null }).categories : null
+    const placeTags = (tagsResult.data ?? []).filter(r => (r as { experience_id: string }).experience_id === place.id).map(r => ((r as unknown as { tags: { name: string } | null }).tags)?.name).filter((n): n is string => !!n)
+    const placeLabels = (labelsResult.data ?? []).filter(r => (r as { experience_id: string }).experience_id === place.id).map(r => ((r as unknown as { place_labels: { name: string } | null }).place_labels)?.name).filter((n): n is string => !!n)
+    return { ...place, primary_category: catData ?? null, top_tags: placeTags.slice(0, 3), display_labels: placeLabels.slice(0, 2) }
+  })
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -68,6 +87,10 @@ export default async function CollectionDetailPage({
     )
     places = placeIds.map(id => placeMap.get(id)).filter((p): p is Place => !!p)
   }
+
+  try {
+    places = await enrichPlacesWithTaxonomy(supabase, places)
+  } catch { /* use unenriched */ }
 
   const savedPlaceIds = new Set(
     (bucketResult.data ?? []).map(r => r.place_id as string).filter(Boolean)

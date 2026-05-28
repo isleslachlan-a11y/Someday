@@ -88,6 +88,23 @@ export default function HomePlaceCard({ place, isAdded, onAdd, onRemove, index }
             {place.type === 'food' ? '🍜 Food' : '✨ Experience'}
           </span>
         )}
+        {place.display_labels && place.display_labels.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-1 pointer-events-none">
+            {place.display_labels.slice(0, 2).map(label => (
+              <span
+                key={label}
+                className="px-1.5 py-0.5 rounded-full font-nunito"
+                style={{
+                  fontSize: 9,
+                  background: dark ? 'rgba(252,217,154,0.2)' : 'rgba(19,25,54,0.08)',
+                  color: dark ? '#fcd99a' : '#131936',
+                }}
+              >
+                {label}
+              </span>
+            ))}
+          </div>
+        )}
         {location && (
           <p
             className={`flex items-center gap-0.5 font-nunito mt-0.5 truncate ${place.image_url || dark ? 'text-white/75' : 'text-[#131936]/70'}`}

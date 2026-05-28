@@ -72,6 +72,19 @@ export default function DiscoverPlaceCard({
         <p className="font-syne font-bold text-white text-[13px] leading-tight line-clamp-2">
           {place.name}
         </p>
+        {place.top_tags && place.top_tags.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-1">
+            {place.top_tags.slice(0, 3).map(tag => (
+              <span
+                key={tag}
+                className="px-1.5 py-0.5 rounded-full bg-white/15 text-white/80 font-nunito"
+                style={{ fontSize: 9 }}
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
         <p className="font-nunito text-white/70 text-[11px] mt-0.5 flex items-center gap-0.5">
           <MapPin size={9} className="shrink-0" />
           {[place.region, place.country].filter(Boolean).join(', ')}

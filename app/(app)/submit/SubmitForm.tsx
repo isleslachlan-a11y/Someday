@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { ChevronLeft } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -8,6 +8,21 @@ import { createClient } from '@/lib/supabase/client'
 import { submitPlace } from '@/app/actions/submissions'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
+
+interface CategoryItem {
+  id: string
+  name: string
+  slug: string
+  icon: string
+}
+
+interface TagItem {
+  id: string
+  name: string
+  slug: string
+  category: string
+  place_type: string[]
+}
 
 interface Prediction {
   place_id: string
@@ -40,15 +55,29 @@ const CARDS = [
     type: 'type_select' as const,
   },
   {
-    id: 'vibes',
+    id: 'category',
     step: 3,
+    prompt: "What's the best category for it?",
+    subprompt: 'Optional — skip if unsure.',
+    type: 'category_select' as const,
+  },
+  {
+    id: 'tags',
+    step: 4,
+    prompt: 'Tag it with a few descriptors:',
+    subprompt: 'Optional — pick up to 8 that fit.',
+    type: 'tags_select' as const,
+  },
+  {
+    id: 'vibes',
+    step: 5,
     prompt: "You'd love it here if you're into…",
     subprompt: 'Pick up to 5 that feel right.',
     type: 'vibes' as const,
   },
   {
     id: 'must_do',
-    step: 4,
+    step: 6,
     prompt: 'The one thing everyone must do here:',
     subprompt: 'One sentence. Make it specific.',
     type: 'text' as const,
@@ -57,7 +86,7 @@ const CARDS = [
   },
   {
     id: 'hidden_gem',
-    step: 5,
+    step: 7,
     prompt: 'Best kept secret:',
     subprompt: 'Something the guidebooks miss.',
     type: 'text' as const,
@@ -66,7 +95,7 @@ const CARDS = [
   },
   {
     id: 'not_for_you',
-    step: 6,
+    step: 8,
     prompt: "Don't come here if you hate…",
     subprompt: 'Honesty makes a better catalogue.',
     type: 'text' as const,
@@ -75,7 +104,7 @@ const CARDS = [
   },
   {
     id: 'best_time',
-    step: 7,
+    step: 9,
     prompt: 'Best time to visit:',
     subprompt: 'Month, season, or reason.',
     type: 'text' as const,
@@ -84,14 +113,14 @@ const CARDS = [
   },
   {
     id: 'photo',
-    step: 8,
+    step: 10,
     prompt: 'Got a photo?',
     subprompt: 'Optional — helps us review it faster.',
     type: 'photo' as const,
   },
   {
     id: 'review',
-    step: 9,
+    step: 11,
     prompt: 'One last thing — why does this place deserve to be on Someday?',
     subprompt: 'This becomes the description. Make someone want to go.',
     type: 'text' as const,
@@ -103,6 +132,17 @@ const CARDS = [
 type CardId = (typeof CARDS)[number]['id']
 
 // ── Constants ─────────────────────────────────────────────────────────────────
+
+const TAG_CATEGORY_LABELS: Record<string, string> = {
+  vibe:         'Vibe',
+  activity:     'Activity',
+  season:       'Season',
+  budget:       'Budget',
+  travel_style: 'Travel Style',
+  landscape:    'Landscape',
+  food_drink:   'Food & Drink',
+  general:      'General',
+}
 
 const VIBE_OPTIONS = [
   { label: 'Adventure', emoji: '🧗' },
@@ -153,6 +193,12 @@ export default function SubmitForm({ userId }: Props) {
   const [photoFile, setPhotoFile]         = useState<File | null>(null)
   const [photoPreview, setPhotoPreview]   = useState<string | null>(null)
 
+  // Taxonomy
+  const [allCategories, setAllCategories]     = useState<CategoryItem[]>([])
+  const [allTaxTags, setAllTaxTags]           = useState<TagItem[]>([])
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('')
+  const [selectedTagIds, setSelectedTagIds]   = useState<string[]>([])
+
   // Geocoding
   const [suggestions, setSuggestions]         = useState<Prediction[]>([])
   const [showSuggestions, setShowSuggestions] = useState(false)
@@ -161,6 +207,17 @@ export default function SubmitForm({ userId }: Props) {
   const [resolvedLat, setResolvedLat]         = useState<number | null>(null)
   const [resolvedLng, setResolvedLng]         = useState<number | null>(null)
   const nameDebounceRef = useRef<NodeJS.Timeout | null>(null)
+
+  useEffect(() => {
+    const supabase = createClient()
+    void Promise.all([
+      supabase.from('categories').select('id, name, slug, icon').order('sort_order'),
+      supabase.from('tags').select('id, name, slug, category, place_type').order('category').order('name'),
+    ]).then(([catsRes, tagsRes]) => {
+      setAllCategories((catsRes.data ?? []) as CategoryItem[])
+      setAllTaxTags((tagsRes.data ?? []) as TagItem[])
+    })
+  }, [])
 
   // ── Navigation ───────────────────────────────────────────────────────────
 
@@ -179,6 +236,8 @@ export default function SubmitForm({ userId }: Props) {
     switch (card.id) {
       case 'place':       return locationLocked || placeName.trim().length > 2
       case 'type':        return placeType !== ''
+      case 'category':    return true
+      case 'tags':        return true
       case 'vibes':       return vibes.length > 0
       case 'must_do':     return mustDo.trim().length > 10
       case 'hidden_gem':  return hiddenGem.trim().length > 5
@@ -290,6 +349,8 @@ export default function SubmitForm({ userId }: Props) {
       photo_url,
       lat:         resolvedLat,
       lng:         resolvedLng,
+      categoryId:  selectedCategoryId || null,
+      tagIds:      selectedTagIds,
     })
 
     setSubmitting(false)
@@ -319,6 +380,8 @@ export default function SubmitForm({ userId }: Props) {
     setResolvedLat(null)
     setResolvedLng(null)
     setSuggestions([])
+    setSelectedCategoryId('')
+    setSelectedTagIds([])
   }
 
   // ── Card input renderer ──────────────────────────────────────────────────
@@ -448,6 +511,70 @@ export default function SubmitForm({ userId }: Props) {
                 )}
               </button>
             ))}
+          </div>
+        )
+
+      case 'category':
+        return (
+          <div className="flex flex-wrap gap-3">
+            {allCategories.map(cat => {
+              const active = selectedCategoryId === cat.id
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setSelectedCategoryId(prev => prev === cat.id ? '' : cat.id)}
+                  className={`flex items-center gap-2 rounded-2xl border-2 px-5 py-3 transition-all text-left active:scale-[0.97] ${
+                    active ? 'border-[#f08c21] bg-[#f08c21]/5' : 'border-[#fcd99a]/50 bg-white'
+                  }`}
+                >
+                  {cat.icon && <span className="text-[22px]">{cat.icon}</span>}
+                  <span className={`font-syne font-bold text-[15px] ${active ? 'text-[#f08c21]' : 'text-[#131936]'}`}>
+                    {cat.name}
+                  </span>
+                  {active && <span className="ml-1 text-[#f08c21] text-[14px]">✦</span>}
+                </button>
+              )
+            })}
+          </div>
+        )
+
+      case 'tags':
+        return (
+          <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-1">
+            {Array.from(new Set(allTaxTags.map(t => t.category))).map(dim => (
+              <div key={dim}>
+                <p className="font-nunito text-[10px] font-bold uppercase tracking-wider text-[#131936]/40 mb-2">
+                  {TAG_CATEGORY_LABELS[dim] ?? dim}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {allTaxTags.filter(t => t.category === dim).map(tag => {
+                    const active = selectedTagIds.includes(tag.id)
+                    const atLimit = selectedTagIds.length >= 8
+                    return (
+                      <button
+                        key={tag.id}
+                        type="button"
+                        disabled={!active && atLimit}
+                        onClick={() => setSelectedTagIds(prev =>
+                          active ? prev.filter(id => id !== tag.id) : [...prev, tag.id]
+                        )}
+                        className={`px-4 py-2 rounded-full border font-nunito text-[13px] font-medium transition-all disabled:opacity-30 ${
+                          active
+                            ? 'bg-[#f08c21] text-[#131936] border-[#f08c21]'
+                            : 'bg-white text-[#131936]/60 border-[#fcd99a]'
+                        }`}
+                      >
+                        {tag.name}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
+            {selectedTagIds.length === 8 && (
+              <p className="font-nunito text-[#131936]/40 text-[12px] pt-1">Max 8 selected</p>
+            )}
           </div>
         )
 
@@ -666,7 +793,7 @@ export default function SubmitForm({ userId }: Props) {
         <span className="font-nunito text-[#131936]/40 text-[13px]">
           {currentStep + 1} of {totalSteps}
         </span>
-        {card.id === 'photo' ? (
+        {(card.id === 'photo' || card.id === 'category' || card.id === 'tags') ? (
           <button
             onClick={goNext}
             className="font-nunito text-[#131936]/40 text-[13px] hover:text-[#131936] transition-colors px-2"

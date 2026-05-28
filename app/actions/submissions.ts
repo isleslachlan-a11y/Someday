@@ -28,6 +28,8 @@ export interface SubmitPlaceData {
   photo_url: string | null
   lat: number | null
   lng: number | null
+  categoryId?: string | null
+  tagIds?: string[]
 }
 
 export async function submitPlace(data: SubmitPlaceData): Promise<{ error?: string }> {
@@ -40,7 +42,7 @@ export async function submitPlace(data: SubmitPlaceData): Promise<{ error?: stri
     country: data.country.trim() || null,
     region: data.region || null,
     description: data.description.trim() || null,
-    tags: data.tags.length > 0 ? data.tags : null,
+    tags: (data.tagIds && data.tagIds.length > 0) ? data.tagIds : (data.tags.length > 0 ? data.tags : null),
     image_url: data.image_url,
     must_do: data.must_do || null,
     hidden_gem: data.hidden_gem || null,
@@ -62,6 +64,7 @@ export async function submitPlace(data: SubmitPlaceData): Promise<{ error?: stri
       submission_id: inserted.id,
       type: data.type,
       country: data.country,
+      category_id: data.categoryId ?? null,
     },
     platform: 'web',
     app_version: process.env.NEXT_PUBLIC_APP_VERSION ?? '0.1.0',

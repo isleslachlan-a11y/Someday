@@ -12,6 +12,18 @@ type PlaceType = 'city' | 'nature' | 'experience' | 'food'
 type Region    = 'Asia' | 'Europe' | 'Americas' | 'Africa' | 'Oceania' | 'Global'
 type Intensity = 'low' | 'medium' | 'high'
 
+interface Category {
+  id: string
+  name: string
+  slug: string
+  icon: string
+}
+
+interface Label {
+  id: string
+  name: string
+}
+
 interface Tag {
   id: string
   name: string
@@ -65,6 +77,17 @@ const ACTIVITY_CATEGORIES = [
 ]
 const IMAGE_PAGE_SIZE = 9
 
+const TAG_CATEGORY_LABELS: Record<string, string> = {
+  vibe:         'Vibe',
+  activity:     'Activity',
+  season:       'Season',
+  budget:       'Budget',
+  travel_style: 'Travel Style',
+  landscape:    'Landscape',
+  food_drink:   'Food & Drink',
+  general:      'General',
+}
+
 // ── Style helpers ─────────────────────────────────────────────────────────────
 
 const INPUT_CLASS =
@@ -76,6 +99,20 @@ function pillClass(active: boolean) {
   return `px-4 py-2 rounded-full border font-nunito text-[13px] font-medium transition-all ${
     active
       ? 'bg-[#f08c21] text-[#131936] border-[#f08c21]'
+      : 'bg-white text-[#131936]/60 border-[#fcd99a]'
+  }`
+}
+
+function catPillClass(state: 'none' | 'selected' | 'primary') {
+  if (state === 'primary')  return 'px-4 py-2 rounded-full border font-nunito text-[13px] font-medium transition-all bg-[#f08c21] text-white border-[#f08c21]'
+  if (state === 'selected') return 'px-4 py-2 rounded-full border font-nunito text-[13px] font-medium transition-all bg-[#f08c21]/10 text-[#131936] border-[#f08c21]'
+  return 'px-4 py-2 rounded-full border font-nunito text-[13px] font-medium transition-all bg-white text-[#131936]/60 border-[#fcd99a]'
+}
+
+function labelPillClass(active: boolean) {
+  return `px-4 py-2 rounded-full border font-nunito text-[13px] font-medium transition-all ${
+    active
+      ? 'bg-[#131936] text-white border-[#131936]'
       : 'bg-white text-[#131936]/60 border-[#fcd99a]'
   }`
 }
@@ -260,6 +297,13 @@ export default function AdminAddForm({ userId: _userId }: Props) {
   const [resolvedLat, setResolvedLat]         = useState<number | null>(null)
   const [resolvedLng, setResolvedLng]         = useState<number | null>(null)
 
+  // Taxonomy
+  const [allCategories, setAllCategories]           = useState<Category[]>([])
+  const [allLabels, setAllLabels]                   = useState<Label[]>([])
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<Set<string>>(new Set())
+  const [primaryCategoryId, setPrimaryCategoryId]   = useState<string | null>(null)
+  const [selectedLabelIds, setSelectedLabelIds]     = useState<Set<string>>(new Set())
+
   // Tags — allTags holds full Tag objects; selectedTags holds tag IDs
   const [allTags, setAllTags]           = useState<Tag[]>([])
   const [selectedTags, setSelectedTags] = useState<string[]>([])
@@ -283,11 +327,15 @@ export default function AdminAddForm({ userId: _userId }: Props) {
 
   useEffect(() => {
     const supabase = createClient()
-    supabase
-      .from('tags')
-      .select('id, name, slug, category, place_type')
-      .order('name')
-      .then(({ data }) => setAllTags((data ?? []) as Tag[]))
+    void Promise.all([
+      supabase.from('tags').select('id, name, slug, category, place_type').order('category').order('name'),
+      supabase.from('categories').select('id, name, slug, icon').order('sort_order'),
+      supabase.from('place_labels').select('id, name').order('name'),
+    ]).then(([tagsRes, catsRes, labelsRes]) => {
+      setAllTags((tagsRes.data ?? []) as Tag[])
+      setAllCategories((catsRes.data ?? []) as Category[])
+      setAllLabels((labelsRes.data ?? []) as Label[])
+    })
   }, [])
 
   // ── Handlers ──────────────────────────────────────────────────────────────
@@ -312,6 +360,27 @@ export default function AdminAddForm({ userId: _userId }: Props) {
         ? prev.vibe_tags.filter(v => v !== vibe)
         : [...prev.vibe_tags, vibe],
     }))
+  }
+
+  function toggleCategory(id: string) {
+    if (!selectedCategoryIds.has(id)) {
+      setSelectedCategoryIds(prev => new Set([...prev, id]))
+      if (!primaryCategoryId) setPrimaryCategoryId(id)
+    } else if (primaryCategoryId !== id) {
+      setPrimaryCategoryId(id)
+    } else {
+      setSelectedCategoryIds(prev => { const n = new Set(prev); n.delete(id); return n })
+      const remaining = [...selectedCategoryIds].filter(c => c !== id)
+      setPrimaryCategoryId(remaining[0] ?? null)
+    }
+  }
+
+  function toggleLabel(id: string) {
+    setSelectedLabelIds(prev => {
+      const n = new Set(prev)
+      n.has(id) ? n.delete(id) : n.add(id)
+      return n
+    })
   }
 
   function handleNameChange(value: string) {
@@ -440,8 +509,38 @@ export default function AdminAddForm({ userId: _userId }: Props) {
       setError(result.error)
       toast.error(result.error)
     } else {
+      const placeId = result.placeId!
+      const supabase = createClient()
+
+      // Write taxonomy join tables (non-fatal)
+      if (selectedCategoryIds.size > 0) {
+        try {
+          await supabase.from('experiences_categories').insert(
+            [...selectedCategoryIds].map(catId => ({
+              experience_id: placeId,
+              category_id: catId,
+              is_primary: catId === primaryCategoryId,
+            }))
+          )
+        } catch { /* non-fatal */ }
+      }
+      if (selectedTags.length > 0) {
+        try {
+          await supabase.from('experiences_tags').insert(
+            selectedTags.map(tagId => ({ experience_id: placeId, tag_id: tagId }))
+          )
+        } catch { /* non-fatal */ }
+      }
+      if (selectedLabelIds.size > 0) {
+        try {
+          await supabase.from('experiences_labels').insert(
+            [...selectedLabelIds].map(labelId => ({ experience_id: placeId, label_id: labelId }))
+          )
+        } catch { /* non-fatal */ }
+      }
+
       toast.success(`${form.name} added to the database ✦`)
-      setSavedPlaceId(result.placeId ?? null)
+      setSavedPlaceId(placeId)
       setSavedPlaceName(form.name)
       setForm({
         name: '', type: 'city', country: '', region: 'Europe',
@@ -449,6 +548,9 @@ export default function AdminAddForm({ userId: _userId }: Props) {
       })
       setHingeFields({ must_do: '', hidden_gem: '', not_for_you: '', best_time: '', vibe_tags: [] })
       setSelectedTags([])
+      setSelectedCategoryIds(new Set())
+      setPrimaryCategoryId(null)
+      setSelectedLabelIds(new Set())
       setSelectedImage(null)
       setAllImageResults([])
       setImageQuery('')
@@ -771,12 +873,40 @@ export default function AdminAddForm({ userId: _userId }: Props) {
           />
         </div>
 
-        {/* Tags multi-select */}
+        {/* ── Taxonomy: Categories ── */}
+        {allCategories.length > 0 && (
+          <div>
+            <p className="font-nunito text-[12px] text-[#131936]/50 mb-2">
+              Category
+              <span className="ml-1 text-[#131936]/30 font-normal">— tap once to select, again for primary ★</span>
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {allCategories.map(cat => {
+                const state = !selectedCategoryIds.has(cat.id) ? 'none'
+                  : primaryCategoryId === cat.id ? 'primary' : 'selected'
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => toggleCategory(cat.id)}
+                    className={catPillClass(state)}
+                  >
+                    {cat.icon && <span className="mr-1">{cat.icon}</span>}
+                    {cat.name}
+                    {state === 'primary' && <span className="ml-1 text-[10px]">★</span>}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* ── Taxonomy: Tags grouped by dimension ── */}
         <div>
           <div className="flex items-center justify-between mb-2">
             <p className="font-nunito text-[12px] text-[#131936]/50">
               Tags
-              <span className="ml-1 text-[#131936]/30 font-normal">(describe the place — not activities)</span>
+              <span className="ml-1 text-[#131936]/30 font-normal">(describe the place)</span>
             </p>
             <button
               type="button"
@@ -798,22 +928,31 @@ export default function AdminAddForm({ userId: _userId }: Props) {
             placeholder="Filter tags…"
             className="w-full rounded-full border border-[#fcd99a] bg-white px-4 py-2 font-nunito text-[13px] text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:ring-2 focus:ring-[#f08c21]/30 mb-3"
           />
-          <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto pr-1 pb-1">
-            {visibleTags.map(tag => {
-              const active = selectedTags.includes(tag.id)
-              return (
-                <button
-                  key={tag.id}
-                  type="button"
-                  onClick={() => setSelectedTags(prev =>
-                    active ? prev.filter(id => id !== tag.id) : [...prev, tag.id]
-                  )}
-                  className={pillClass(active)}
-                >
-                  {tag.name}
-                </button>
-              )
-            })}
+          <div className="space-y-4 max-h-64 overflow-y-auto pr-1">
+            {Array.from(new Set(visibleTags.map(t => t.category))).map(dim => (
+              <div key={dim}>
+                <p className="font-nunito text-[10px] font-bold uppercase tracking-wider text-[#131936]/40 mb-1.5">
+                  {TAG_CATEGORY_LABELS[dim] ?? dim}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {visibleTags.filter(t => t.category === dim).map(tag => {
+                    const active = selectedTags.includes(tag.id)
+                    return (
+                      <button
+                        key={tag.id}
+                        type="button"
+                        onClick={() => setSelectedTags(prev =>
+                          active ? prev.filter(id => id !== tag.id) : [...prev, tag.id]
+                        )}
+                        className={pillClass(active)}
+                      >
+                        {tag.name}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
           {selectedTags.length > 0 && (
             <p className="font-nunito text-[11px] text-[#131936]/50 mt-2">
@@ -829,6 +968,25 @@ export default function AdminAddForm({ userId: _userId }: Props) {
             </p>
           )}
         </div>
+
+        {/* ── Taxonomy: Labels ── */}
+        {allLabels.length > 0 && (
+          <div>
+            <p className="font-nunito text-[12px] text-[#131936]/50 mb-2">Labels</p>
+            <div className="flex flex-wrap gap-2">
+              {allLabels.map(label => (
+                <button
+                  key={label.id}
+                  type="button"
+                  onClick={() => toggleLabel(label.id)}
+                  className={labelPillClass(selectedLabelIds.has(label.id))}
+                >
+                  {label.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Vibes */}
         <div>

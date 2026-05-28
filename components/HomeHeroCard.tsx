@@ -77,10 +77,15 @@ export default function HomeHeroCard({ place, isAdded, onAdd, onRemove, userId }
       {/* All content — pointer-events-none so the Link above handles body taps */}
       <div className="absolute inset-0 p-4 flex flex-col justify-between pointer-events-none">
         {/* Top row */}
-        <div className="flex items-start">
+        <div className="flex items-start flex-wrap gap-2">
           <span className="px-3 py-1 rounded-full bg-white text-[#f08c21] text-[11px] font-nunito font-semibold leading-none flex items-center">
             ✦ Trending this week
           </span>
+          {place.primary_category && (
+            <span className="px-2.5 py-1 rounded-full bg-black/20 text-white text-[11px] font-nunito font-medium leading-none flex items-center">
+              {place.primary_category.icon} {place.primary_category.name}
+            </span>
+          )}
         </div>
 
         {/* Bottom row */}
