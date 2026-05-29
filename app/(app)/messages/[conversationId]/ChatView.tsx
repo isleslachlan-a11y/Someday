@@ -39,10 +39,8 @@ interface Props {
 }
 
 const TYPE_ICON: Record<string, string> = {
-  city:       '🏙',
-  nature:     '🌿',
-  experience: '✨',
-  food:       '🍜',
+  destination: '🗺',
+  experience:  '✨',
 }
 
 export default function ChatView({ conversation, initialMessages, currentUserId }: Props) {

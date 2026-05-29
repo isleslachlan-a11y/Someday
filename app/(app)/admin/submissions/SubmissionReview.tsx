@@ -14,6 +14,7 @@ import type { Submission } from './page'
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 type StatusFilter = 'pending' | 'approved' | 'rejected' | 'all'
+type KindFilter   = 'all' | 'destination' | 'experience'
 
 const STATUS_FILTERS: { value: StatusFilter; label: string }[] = [
   { value: 'pending',  label: 'Pending' },
@@ -23,7 +24,8 @@ const STATUS_FILTERS: { value: StatusFilter; label: string }[] = [
 ]
 
 const TYPE_ICON: Record<string, string> = {
-  city: '🏙', nature: '🌿', experience: '✨', food: '🍜',
+  destination: '🗺',
+  experience:  '✨',
 }
 
 // ── Props ─────────────────────────────────────────────────────────────────────
@@ -37,12 +39,17 @@ interface Props {
 export default function SubmissionReview({ submissions: initial }: Props) {
   const [submissions, setSubmissions] = useState<Submission[]>(initial)
   const [filter, setFilter]           = useState<StatusFilter>('pending')
+  const [kindFilter, setKindFilter]   = useState<KindFilter>('all')
   const [expandedId, setExpandedId]   = useState<string | null>(null)
   const [rejectingId, setRejectingId] = useState<string | null>(null)
   const [rejectNote, setRejectNote]   = useState('')
   const [loadingId, setLoadingId]     = useState<string | null>(null)
 
-  const filtered = submissions.filter(s => filter === 'all' || s.status === filter)
+  const filtered = submissions.filter(s => {
+    const matchesStatus = filter === 'all' || s.status === filter
+    const matchesKind   = kindFilter === 'all' || (s.submission_kind ?? s.type) === kindFilter
+    return matchesStatus && matchesKind
+  })
 
   const counts = {
     pending:  submissions.filter(s => s.status === 'pending').length,
@@ -107,6 +114,23 @@ export default function SubmissionReview({ submissions: initial }: Props) {
 
   return (
     <div>
+
+      {/* Kind filter */}
+      <div className="flex gap-2 mb-3 overflow-x-auto scrollbar-none">
+        {(['all', 'destination', 'experience'] as KindFilter[]).map(k => (
+          <button
+            key={k}
+            onClick={() => setKindFilter(k)}
+            className={`shrink-0 px-3 py-1 rounded-full border font-nunito text-[12px] font-medium transition-all capitalize ${
+              kindFilter === k
+                ? 'bg-[#131936] border-[#131936] text-white'
+                : 'bg-white border-[#fcd99a] text-[#131936]/60'
+            }`}
+          >
+            {k === 'all' ? 'All types' : k === 'destination' ? '🗺 Destinations' : '✨ Experiences'}
+          </button>
+        ))}
+      </div>
 
       {/* Filter tabs */}
       <div className="flex gap-2 mb-4 overflow-x-auto scrollbar-none">
@@ -211,6 +235,27 @@ export default function SubmissionReview({ submissions: initial }: Props) {
               {/* Expanded detail */}
               {isExpanded && (
                 <div className="border-t border-[#fcd99a]/30 px-4 pt-4 pb-5 space-y-4">
+
+                  {/* Kind + parent info */}
+                  {(sub.submission_kind || sub.parent_place_id || sub.extra_metadata) && (
+                    <div className="flex flex-wrap gap-2">
+                      {sub.submission_kind && (
+                        <span className="px-2.5 py-1 rounded-full bg-[#fcd99a]/40 font-nunito text-[11px] text-[#131936] capitalize">
+                          {TYPE_ICON[sub.submission_kind]} {sub.submission_kind}
+                        </span>
+                      )}
+                      {!!sub.extra_metadata?.duration && (
+                        <span className="px-2.5 py-1 rounded-full bg-[#fcd99a]/40 font-nunito text-[11px] text-[#131936]">
+                          ⏱ {String(sub.extra_metadata.duration)}
+                        </span>
+                      )}
+                      {!!sub.extra_metadata?.needs_booking && (
+                        <span className="px-2.5 py-1 rounded-full bg-[#fcd99a]/40 font-nunito text-[11px] text-[#131936]">
+                          📅 Needs booking
+                        </span>
+                      )}
+                    </div>
+                  )}
 
                   {/* Hinge answers */}
                   <div className="space-y-3">

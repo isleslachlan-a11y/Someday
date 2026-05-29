@@ -25,6 +25,10 @@ export default async function PlaceDetailPage({
   } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  const { data: profileData } = await supabase
+    .from('profiles').select('is_admin').eq('id', user.id).single()
+  const isAdmin = !!(profileData as { is_admin?: boolean } | null)?.is_admin
+
   const { data: placeRaw } = await supabase
     .from('places')
     .select('*')
@@ -63,6 +67,8 @@ export default async function PlaceDetailPage({
   const [
     bucketResult, countryPlacesResult, friendshipsResult, activitiesResult,
     catExpIdsResult, colExpIdsResult,
+    collectionsResult, placeCollectionsResult,
+    parentPlaceResult, childExperiencesResult,
   ] = await Promise.all([
     supabase
       .from('bucket_list_items')
@@ -101,10 +107,33 @@ export default async function PlaceDetailPage({
           .neq('experience_id', id)
           .limit(8)
       : Promise.resolve({ data: null as null }),
+    isAdmin
+      ? admin.from('collections').select('id, name, slug').eq('is_active', true).order('sort_order')
+      : Promise.resolve({ data: null as null }),
+    isAdmin
+      ? admin.from('collections_places').select('collection_id').eq('place_id', id)
+      : Promise.resolve({ data: null as null }),
+    // Parent destination for experience pages
+    place.parent_place_id
+      ? admin.from('places').select('id, name, type, image_thumb_url, country').eq('id', place.parent_place_id).maybeSingle()
+      : Promise.resolve({ data: null as null }),
+    // Child experiences for destination pages
+    place.type === 'destination'
+      ? admin.from('places').select('*').eq('parent_place_id', id).order('popularity', { ascending: false }).limit(12)
+      : Promise.resolve({ data: null as null }),
   ])
+
+  const allCollections = isAdmin
+    ? ((collectionsResult.data ?? []) as { id: string; name: string; slug: string }[])
+    : []
+  const placeCollectionIds = isAdmin
+    ? new Set(((placeCollectionsResult.data ?? []) as { collection_id: string }[]).map(r => r.collection_id))
+    : new Set<string>()
 
   const initialIsSaved = !!bucketResult.data
   const activities = (activitiesResult.data ?? []) as Activity[]
+  const parentPlace = parentPlaceResult.data as { id: string; name: string; type: string; image_thumb_url: string | null; country: string } | null
+  const childExperiences = (childExperiencesResult.data ?? []) as unknown as Place[]
 
   const catIds = ((catExpIdsResult.data ?? []) as { experience_id: string }[]).map(
     r => r.experience_id,
@@ -195,6 +224,10 @@ export default async function PlaceDetailPage({
           collectionContext={collectionContext}
           friendVisitors={friendVisitors}
           activities={activities}
+          isAdmin={isAdmin}
+          adminCollections={allCollections}
+          initialPlaceCollectionIds={[...placeCollectionIds]}
+          childExperiencePlaces={childExperiences}
         />
       ) : (
         <ExperienceDetailContent
@@ -206,6 +239,10 @@ export default async function PlaceDetailPage({
           collectionContext={collectionContext}
           friendVisitors={friendVisitors}
           activities={activities}
+          isAdmin={isAdmin}
+          adminCollections={allCollections}
+          initialPlaceCollectionIds={[...placeCollectionIds]}
+          parentPlace={parentPlace}
         />
       )}
     </>

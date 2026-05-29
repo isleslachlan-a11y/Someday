@@ -4,10 +4,11 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ChevronLeft, Heart, Share2, Bookmark, MapPin, ChevronRight } from 'lucide-react'
+import { ChevronLeft, Heart, Share2, Bookmark, MapPin, ChevronRight, FolderPlus, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { logEvent } from '@/lib/events'
 import { addPlaceToList, removePlaceByPlaceId } from '@/app/actions/bucketList'
+import { addPlaceToCollection, removePlaceFromCollection } from '@/app/actions/adminCollections'
 import { parseBestTimeToMonths } from '@/lib/bestTimeParser'
 import Avatar from '@/components/Avatar'
 import type { Place } from '@/lib/types'
@@ -65,6 +66,16 @@ const STEP_SUBTITLES = [
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
+interface AdminCollection { id: string; name: string; slug: string }
+
+interface ParentPlaceSnap {
+  id: string
+  name: string
+  type: string
+  image_thumb_url: string | null
+  country: string
+}
+
 interface Props {
   place: Place
   userId: string
@@ -74,6 +85,10 @@ interface Props {
   collectionContext?: { name: string; places: Place[] } | null
   friendVisitors: FriendVisitor[]
   activities?: Activity[]
+  isAdmin?: boolean
+  adminCollections?: AdminCollection[]
+  initialPlaceCollectionIds?: string[]
+  parentPlace?: ParentPlaceSnap | null
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -87,12 +102,19 @@ export default function ExperienceDetailContent({
   collectionContext = null,
   friendVisitors,
   activities = [],
+  isAdmin = false,
+  adminCollections = [],
+  initialPlaceCollectionIds = [],
+  parentPlace = null,
 }: Props) {
   const router = useRouter()
   const [isSaved, setIsSaved] = useState(initialIsSaved)
   const [descExpanded, setDescExpanded] = useState(false)
   const [activeDot, setActiveDot] = useState(0)
   const [savedSimilarIds, setSavedSimilarIds] = useState<Set<string>>(new Set())
+  const [showCollectionSheet, setShowCollectionSheet] = useState(false)
+  const [collectionIds, setCollectionIds] = useState<Set<string>>(new Set(initialPlaceCollectionIds))
+  const [togglingId, setTogglingId] = useState<string | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -123,11 +145,20 @@ export default function ExperienceDetailContent({
 
   async function handleShare() {
     const url = window.location.href
+    const title = place.name
+    const text = place.must_do
+      ? `${place.name} — ${place.must_do}`
+      : `${place.name}, ${place.country} — on my Someday list`
+
     if (navigator.share) {
-      try { await navigator.share({ title: place.name, url }) } catch { /* cancelled */ }
+      try {
+        await navigator.share({ title, text, url })
+        void logEvent(userId, 'place_shared', { place_id: place.id, source: 'experience_detail', method: 'native_share' })
+      } catch { /* User cancelled */ }
     } else {
       await navigator.clipboard.writeText(url)
-      toast.success('Link copied!')
+      toast.success('Link copied ✦')
+      void logEvent(userId, 'place_shared', { place_id: place.id, source: 'experience_detail', method: 'clipboard' })
     }
   }
 
@@ -139,6 +170,28 @@ export default function ExperienceDetailContent({
       setSavedSimilarIds(prev => { const s = new Set(prev); s.delete(placeId); return s })
       toast.error('Something went wrong.')
     }
+  }
+
+  async function handleCollectionToggle(collectionId: string) {
+    setTogglingId(collectionId)
+    const isIn = collectionIds.has(collectionId)
+    setCollectionIds(prev => {
+      const next = new Set(prev)
+      isIn ? next.delete(collectionId) : next.add(collectionId)
+      return next
+    })
+    const result = isIn
+      ? await removePlaceFromCollection({ collectionId, placeId: place.id })
+      : await addPlaceToCollection({ collectionId, placeId: place.id })
+    if (result.error) {
+      setCollectionIds(prev => {
+        const next = new Set(prev)
+        isIn ? next.add(collectionId) : next.delete(collectionId)
+        return next
+      })
+      toast.error(result.error)
+    }
+    setTogglingId(null)
   }
 
   function handleScroll() {
@@ -245,6 +298,18 @@ export default function ExperienceDetailContent({
 
           {/* ── Identity block ─────────────────────────────────────────────── */}
           <div className="px-5">
+            {/* Parent destination breadcrumb */}
+            {parentPlace && (
+              <Link
+                href={`/places/${parentPlace.id}`}
+                className="inline-flex items-center gap-1.5 mb-3 font-nunito text-[12px] text-[#f08c21] hover:opacity-80 transition-opacity"
+              >
+                <span>🗺</span>
+                <span>Part of {parentPlace.name}</span>
+                <span className="text-[10px]">→</span>
+              </Link>
+            )}
+
             <h1 className="font-syne font-bold text-[#131936] text-[26px] leading-tight">
               {place.name}
             </h1>
@@ -583,8 +648,74 @@ export default function ExperienceDetailContent({
           >
             Plan it +
           </Link>
+
+          {/* Admin: collections */}
+          {isAdmin && (
+            <button
+              onClick={() => setShowCollectionSheet(true)}
+              className={`w-12 h-12 rounded-full border flex items-center justify-center shrink-0 ${
+                collectionIds.size > 0 ? 'bg-[#131936] border-[#131936]' : 'bg-white border-[#fcd99a]'
+              }`}
+              aria-label="Manage collections"
+            >
+              <FolderPlus size={18} className={collectionIds.size > 0 ? 'text-[#f08c21]' : 'text-[#131936]'} />
+            </button>
+          )}
         </div>
       </div>
+
+      {/* ── Admin collection sheet ─────────────────────────────────────────────── */}
+      {isAdmin && showCollectionSheet && (
+        <div className="fixed inset-0 z-50 flex items-end">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowCollectionSheet(false)} />
+          <div className="relative w-full bg-[#fff9f0] rounded-t-3xl px-4 pt-5 pb-10 max-h-[70vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-syne font-bold text-[#131936] text-[16px]">Collections</h3>
+              <button
+                onClick={() => setShowCollectionSheet(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-[#131936]/10"
+                aria-label="Close"
+              >
+                <X size={14} className="text-[#131936]" />
+              </button>
+            </div>
+            {adminCollections.length === 0 ? (
+              <p className="font-nunito text-[#131936]/40 text-[13px] text-center py-4">
+                No active collections
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {adminCollections.map(col => {
+                  const isIn = collectionIds.has(col.id)
+                  return (
+                    <button
+                      key={col.id}
+                      type="button"
+                      onClick={() => void handleCollectionToggle(col.id)}
+                      disabled={togglingId === col.id}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border text-left transition-colors ${
+                        isIn ? 'bg-[#131936] border-[#131936]' : 'bg-white border-[#fcd99a]/60'
+                      }`}
+                    >
+                      <span className={`text-[18px] ${isIn ? 'opacity-100' : 'opacity-40'}`}>
+                        {isIn ? '★' : '☆'}
+                      </span>
+                      <span className={`font-nunito font-semibold text-[14px] flex-1 ${
+                        isIn ? 'text-white' : 'text-[#131936]'
+                      }`}>
+                        {col.name}
+                      </span>
+                      {togglingId === col.id && (
+                        <div className="w-4 h-4 rounded-full border-2 border-[#f08c21] border-t-transparent animate-spin" />
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
     </div>
   )

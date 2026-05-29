@@ -4,12 +4,13 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ChevronLeft, Heart, Share2, Compass, Locate } from 'lucide-react'
+import { ChevronLeft, Heart, Share2, Compass, Locate, FolderPlus, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import Map, { Marker, NavigationControl } from 'react-map-gl/mapbox'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { logEvent } from '@/lib/events'
 import { addPlaceToList, removePlaceByPlaceId } from '@/app/actions/bucketList'
+import { addPlaceToCollection, removePlaceFromCollection } from '@/app/actions/adminCollections'
 import { parseBestTimeToMonths } from '@/lib/bestTimeParser'
 import Avatar from '@/components/Avatar'
 import type { Place } from '@/lib/types'
@@ -17,10 +18,8 @@ import type { Place } from '@/lib/types'
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? ''
 
 const PIN_COLOR: Record<string, string> = {
-  city:       '#131936',
-  nature:     '#16a34a',
-  experience: '#f08c21',
-  food:       '#dc2626',
+  destination: '#131936',
+  experience:  '#f08c21',
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -40,6 +39,8 @@ export interface Activity {
   rating: number | null
 }
 
+interface AdminCollection { id: string; name: string; slug: string }
+
 interface Props {
   place: Place
   userId: string
@@ -49,6 +50,10 @@ interface Props {
   collectionContext?: { name: string; places: Place[] } | null
   friendVisitors: FriendVisitor[]
   activities: Activity[]
+  isAdmin?: boolean
+  adminCollections?: AdminCollection[]
+  initialPlaceCollectionIds?: string[]
+  childExperiencePlaces?: Place[]
 }
 
 // ─── Month logic ──────────────────────────────────────────────────────────────
@@ -92,12 +97,19 @@ export default function PlaceDetailContent({
   collectionContext = null,
   friendVisitors,
   activities,
+  isAdmin = false,
+  adminCollections = [],
+  initialPlaceCollectionIds = [],
+  childExperiencePlaces = [],
 }: Props) {
   const router = useRouter()
   const [isSaved, setIsSaved] = useState(initialIsSaved)
   const [descExpanded, setDescExpanded] = useState(false)
   const [activeDot, setActiveDot] = useState(0)
   const [savedSimilarIds, setSavedSimilarIds] = useState<Set<string>>(new Set())
+  const [showCollectionSheet, setShowCollectionSheet] = useState(false)
+  const [collectionIds, setCollectionIds] = useState<Set<string>>(new Set(initialPlaceCollectionIds))
+  const [togglingId, setTogglingId] = useState<string | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
   const mapRef    = useRef<import('react-map-gl/mapbox').MapRef>(null)
 
@@ -143,12 +155,45 @@ export default function PlaceDetailContent({
 
   async function handleShare() {
     const url = window.location.href
+    const title = place.name
+    const text = place.must_do
+      ? `${place.name} — ${place.must_do}`
+      : `${place.name}, ${place.country} — on my Someday list`
+
     if (navigator.share) {
-      try { await navigator.share({ title: place.name, url }) } catch { /* cancelled */ }
+      try {
+        await navigator.share({ title, text, url })
+        void logEvent(userId, 'place_shared', { place_id: place.id, source: 'place_detail', method: 'native_share' })
+      } catch { /* User cancelled */ }
     } else {
       await navigator.clipboard.writeText(url)
-      toast.success('Link copied!')
+      toast.success('Link copied ✦')
+      void logEvent(userId, 'place_shared', { place_id: place.id, source: 'place_detail', method: 'clipboard' })
     }
+  }
+
+  // ── Admin: toggle collection membership ──────────────────────────────────
+
+  async function handleCollectionToggle(collectionId: string) {
+    setTogglingId(collectionId)
+    const isIn = collectionIds.has(collectionId)
+    setCollectionIds(prev => {
+      const next = new Set(prev)
+      isIn ? next.delete(collectionId) : next.add(collectionId)
+      return next
+    })
+    const result = isIn
+      ? await removePlaceFromCollection({ collectionId, placeId: place.id })
+      : await addPlaceToCollection({ collectionId, placeId: place.id })
+    if (result.error) {
+      setCollectionIds(prev => {
+        const next = new Set(prev)
+        isIn ? next.add(collectionId) : next.delete(collectionId)
+        return next
+      })
+      toast.error(result.error)
+    }
+    setTogglingId(null)
   }
 
   // ── Recentre map ──────────────────────────────────────────────────────────
@@ -385,9 +430,7 @@ export default function PlaceDetailContent({
                                 title={sp.name}
                               >
                                 <span style={{ fontSize: 11, color: 'white', lineHeight: 1 }}>
-                                  {sp.type === 'nature'     ? '🌿' :
-                                   sp.type === 'food'       ? '🍜' :
-                                   sp.type === 'experience' ? '✦'  : '●'}
+                                  {sp.type === 'experience' ? '✦' : '●'}
                                 </span>
                               </div>
                             </Link>
@@ -559,6 +602,27 @@ export default function PlaceDetailContent({
           </div>
         )}
 
+        {/* ── Things to do here (child experiences) ────────────────────────── */}
+        {childExperiencePlaces.length > 0 && (
+          <div className="pt-6">
+            <div className="flex items-center justify-between px-4 mb-3">
+              <h2 className="font-syne font-bold text-[#131936] text-[16px]">
+                Things to do here
+              </h2>
+            </div>
+            <div className="flex gap-3 overflow-x-auto px-4 pb-3 scrollbar-none" style={{ scrollSnapType: 'x mandatory' }}>
+              {childExperiencePlaces.map(exp => (
+                <SimilarCard
+                  key={exp.id}
+                  place={exp}
+                  isSaved={savedSimilarIds.has(exp.id)}
+                  onSave={() => handleSaveSimilar(exp.id)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* ── More like this (same category) ────────────────────────────────── */}
         {similarPlaces.length > 0 && (
           <div className="pt-6">
@@ -705,8 +769,74 @@ export default function PlaceDetailContent({
           >
             <Compass size={18} className="text-[#131936]" />
           </Link>
+
+          {/* Admin: collections */}
+          {isAdmin && (
+            <button
+              onClick={() => setShowCollectionSheet(true)}
+              className={`w-12 h-12 rounded-full border flex items-center justify-center shrink-0 ${
+                collectionIds.size > 0 ? 'bg-[#131936] border-[#131936]' : 'bg-white border-[#fcd99a]'
+              }`}
+              aria-label="Manage collections"
+            >
+              <FolderPlus size={18} className={collectionIds.size > 0 ? 'text-[#f08c21]' : 'text-[#131936]'} />
+            </button>
+          )}
         </div>
       </div>
+
+      {/* ── Admin collection sheet ─────────────────────────────────────────────── */}
+      {isAdmin && showCollectionSheet && (
+        <div className="fixed inset-0 z-50 flex items-end">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowCollectionSheet(false)} />
+          <div className="relative w-full bg-[#fff9f0] rounded-t-3xl px-4 pt-5 pb-10 max-h-[70vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-syne font-bold text-[#131936] text-[16px]">Collections</h3>
+              <button
+                onClick={() => setShowCollectionSheet(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-[#131936]/10"
+                aria-label="Close"
+              >
+                <X size={14} className="text-[#131936]" />
+              </button>
+            </div>
+            {adminCollections.length === 0 ? (
+              <p className="font-nunito text-[#131936]/40 text-[13px] text-center py-4">
+                No active collections
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {adminCollections.map(col => {
+                  const isIn = collectionIds.has(col.id)
+                  return (
+                    <button
+                      key={col.id}
+                      type="button"
+                      onClick={() => void handleCollectionToggle(col.id)}
+                      disabled={togglingId === col.id}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border text-left transition-colors ${
+                        isIn ? 'bg-[#131936] border-[#131936]' : 'bg-white border-[#fcd99a]/60'
+                      }`}
+                    >
+                      <span className={`text-[18px] ${isIn ? 'opacity-100' : 'opacity-40'}`}>
+                        {isIn ? '★' : '☆'}
+                      </span>
+                      <span className={`font-nunito font-semibold text-[14px] flex-1 ${
+                        isIn ? 'text-white' : 'text-[#131936]'
+                      }`}>
+                        {col.name}
+                      </span>
+                      {togglingId === col.id && (
+                        <div className="w-4 h-4 rounded-full border-2 border-[#f08c21] border-t-transparent animate-spin" />
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
     </div>
   )

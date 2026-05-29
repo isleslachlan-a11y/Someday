@@ -272,10 +272,8 @@ function StatCard({
 // ─── Public place card ────────────────────────────────────────────────────────
 
 const TYPE_ICON: Record<string, string> = {
-  city:       '🏙',
-  nature:     '🌿',
-  experience: '✨',
-  food:       '🍜',
+  destination: '🗺',
+  experience:  '✨',
 }
 
 function PublicPlaceCard({ entry }: { entry: BucketEntry }) {

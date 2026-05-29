@@ -20,10 +20,10 @@ const CATEGORIES = [
   { id: 'oceania',     label: 'Oceania',     filter: (p: Place) => p.region === 'Oceania' },
   { id: 'adventure',   label: 'Adventure',   filter: (p: Place) => (p.vibes ?? []).includes('Adventure') },
   { id: 'romantic',    label: 'Romantic',    filter: (p: Place) => (p.vibes ?? []).includes('Romantic') },
-  { id: 'foodie',      label: 'Foodie',      filter: (p: Place) => (p.vibes ?? []).includes('Foodie') || p.type === 'food' },
+  { id: 'foodie',      label: 'Foodie',      filter: (p: Place) => (p.vibes ?? []).includes('Foodie') || p.primary_category?.slug === 'food-drink' },
   { id: 'epic',        label: 'Epic',        filter: (p: Place) => (p.vibes ?? []).includes('Epic') },
-  { id: 'nature',      label: 'Nature',      filter: (p: Place) => p.type === 'nature' },
-  { id: 'cities',      label: 'Cities',      filter: (p: Place) => p.type === 'city' },
+  { id: 'nature',      label: 'Nature',      filter: (p: Place) => p.primary_category?.slug === 'nature-wilderness' },
+  { id: 'cities',      label: 'Cities',      filter: (p: Place) => p.type === 'destination' && p.primary_category?.slug === 'city-escapes' },
   { id: 'experiences', label: 'Experiences', filter: (p: Place) => p.type === 'experience' },
 ]
 

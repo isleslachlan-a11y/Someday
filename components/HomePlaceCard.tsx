@@ -1,8 +1,10 @@
 'use client'
 
+import { useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Heart, MapPin } from 'lucide-react'
+import toast from 'react-hot-toast'
 import type { Place } from '@/lib/types'
 
 interface Props {
@@ -26,11 +28,29 @@ function formatCount(n: number): string {
 export default function HomePlaceCard({ place, isAdded, onAdd, onRemove, index }: Props) {
   const dark = isDark(index)
   const location = place.state_province ? `${place.state_province}, ${place.country}` : place.country
+  const longPressRef = useRef<NodeJS.Timeout | null>(null)
+
+  function handleTouchStart() {
+    longPressRef.current = setTimeout(async () => {
+      const url = `${window.location.origin}/places/${place.id}`
+      await navigator.clipboard.writeText(url).catch(() => {})
+      toast.success('Link copied ✦', {
+        style: { background: '#131936', color: '#fff9f0', fontFamily: 'Nunito, sans-serif' },
+      })
+    }, 600)
+  }
+
+  function handleTouchEnd() {
+    if (longPressRef.current) clearTimeout(longPressRef.current)
+  }
 
   return (
     <div
       className="relative rounded-2xl overflow-hidden"
       style={{ height: 260, background: dark ? '#131936' : '#fcd99a' }}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
     >
       {/* Unsplash photo */}
       {place.image_url && (
@@ -78,14 +98,24 @@ export default function HomePlaceCard({ place, isAdded, onAdd, onRemove, index }
         >
           {place.name}
         </h3>
-        {(place.type === 'experience' || place.type === 'food') && (
+        {place.primary_category && (
           <span
             className={`inline-block rounded-full px-2 py-0.5 font-nunito mt-0.5 ${
               dark ? 'bg-[#f08c21]/20 text-[#fcd99a]' : 'bg-[#131936]/10 text-[#131936]/70'
             }`}
             style={{ fontSize: 9 }}
           >
-            {place.type === 'food' ? '🍜 Food' : '✨ Experience'}
+            {place.primary_category.icon} {place.primary_category.name}
+          </span>
+        )}
+        {!place.primary_category && place.type === 'experience' && (
+          <span
+            className={`inline-block rounded-full px-2 py-0.5 font-nunito mt-0.5 ${
+              dark ? 'bg-[#f08c21]/20 text-[#fcd99a]' : 'bg-[#131936]/10 text-[#131936]/70'
+            }`}
+            style={{ fontSize: 9 }}
+          >
+            ✨ Experience
           </span>
         )}
         {place.display_labels && place.display_labels.length > 0 && (

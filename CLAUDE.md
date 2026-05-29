@@ -22,14 +22,17 @@ A travel bucket list app where users save experiences and track places they want
 ## Build & Run
 
 ```bash
-npm run dev       # Start local development server at localhost:3000
+npm run dev       # Start local development server at localhost:3000 (uses Turbopack)
 npm run build     # Production build — fix all errors before committing
 npm run lint      # Run ESLint
+npx tsx scripts/check-events.ts  # QA: verify events are flowing after a deploy
 ```
 
 Seeding and data utilities live in `scripts/`: `seed-experiences.ts` (populates the places catalogue), `check-events.ts` (validates event logging), and `link-images.ts` (bulk-links Unsplash images to places).
 
 Run `npm run build` after significant changes and fix all errors before committing.
+
+> **Turbopack:** `next.config.ts` enables Turbopack with a pinned workspace root. If you hit an inexplicable build error, check Turbopack compatibility before assuming a code bug.
 
 ### Summary Worker (Cloudflare)
 
@@ -113,6 +116,7 @@ Mutations use Server Actions (not API routes). API routes that exist:
 - `app/api/tags/route.ts` — GET, returns all tags with counts; used by admin place/submission forms
 - `app/api/admin/activities/route.ts` — POST, creates activities for a place; requires `is_admin = true`
 - `app/api/unsplash/search/route.ts` — GET, proxies Unsplash search; server-only, requires `UNSPLASH_ACCESS_KEY`
+- `app/api/places/recommendations/route.ts` — GET, personalised recommendations via `get_recommendations_for_user` RPC, falls back to popularity sort; accepts `?offset=&sessionId=`; logs impressions server-side
 
 On signup, always insert a row into `profiles` using the returned `user.id`.
 
@@ -124,13 +128,15 @@ On signup, always insert a row into `profiles` using the returned `user.id`.
 
 **Onboarding gate:** `app/(app)/layout.tsx` checks `user_context.completed_onboarding` on every authenticated request and redirects to `/onboarding` if incomplete. `/onboarding` lives outside the `(app)` group to avoid a redirect loop.
 
-**ViewTracker components:** `HomeViewTracker` and `ProfileViewTracker` are thin `'use client'` components that fire `logEvent` in a `useEffect` on mount — used to log page_viewed events without making the whole page client-side.
+**ViewTracker components:** `HomeViewTracker`, `ProfileViewTracker`, and `PlaceViewTracker` are thin `'use client'` components that fire `logEvent` in a `useEffect` on mount — used to log page_viewed events without making the whole page client-side.
 
 **Error states:** Pages return inline error UI (not thrown errors) when Supabase queries fail. `error.tsx` files handle unexpected errors per route segment.
 
 **Home feed realtime:** `HomeContent.tsx` subscribes to `bucket_list_items` updates via Supabase Realtime. When a friend's item changes to `status === 'completed'`, it surfaces a "New activity" banner. This is the established pattern for realtime UI on the home screen.
 
 **Personalised recommendations:** The `get_recommendations_for_user(p_user_id, p_limit)` Postgres RPC scores unsaved places using a weighted signal: category match (0.35), tag match (0.20), social graph/friends (0.20), trending flag (0.10), momentum/newness (0.15). Cold-start users (0 saves) see popular + new places instead. Impression/interaction tracking flows through `lib/recommendations.ts` → `log_recommendation_event` RPC.
+
+**Place detail routing:** `places/[id]/page.tsx` branches on `isDestination(place)`: destinations render `PlaceDetailContent.tsx` (warm tangerine palette, activities, similar places); experiences render `ExperienceDetailContent.tsx`. Both receive the same `Place` data but present different UI.
 
 **Admin tagging flow:** `adminTagging.ts` → `savePlaceTags(placeId, categoryIds, primaryCategoryId, tagIds, labelIds)` — atomically replaces all taxonomy assignments for a place. Admin-only (checks `is_admin` profile flag). Used by the tag manager UI at `admin/tags/`.
 
@@ -190,7 +196,7 @@ NEXT_PUBLIC_MAPBOX_TOKEN=        # Required for the Map tab (mapbox-gl / react-m
 UNSPLASH_ACCESS_KEY=             # Used by seed scripts only — not required at runtime
 ```
 
-When adding new env variables, also add them to Vercel's environment settings.
+When adding new env variables, also add them to Vercel's environment settings. `vercel.json` only covers `SUPABASE_SERVICE_ROLE_KEY` and `ADMIN_USER_ID` via secret references — all others (`NEXT_PUBLIC_MAPBOX_TOKEN`, `NEXT_PUBLIC_ADMIN_EMAIL`, etc.) must be set manually in the Vercel dashboard.
 
 ## Code Conventions
 

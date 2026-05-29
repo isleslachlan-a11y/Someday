@@ -13,6 +13,9 @@ export interface Submission {
   country: string | null
   region: string | null
   type: string | null
+  submission_kind: 'destination' | 'experience' | null
+  parent_place_id: string | null
+  extra_metadata: Record<string, unknown> | null
   description: string | null
   tags: string[] | null
   image_url: string | null
@@ -47,8 +50,8 @@ export default async function AdminSubmissionsPage() {
   const { data: rawSubs } = await admin
     .from('submissions')
     .select(`
-      id, user_id, name, country, region, type, description,
-      tags, image_url, photo_url, status, submitted_at,
+      id, user_id, name, country, region, type, submission_kind, parent_place_id, extra_metadata,
+      description, tags, image_url, photo_url, status, submitted_at,
       reviewed_at, reviewer_notes,
       must_do, hidden_gem, not_for_you, best_time, vibe_tags,
       lat, lng
@@ -74,6 +77,9 @@ export default async function AdminSubmissionsPage() {
       country:            (s.country as string | null) ?? null,
       region:             (s.region as string | null) ?? null,
       type:               (s.type as string | null) ?? null,
+      submission_kind:    (s.submission_kind as 'destination' | 'experience' | null) ?? null,
+      parent_place_id:    (s.parent_place_id as string | null) ?? null,
+      extra_metadata:     (s.extra_metadata as Record<string, unknown> | null) ?? null,
       description:        (s.description as string | null) ?? null,
       tags:               (s.tags as string[] | null) ?? null,
       image_url:          (s.image_url as string | null) ?? null,

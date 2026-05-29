@@ -60,12 +60,22 @@ export async function GET(req: NextRequest) {
 
   // ── AUTOCOMPLETE ──────────────────────────────────────────────────────────
   if (mode === 'autocomplete') {
+    const placeType = req.nextUrl.searchParams.get('placeType') ?? ''
+
+    const mapboxTypes = (() => {
+      if (placeType === 'experience' || placeType === 'food') {
+        return 'poi,place,locality,address'
+      }
+      return 'country,region,place,locality,neighborhood'
+    })()
+
     const url = new URL('https://api.mapbox.com/search/geocode/v6/forward')
     url.searchParams.set('q', input)
     url.searchParams.set('access_token', MAPBOX_TOKEN)
     url.searchParams.set('autocomplete', 'true')
     url.searchParams.set('limit', '6')
-    url.searchParams.set('types', 'country,region,place,locality,neighborhood')
+    url.searchParams.set('types', mapboxTypes)
+    url.searchParams.set('language', 'en')
 
     const res = await fetch(url.toString(), { cache: 'no-store' })
     if (!res.ok) return NextResponse.json({ error: 'Mapbox error' }, { status: 502 })
@@ -74,23 +84,28 @@ export async function GET(req: NextRequest) {
     const predictions = (data.features ?? []).map((f: Record<string, unknown>) => {
       const props   = (f.properties ?? {}) as Record<string, unknown>
       const context = (props.context ?? {}) as Record<string, Record<string, string>>
-      const mainText  = props.name as string ?? ''
-      const country   = context.country?.name ?? ''
-      const region    = context.region?.name  ?? ''
-      const secondary = [region, country].filter(Boolean).join(', ')
-      const geometry  = (f.geometry ?? {}) as { coordinates?: number[] }
+      const mainText    = props.name as string ?? ''
+      const country     = context.country?.name ?? ''
+      const region      = context.region?.name  ?? ''
+      const featureType = (props.feature_type as string | undefined) ?? ''
+      const poiCategory = ((props.poi_category as string[] | undefined)?.[0]) ?? ''
+      const geometry    = (f.geometry ?? {}) as { coordinates?: number[] }
+
+      const secondaryText = featureType === 'poi'
+        ? [poiCategory, context.place?.name, country].filter(Boolean).join(', ')
+        : [region, country].filter(Boolean).join(', ')
 
       return {
         place_id:        (props.mapbox_id as string | undefined) ?? (f.id as string),
         description:     (props.place_formatted as string | undefined) ?? mainText,
         main_text:       mainText,
-        secondary_text:  secondary,
+        secondary_text:  secondaryText,
         lat:             geometry.coordinates?.[1] ?? null,
         lng:             geometry.coordinates?.[0] ?? null,
         country,
         region_name:     region,
-        feature_type:    (props.feature_type as string | undefined) ?? null,
-        mapbox_category: ((props.poi_category as string[] | undefined)?.[0]) ?? null,
+        feature_type:    featureType || null,
+        mapbox_category: poiCategory || null,
       }
     })
 

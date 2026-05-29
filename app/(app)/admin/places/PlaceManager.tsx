@@ -9,10 +9,8 @@ import { adminDeletePlace } from '@/app/actions/adminPlaces'
 import type { Place } from '@/lib/types'
 
 const TYPE_ICON: Record<string, string> = {
-  city:       '🏙',
-  nature:     '🌿',
-  experience: '✨',
-  food:       '🍜',
+  destination: '🗺',
+  experience:  '✨',
 }
 
 const TYPE_OPTIONS = ['all', 'city', 'nature', 'experience', 'food'] as const
@@ -102,7 +100,7 @@ export default function PlaceManager({ places: initialPlaces, taggedCount }: Pro
                 : 'bg-white border-[#fcd99a] text-[#131936]/60'
             }`}
           >
-            {t === 'all' ? `All (${places.length})` : `${TYPE_ICON[t]} ${t}`}
+            {t === 'all' ? `All (${places.length})` : `${TYPE_ICON[t] ?? '✦'} ${t}`}
           </button>
         ))}
       </div>

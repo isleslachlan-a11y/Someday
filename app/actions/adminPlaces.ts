@@ -9,7 +9,7 @@ interface AdminPlaceInput {
   country: string
   region: 'Asia' | 'Europe' | 'Americas' | 'Africa' | 'Oceania' | 'Global'
   state_province?: string | null
-  type: 'city' | 'nature' | 'experience' | 'food'
+  type: 'destination' | 'experience'
   description: string
   tags?: string[]
   tag_ids?: string[]
@@ -32,6 +32,9 @@ interface AdminPlaceInput {
   best_time?: string | null
   vibe_tags?: string[]
   submitted_photo_url?: string | null
+  parent_place_id?: string | null
+  duration?: string | null
+  needs_booking?: boolean | null
 }
 
 export async function adminCreatePlace(input: AdminPlaceInput): Promise<{ error?: string; success?: boolean; placeId?: string }> {
@@ -87,6 +90,9 @@ export async function adminCreatePlace(input: AdminPlaceInput): Promise<{ error?
       best_time:            input.best_time ?? null,
       vibe_tags:            input.vibe_tags ?? [],
       submitted_photo_url:  input.submitted_photo_url ?? null,
+      parent_place_id:      input.parent_place_id ?? null,
+      duration:             input.duration ?? null,
+      needs_booking:        input.needs_booking ?? false,
       created_at:           new Date().toISOString(),
     })
     .select('id')

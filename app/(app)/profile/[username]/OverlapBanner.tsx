@@ -5,10 +5,8 @@ import { logEvent } from '@/lib/events'
 import type { PlaceSnap } from '@/lib/types'
 
 const TYPE_ICON: Record<string, string> = {
-  city:       '🏙',
-  nature:     '🌿',
-  experience: '✨',
-  food:       '🍜',
+  destination: '🗺',
+  experience:  '✨',
 }
 
 interface Props {

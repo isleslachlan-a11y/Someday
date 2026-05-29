@@ -43,6 +43,10 @@ interface Props {
   initialBucketPlaceIds: string[]
   isPersonalised: boolean
   sessionId: string
+  isFirstSession: boolean
+  isNewUser: boolean
+  travelStyle: string[] | null
+  startHerePlaces: Place[]
 }
 
 // ─── Skeletons ────────────────────────────────────────────────────────────────
@@ -95,6 +99,10 @@ export default function HomeContent({
   initialBucketPlaceIds,
   isPersonalised,
   sessionId,
+  isFirstSession,
+  isNewUser,
+  travelStyle,
+  startHerePlaces,
 }: Props) {
   const router = useRouter()
   const [bucketPlaceIds, setBucketPlaceIds] = useState<string[]>(initialBucketPlaceIds)
@@ -307,6 +315,36 @@ export default function HomeContent({
       {/* ── Scrollable content ────────────────────────────────────────────── */}
       <main className="max-w-[480px] mx-auto px-4 pt-4 pb-8">
 
+        {/* First-session welcome banner */}
+        {isFirstSession && (
+          <div className="mb-5 rounded-2xl bg-[#131936] px-5 py-4 relative overflow-hidden">
+            <div className="absolute top-3 right-4 text-[#f08c21] text-[24px] opacity-40 select-none">✦</div>
+            <p className="font-syne font-bold text-white text-[16px] mb-1">
+              Your Someday starts here.
+            </p>
+            <p className="font-nunito text-white/60 text-[13px] leading-relaxed">
+              {travelStyle && travelStyle.length > 0
+                ? `We've tailored your feed for ${travelStyle.slice(0, 2).join(' & ')} travellers.`
+                : 'Save places as you discover them. Your list builds itself.'
+              }
+            </p>
+            <div className="flex gap-2 mt-3">
+              <Link
+                href="/discover"
+                className="px-4 py-1.5 rounded-full bg-[#f08c21] text-[#131936] font-nunito font-semibold text-[12px]"
+              >
+                Explore →
+              </Link>
+              <Link
+                href="/list"
+                className="px-4 py-1.5 rounded-full bg-white/10 text-white font-nunito font-semibold text-[12px]"
+              >
+                My list
+              </Link>
+            </div>
+          </div>
+        )}
+
         {/* Search bar */}
         <form onSubmit={handleSearchSubmit} className="mb-5">
           <div className="relative flex items-center gap-2 bg-white rounded-full border border-[#fcd99a] px-4 h-11">
@@ -340,21 +378,48 @@ export default function HomeContent({
           <HeroSkeleton />
         )}
 
+        {/* Start-here collection for new users */}
+        {startHerePlaces.length > 0 && isNewUser && (
+          <div className="mt-5 mb-1">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="font-syne font-bold text-[#131936] text-[16px]">Start here</h2>
+              <Link href="/discover" className="font-nunito text-[#f08c21] text-[13px]">see all →</Link>
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-none">
+              {startHerePlaces.map((place, i) => (
+                <div key={place.id} className="shrink-0 w-40">
+                  <HomePlaceCard
+                    place={{ ...place, recommendation_source: 'editorial', recommendation_score: 0 } as RecommendedPlace}
+                    isAdded={bucketPlaceIds.includes(place.id)}
+                    onAdd={() => handleAdd(place, 'start_here')}
+                    onRemove={() => handleRemove(place, 'start_here')}
+                    index={i % 4}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Bucket list section */}
         <div className="mt-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-syne font-bold text-[#131936] text-[18px]">
-              {isPersonalised ? 'Picked for you' : 'For your bucket list'}
+              {isNewUser ? 'Start building your list' : isPersonalised ? 'Picked for you' : 'For your bucket list'}
             </h2>
             <Link href="/list" className="font-nunito text-[13px] text-[#f08c21]">
               See all →
             </Link>
           </div>
-          {isPersonalised && (
+          {isNewUser ? (
+            <p className="font-nunito text-[#131936]/40 text-[11px] -mt-3 mb-4">
+              Save anything that sparks something. No pressure.
+            </p>
+          ) : isPersonalised ? (
             <p className="font-nunito text-[#131936]/40 text-[11px] -mt-3 mb-4">
               Based on your travel style
             </p>
-          )}
+          ) : null}
 
           {allGridPlaces.length > 0 ? (
             <>

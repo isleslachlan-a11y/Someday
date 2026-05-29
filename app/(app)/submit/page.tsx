@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import SubmitForm from './SubmitForm'
+import { Inbox, Map } from 'lucide-react'
+import SubmitTypeSelector from './SubmitTypeSelector'
 import AdminAddForm from './AdminAddForm'
 import SubmitBackButton from './SubmitBackButton'
 
@@ -15,6 +16,7 @@ interface Submission {
   id: string
   name: string
   type: string | null
+  submission_kind: 'destination' | 'experience' | null
   country: string | null
   status: 'pending' | 'approved' | 'rejected'
   submitted_at: string
@@ -33,7 +35,7 @@ export default async function SubmitPage() {
   const [submissionsResult, profileResult] = await Promise.all([
     supabase
       .from('submissions')
-      .select('id, name, type, country, status, submitted_at, reviewer_notes')
+      .select('id, name, type, submission_kind, country, status, submitted_at, reviewer_notes')
       .eq('user_id', user.id)
       .order('submitted_at', { ascending: false }),
     supabase
@@ -47,6 +49,7 @@ export default async function SubmitPage() {
     id: s.id as string,
     name: s.name as string,
     type: (s.type as string | null) ?? null,
+    submission_kind: (s.submission_kind as 'destination' | 'experience' | null) ?? null,
     country: (s.country as string | null) ?? null,
     status: (s.status as 'pending' | 'approved' | 'rejected') ?? 'pending',
     submitted_at: s.submitted_at as string,
@@ -73,15 +76,17 @@ export default async function SubmitPage() {
               <div className="flex items-center gap-2">
                 <Link
                   href="/admin/submissions"
-                  className="font-nunito text-[12px] text-[#f08c21] hover:opacity-80 transition-opacity"
+                  aria-label="Review submissions"
+                  className="flex items-center justify-center w-9 h-9 rounded-full bg-[#fcd99a]/40 hover:bg-[#fcd99a]/70 transition-colors"
                 >
-                  Submissions →
+                  <Inbox size={16} className="text-[#131936]" />
                 </Link>
                 <Link
                   href="/admin/places"
-                  className="font-nunito text-[12px] text-[#131936]/50 hover:text-[#131936] transition-colors"
+                  aria-label="Places database"
+                  className="flex items-center justify-center w-9 h-9 rounded-full bg-[#fcd99a]/40 hover:bg-[#fcd99a]/70 transition-colors"
                 >
-                  Places
+                  <Map size={16} className="text-[#131936]" />
                 </Link>
                 <span className="px-2 py-0.5 rounded-full bg-[#f08c21] text-[#131936] font-nunito font-bold text-[10px] uppercase tracking-wider">
                   Admin
@@ -108,7 +113,7 @@ export default async function SubmitPage() {
                 database.
               </p>
             </div>
-            <SubmitForm userId={user.id} />
+            <SubmitTypeSelector userId={user.id} />
             {submissions.length > 0 && (
               <section className="mt-10">
                 <h2 className="font-syne font-bold text-[#131936] mb-4">Your submissions</h2>
@@ -142,10 +147,8 @@ const STATUS_LABEL: Record<string, string> = {
 }
 
 const TYPE_ICON: Record<string, string> = {
-  city:       '🏙',
-  nature:     '🌿',
-  experience: '✨',
-  food:       '🍜',
+  destination: '🗺',
+  experience:  '✨',
 }
 
 function SubmissionRow({ submission }: { submission: Submission }) {
@@ -159,7 +162,7 @@ function SubmissionRow({ submission }: { submission: Submission }) {
     <div className="rounded-2xl border border-[#fcd99a]/40 bg-white p-4">
       <div className="flex items-start gap-3">
         <span className="text-xl select-none mt-0.5" aria-hidden>
-          {TYPE_ICON[submission.type ?? ''] ?? '✦'}
+          {TYPE_ICON[submission.submission_kind ?? submission.type ?? ''] ?? '✦'}
         </span>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-0.5">

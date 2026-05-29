@@ -237,10 +237,8 @@ export default async function ProfilePage() {
 // ─── Profile place card ───────────────────────────────────────────────────────
 
 const TYPE_ICON: Record<string, string> = {
-  city:       '🏙',
-  nature:     '🌿',
-  experience: '✨',
-  food:       '🍜',
+  destination: '🗺',
+  experience:  '✨',
 }
 
 const STATUS_LABEL: Record<string, string> = {

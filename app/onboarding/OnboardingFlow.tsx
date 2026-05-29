@@ -79,10 +79,8 @@ const FREQUENCY_OPTIONS = [
 ]
 
 const TYPE_ICONS: Record<string, string> = {
-  city: '🏙',
-  nature: '🌿',
-  experience: '⭐',
-  food: '🍜',
+  destination: '🗺',
+  experience:  '✨',
 }
 
 // ─── Shared styles ────────────────────────────────────────────────────────────

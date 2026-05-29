@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import ListFilters from './ListFilters'
-import type { BucketListStatus, ListEntry, FriendBucketItem } from '@/lib/types'
+import type { BucketListStatus, ListEntry, FriendBucketItem, Place } from '@/lib/types'
 
 export const metadata: Metadata = {
   title: "My Someday's",
@@ -127,6 +127,57 @@ export default async function ListPage() {
     }
   }
 
+  // ── Suggested places for empty list ────────────────────────────────────────
+
+  let suggestedPlaces: Place[] = []
+
+  if (entries.length === 0) {
+    const { data: ctx } = await supabase
+      .from('user_context')
+      .select('travel_style')
+      .eq('user_id', user.id)
+      .maybeSingle()
+
+    const travelStyle = (ctx as { travel_style?: string[] } | null)?.travel_style ?? []
+
+    const categoryMap: Record<string, string> = {
+      'Adventure Seeker':    'adventure-sport',
+      'Culture Lover':       'culture-history',
+      'Food Obsessed':       'food-drink',
+      'Beach Bum':           'nature-wilderness',
+      'City Explorer':       'city-escapes',
+      'Off the Beaten Track':'hidden-gems',
+      'Wellness Focused':    'wellness-retreat',
+      'Party Starter':       'events-festivals',
+    }
+    const preferredCategory = travelStyle.length > 0 ? categoryMap[travelStyle[0]] ?? null : null
+
+    if (preferredCategory) {
+      const { data: catRow } = await supabase
+        .from('categories').select('id').eq('slug', preferredCategory).maybeSingle()
+      if (catRow) {
+        const { data: catPlacesData } = await supabase
+          .from('experiences_categories')
+          .select('experience_id')
+          .eq('category_id', (catRow as { id: string }).id)
+          .limit(8)
+        const ids = (catPlacesData ?? []).map((r: { experience_id: string }) => r.experience_id)
+        if (ids.length > 0) {
+          const { data: placesData } = await supabase
+            .from('places').select('*').in('id', ids)
+            .order('popularity', { ascending: false }).limit(4)
+          suggestedPlaces = (placesData ?? []) as Place[]
+        }
+      }
+    }
+
+    if (suggestedPlaces.length < 4) {
+      const { data: fallback } = await supabase
+        .from('places').select('*').order('popularity', { ascending: false }).limit(4)
+      suggestedPlaces = (fallback ?? []) as Place[]
+    }
+  }
+
   return (
     <main className="min-h-screen bg-[#fff9f0]">
 
@@ -149,6 +200,7 @@ export default async function ListPage() {
             entries={entries}
             userId={user.id}
             friendItems={friendItems}
+            suggestedPlaces={suggestedPlaces}
           />
         </Suspense>
       </div>

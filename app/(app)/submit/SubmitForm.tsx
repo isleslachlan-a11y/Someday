@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useRef } from 'react'
 import Image from 'next/image'
 import { ChevronLeft } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -8,21 +8,6 @@ import { createClient } from '@/lib/supabase/client'
 import { submitPlace } from '@/app/actions/submissions'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
-
-interface CategoryItem {
-  id: string
-  name: string
-  slug: string
-  icon: string
-}
-
-interface TagItem {
-  id: string
-  name: string
-  slug: string
-  category: string
-  place_type: string[]
-}
 
 interface Prediction {
   place_id: string
@@ -43,8 +28,8 @@ const CARDS = [
   {
     id: 'place',
     step: 1,
-    prompt: 'Where should everyone go someday?',
-    subprompt: 'Search for a real place — city, nature spot, experience, or restaurant.',
+    prompt: 'Where is it?',
+    subprompt: 'Search for the place or experience.',
     type: 'place_search' as const,
   },
   {
@@ -55,29 +40,8 @@ const CARDS = [
     type: 'type_select' as const,
   },
   {
-    id: 'category',
-    step: 3,
-    prompt: "What's the best category for it?",
-    subprompt: 'Optional — skip if unsure.',
-    type: 'category_select' as const,
-  },
-  {
-    id: 'tags',
-    step: 4,
-    prompt: 'Tag it with a few descriptors:',
-    subprompt: 'Optional — pick up to 8 that fit.',
-    type: 'tags_select' as const,
-  },
-  {
-    id: 'vibes',
-    step: 5,
-    prompt: "You'd love it here if you're into…",
-    subprompt: 'Pick up to 5 that feel right.',
-    type: 'vibes' as const,
-  },
-  {
     id: 'must_do',
-    step: 6,
+    step: 3,
     prompt: 'The one thing everyone must do here:',
     subprompt: 'One sentence. Make it specific.',
     type: 'text' as const,
@@ -85,26 +49,8 @@ const CARDS = [
     maxLength: 120,
   },
   {
-    id: 'hidden_gem',
-    step: 7,
-    prompt: 'Best kept secret:',
-    subprompt: 'Something the guidebooks miss.',
-    type: 'text' as const,
-    placeholder: 'e.g. The tiny noodle shop down the alley behind the night market',
-    maxLength: 120,
-  },
-  {
-    id: 'not_for_you',
-    step: 8,
-    prompt: "Don't come here if you hate…",
-    subprompt: 'Honesty makes a better catalogue.',
-    type: 'text' as const,
-    placeholder: 'e.g. Crowds, hot weather, or walking uphill for 3 hours',
-    maxLength: 100,
-  },
-  {
     id: 'best_time',
-    step: 9,
+    step: 4,
     prompt: 'Best time to visit:',
     subprompt: 'Month, season, or reason.',
     type: 'text' as const,
@@ -113,18 +59,18 @@ const CARDS = [
   },
   {
     id: 'photo',
-    step: 10,
+    step: 5,
     prompt: 'Got a photo?',
-    subprompt: 'Optional — helps us review it faster.',
+    subprompt: 'Optional — helps us review faster.',
     type: 'photo' as const,
   },
   {
     id: 'review',
-    step: 11,
-    prompt: 'One last thing — why does this place deserve to be on Someday?',
-    subprompt: 'This becomes the description. Make someone want to go.',
+    step: 6,
+    prompt: 'Why does this place deserve to be on Someday?',
+    subprompt: 'Make someone want to go. Two sentences is enough.',
     type: 'text' as const,
-    placeholder: "e.g. There's nowhere else on earth where you can watch the sun rise over 2,000 ancient temples from a hot air balloon…",
+    placeholder: "There's nowhere else where you can watch the sun rise over 2,000 temples from a hot air balloon…",
     maxLength: 280,
   },
 ] as const
@@ -132,28 +78,6 @@ const CARDS = [
 type CardId = (typeof CARDS)[number]['id']
 
 // ── Constants ─────────────────────────────────────────────────────────────────
-
-const TAG_CATEGORY_LABELS: Record<string, string> = {
-  vibe:         'Vibe',
-  activity:     'Activity',
-  season:       'Season',
-  budget:       'Budget',
-  travel_style: 'Travel Style',
-  landscape:    'Landscape',
-  food_drink:   'Food & Drink',
-  general:      'General',
-}
-
-const VIBE_OPTIONS = [
-  { label: 'Adventure', emoji: '🧗' },
-  { label: 'Culture',   emoji: '🏛' },
-  { label: 'Foodie',    emoji: '🍜' },
-  { label: 'Romantic',  emoji: '🌅' },
-  { label: 'Chill',     emoji: '🌊' },
-  { label: 'Epic',      emoji: '⚡' },
-  { label: 'Peaceful',  emoji: '🌿' },
-  { label: 'Wellness',  emoji: '🧘' },
-]
 
 const PLACE_TYPES = [
   { value: 'city',       label: 'City',        icon: '🏙', desc: 'Urban destination' },
@@ -185,21 +109,12 @@ export default function SubmitForm({ userId }: Props) {
   const [placeRegion, setPlaceRegion]     = useState('')
   const [stateProv, setStateProv]         = useState('')
   const [placeType, setPlaceType]         = useState('')
-  const [vibes, setVibes]                 = useState<string[]>([])
   const [mustDo, setMustDo]               = useState('')
-  const [hiddenGem, setHiddenGem]         = useState('')
-  const [notForYou, setNotForYou]         = useState('')
   const [bestTime, setBestTime]           = useState('')
   const [description, setDescription]     = useState('')
   const [photoFile, setPhotoFile]         = useState<File | null>(null)
   const [photoPreview, setPhotoPreview]   = useState<string | null>(null)
   const [photoConsent, setPhotoConsent]   = useState(false)
-
-  // Taxonomy
-  const [allCategories, setAllCategories]     = useState<CategoryItem[]>([])
-  const [allTaxTags, setAllTaxTags]           = useState<TagItem[]>([])
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('')
-  const [selectedTagIds, setSelectedTagIds]   = useState<string[]>([])
 
   // Geocoding
   const [suggestions, setSuggestions]         = useState<Prediction[]>([])
@@ -209,17 +124,6 @@ export default function SubmitForm({ userId }: Props) {
   const [resolvedLat, setResolvedLat]         = useState<number | null>(null)
   const [resolvedLng, setResolvedLng]         = useState<number | null>(null)
   const nameDebounceRef = useRef<NodeJS.Timeout | null>(null)
-
-  useEffect(() => {
-    const supabase = createClient()
-    void Promise.all([
-      supabase.from('categories').select('id, name, slug, icon').order('sort_order'),
-      supabase.from('tags').select('id, name, slug, category, place_type').order('category').order('name'),
-    ]).then(([catsRes, tagsRes]) => {
-      setAllCategories((catsRes.data ?? []) as CategoryItem[])
-      setAllTaxTags((tagsRes.data ?? []) as TagItem[])
-    })
-  }, [])
 
   // ── Navigation ───────────────────────────────────────────────────────────
 
@@ -236,18 +140,13 @@ export default function SubmitForm({ userId }: Props) {
   function canAdvance(): boolean {
     const card = CARDS[currentStep]
     switch (card.id) {
-      case 'place':       return locationLocked || placeName.trim().length > 2
-      case 'type':        return placeType !== ''
-      case 'category':    return true
-      case 'tags':        return true
-      case 'vibes':       return vibes.length > 0
-      case 'must_do':     return mustDo.trim().length > 10
-      case 'hidden_gem':  return hiddenGem.trim().length > 5
-      case 'not_for_you': return notForYou.trim().length > 5
-      case 'best_time':   return bestTime.trim().length > 3
-      case 'photo':       return true
-      case 'review':      return description.trim().length > 20
-      default:            return true
+      case 'place':     return locationLocked || placeName.trim().length > 2
+      case 'type':      return placeType !== ''
+      case 'must_do':   return mustDo.trim().length > 10
+      case 'best_time': return bestTime.trim().length > 3
+      case 'photo':     return true
+      case 'review':    return description.trim().length > 20
+      default:          return true
     }
   }
 
@@ -354,15 +253,15 @@ export default function SubmitForm({ userId }: Props) {
       tags:        [],
       image_url:   photo_url,
       must_do:     mustDo || null,
-      hidden_gem:  hiddenGem || null,
-      not_for_you: notForYou || null,
+      hidden_gem:  null,
+      not_for_you: null,
       best_time:   bestTime || null,
-      vibe_tags:   vibes,
+      vibe_tags:   [],
       photo_url,
       lat:         resolvedLat,
       lng:         resolvedLng,
-      categoryId:  selectedCategoryId || null,
-      tagIds:      selectedTagIds,
+      categoryId:  null,
+      tagIds:      [],
     })
 
     setSubmitting(false)
@@ -381,10 +280,7 @@ export default function SubmitForm({ userId }: Props) {
     setPlaceRegion('')
     setStateProv('')
     setPlaceType('')
-    setVibes([])
     setMustDo('')
-    setHiddenGem('')
-    setNotForYou('')
     setBestTime('')
     setDescription('')
     setPhotoFile(null)
@@ -394,14 +290,12 @@ export default function SubmitForm({ userId }: Props) {
     setResolvedLat(null)
     setResolvedLng(null)
     setSuggestions([])
-    setSelectedCategoryId('')
-    setSelectedTagIds([])
   }
 
   // ── Card input renderer ──────────────────────────────────────────────────
 
   function renderCardInput(card: (typeof CARDS)[number]) {
-    switch (card.id) {
+    switch (card.id as CardId) {
 
       case 'place':
         return (
@@ -529,116 +423,6 @@ export default function SubmitForm({ userId }: Props) {
           </div>
         )
 
-      case 'category':
-        return (
-          <div className="flex flex-wrap gap-3">
-            {allCategories.map(cat => {
-              const active = selectedCategoryId === cat.id
-              return (
-                <button
-                  key={cat.id}
-                  type="button"
-                  onClick={() => setSelectedCategoryId(prev => prev === cat.id ? '' : cat.id)}
-                  className={`flex items-center gap-2 rounded-2xl border-2 px-5 py-3 transition-all text-left active:scale-[0.97] ${
-                    active ? 'border-[#f08c21] bg-[#f08c21]/5' : 'border-[#fcd99a]/50 bg-white'
-                  }`}
-                >
-                  {cat.icon && <span className="text-[22px]">{cat.icon}</span>}
-                  <span className={`font-syne font-bold text-[15px] ${active ? 'text-[#f08c21]' : 'text-[#131936]'}`}>
-                    {cat.name}
-                  </span>
-                  {active && <span className="ml-1 text-[#f08c21] text-[14px]">✦</span>}
-                </button>
-              )
-            })}
-          </div>
-        )
-
-      case 'tags':
-        return (
-          <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-1">
-            {Array.from(new Set(allTaxTags.map(t => t.category))).map(dim => (
-              <div key={dim}>
-                <p className="font-nunito text-[10px] font-bold uppercase tracking-wider text-[#131936]/40 mb-2">
-                  {TAG_CATEGORY_LABELS[dim] ?? dim}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {allTaxTags.filter(t => t.category === dim).map(tag => {
-                    const active = selectedTagIds.includes(tag.id)
-                    const atLimit = selectedTagIds.length >= 8
-                    return (
-                      <button
-                        key={tag.id}
-                        type="button"
-                        disabled={!active && atLimit}
-                        onClick={() => setSelectedTagIds(prev =>
-                          active ? prev.filter(id => id !== tag.id) : [...prev, tag.id]
-                        )}
-                        className={`px-4 py-2 rounded-full border font-nunito text-[13px] font-medium transition-all disabled:opacity-30 ${
-                          active
-                            ? 'bg-[#f08c21] text-[#131936] border-[#f08c21]'
-                            : 'bg-white text-[#131936]/60 border-[#fcd99a]'
-                        }`}
-                      >
-                        {tag.name}
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-            ))}
-            {selectedTagIds.length === 8 && (
-              <p className="font-nunito text-[#131936]/40 text-[12px] pt-1">Max 8 selected</p>
-            )}
-          </div>
-        )
-
-      case 'vibes':
-        return (
-          <div className="space-y-2">
-            {VIBE_OPTIONS.map(vibe => {
-              const active = vibes.includes(vibe.label)
-              const atLimit = vibes.length >= 5
-              return (
-                <button
-                  key={vibe.label}
-                  type="button"
-                  onClick={() => {
-                    if (active) {
-                      setVibes(prev => prev.filter(v => v !== vibe.label))
-                    } else if (!atLimit) {
-                      setVibes(prev => [...prev, vibe.label])
-                    }
-                  }}
-                  disabled={!active && atLimit}
-                  className={`w-full flex items-center gap-4 rounded-2xl border-2
-                    px-5 py-4 transition-all text-left active:scale-[0.98]
-                    disabled:opacity-30 ${
-                    active
-                      ? 'border-[#f08c21] bg-[#f08c21]/5'
-                      : 'border-[#fcd99a]/50 bg-white'
-                  }`}
-                >
-                  <span className="text-[24px] shrink-0">{vibe.emoji}</span>
-                  <span className={`font-syne font-bold text-[16px] ${
-                    active ? 'text-[#f08c21]' : 'text-[#131936]'
-                  }`}>
-                    {vibe.label}
-                  </span>
-                  {active && (
-                    <span className="ml-auto text-[#f08c21] text-[18px]">✦</span>
-                  )}
-                </button>
-              )
-            })}
-            {vibes.length === 5 && (
-              <p className="font-nunito text-[#131936]/40 text-[12px] text-center pt-1">
-                Max 5 selected
-              </p>
-            )}
-          </div>
-        )
-
       case 'photo':
         return (
           <div>
@@ -714,22 +498,18 @@ export default function SubmitForm({ userId }: Props) {
         )
 
       default: {
-        // Text cards: must_do, hidden_gem, not_for_you, best_time, review
-        type TextCardId = 'must_do' | 'hidden_gem' | 'not_for_you' | 'best_time' | 'review'
+        // Text cards: must_do, best_time, review
+        type TextCardId = 'must_do' | 'best_time' | 'review'
         const textCard = card as { id: TextCardId; type: 'text'; placeholder: string; maxLength: number }
         const valueMap: Record<TextCardId, string> = {
-          must_do:     mustDo,
-          hidden_gem:  hiddenGem,
-          not_for_you: notForYou,
-          best_time:   bestTime,
-          review:      description,
+          must_do:  mustDo,
+          best_time: bestTime,
+          review:   description,
         }
         const setterMap: Record<TextCardId, (v: string) => void> = {
-          must_do:     setMustDo,
-          hidden_gem:  setHiddenGem,
-          not_for_you: setNotForYou,
-          best_time:   setBestTime,
-          review:      setDescription,
+          must_do:  setMustDo,
+          best_time: setBestTime,
+          review:   setDescription,
         }
         const value = valueMap[textCard.id]
         const setter = setterMap[textCard.id]
@@ -772,11 +552,9 @@ export default function SubmitForm({ userId }: Props) {
             </p>
             {(() => {
               const minimums: Record<string, number> = {
-                must_do:     10,
-                hidden_gem:  5,
-                not_for_you: 5,
-                best_time:   3,
-                review:      20,
+                must_do:  10,
+                best_time: 3,
+                review:   20,
               }
               const min = minimums[textCard.id] ?? 0
               const remaining = min - value.length
@@ -824,7 +602,7 @@ export default function SubmitForm({ userId }: Props) {
         <span className="font-nunito text-[#131936]/40 text-[13px]">
           {currentStep + 1} of {totalSteps}
         </span>
-        {(card.id === 'photo' || card.id === 'category' || card.id === 'tags') ? (
+        {card.id === 'photo' ? (
           <button
             onClick={goNext}
             className="font-nunito text-[#131936]/40 text-[13px] hover:text-[#131936] transition-colors px-2"

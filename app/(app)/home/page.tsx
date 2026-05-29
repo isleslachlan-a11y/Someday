@@ -66,8 +66,8 @@ export default async function HomePage() {
 
   if (!user) redirect('/login')
 
-  // Fetch profile, bucket, hero, and personalised recommendations in parallel
-  const [profileResult, bucketResult, heroResult, rpcResult] = await Promise.all([
+  // Fetch profile, bucket, hero, personalised recs, and user context in parallel
+  const [profileResult, bucketResult, heroResult, rpcResult, contextResult] = await Promise.all([
     supabase.from('profiles').select('username, avatar_url').eq('id', user.id).single(),
     supabase.from('bucket_list_items').select('place_id').eq('user_id', user.id),
     supabase
@@ -78,6 +78,11 @@ export default async function HomePage() {
       .limit(1)
       .maybeSingle(),
     supabase.rpc('get_recommendations_for_user', { p_user_id: user.id, p_limit: 12 }),
+    supabase
+      .from('user_context')
+      .select('completed_onboarding, onboarding_completed_at, travel_style')
+      .eq('user_id', user.id)
+      .maybeSingle(),
   ])
 
   const profile = {
@@ -88,6 +93,21 @@ export default async function HomePage() {
   const initialBucketPlaceIds = (bucketResult.data ?? [])
     .map(row => row.place_id)
     .filter((id): id is string => !!id)
+
+  const context = contextResult.data as {
+    completed_onboarding: boolean
+    onboarding_completed_at: string | null
+    travel_style: string[] | null
+  } | null
+
+  const isFirstSession = (() => {
+    if (!context?.onboarding_completed_at) return false
+    const completedAt = new Date(context.onboarding_completed_at)
+    return (Date.now() - completedAt.getTime()) < 10 * 60 * 1000
+  })()
+
+  const isNewUser = initialBucketPlaceIds.length < 5
+  const travelStyle = context?.travel_style ?? null
 
   let heroPlace = heroResult.data as Place | null
 
@@ -156,6 +176,34 @@ export default async function HomePage() {
     if (enrichedHero.length > 0) heroPlace = enrichedHero[0]
   } catch { /* use unenriched places */ }
 
+  // Fetch "start-here" collection for new users
+  let startHerePlaces: Place[] = []
+  if (isNewUser) {
+    const { data: startHereData } = await supabase
+      .from('collections')
+      .select(`
+        id, name, slug,
+        collections_places(
+          sort_order,
+          places(id, name, country, type, image_url, image_thumb_url, popularity, region)
+        )
+      `)
+      .eq('slug', 'start-here')
+      .eq('is_active', true)
+      .maybeSingle()
+
+    if (startHereData) {
+      startHerePlaces = ((startHereData.collections_places ?? []) as Array<{
+        sort_order: number
+        places: unknown
+      }>)
+        .sort((a, b) => a.sort_order - b.sort_order)
+        .map(cp => cp.places as Place)
+        .filter(Boolean)
+        .slice(0, 8)
+    }
+  }
+
   const sessionId = crypto.randomUUID()
 
   return (
@@ -167,6 +215,10 @@ export default async function HomePage() {
       initialBucketPlaceIds={initialBucketPlaceIds}
       isPersonalised={isPersonalised}
       sessionId={sessionId}
+      isFirstSession={isFirstSession}
+      isNewUser={isNewUser}
+      travelStyle={travelStyle}
+      startHerePlaces={startHerePlaces}
     />
   )
 }

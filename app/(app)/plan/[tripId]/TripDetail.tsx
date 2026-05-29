@@ -34,10 +34,8 @@ import type { Trip, TripItem, TripItemVote, Message } from '@/lib/types'
 import type { UserProfile } from '@/lib/types'
 
 const TYPE_ICON: Record<string, string> = {
-  city: '🏙',
-  nature: '🌿',
-  experience: '✨',
-  food: '🍜',
+  destination: '🗺',
+  experience:  '✨',
 }
 
 type TripTab = 'experiences' | 'chat' | 'map'

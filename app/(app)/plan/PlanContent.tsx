@@ -196,10 +196,8 @@ function OverlapState({
 // ─── Place overlap card ───────────────────────────────────────────────────────
 
 const TYPE_ICON: Record<string, string> = {
-  city: '🏙',
-  nature: '🌿',
-  experience: '✨',
-  food: '🍜',
+  destination: '🗺',
+  experience:  '✨',
 }
 
 function PlaceOverlapCard({

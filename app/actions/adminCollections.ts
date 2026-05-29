@@ -170,6 +170,56 @@ export async function reorderCollections(input: {
   return {}
 }
 
+// ─── Add / remove single place ────────────────────────────────────────────────
+
+export async function addPlaceToCollection(input: {
+  collectionId: string
+  placeId: string
+}): Promise<{ error?: string }> {
+  const auth = await requireAdmin()
+  if (auth.error) return { error: auth.error }
+
+  const supabase = await createClient()
+
+  const { data: maxRow } = await supabase
+    .from('collections_places')
+    .select('sort_order')
+    .eq('collection_id', input.collectionId)
+    .order('sort_order', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  const nextOrder = ((maxRow as { sort_order: number } | null)?.sort_order ?? -1) + 1
+
+  const { error } = await supabase
+    .from('collections_places')
+    .insert({ collection_id: input.collectionId, place_id: input.placeId, sort_order: nextOrder })
+
+  if (error) return { error: error.message }
+  revalidatePath('/discover')
+  return {}
+}
+
+export async function removePlaceFromCollection(input: {
+  collectionId: string
+  placeId: string
+}): Promise<{ error?: string }> {
+  const auth = await requireAdmin()
+  if (auth.error) return { error: auth.error }
+
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from('collections_places')
+    .delete()
+    .eq('collection_id', input.collectionId)
+    .eq('place_id', input.placeId)
+
+  if (error) return { error: error.message }
+  revalidatePath('/discover')
+  return {}
+}
+
 // ─── Delete (soft) ────────────────────────────────────────────────────────────
 
 export async function deleteCollection(input: {

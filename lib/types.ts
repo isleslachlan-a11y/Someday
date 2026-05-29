@@ -97,6 +97,7 @@ export interface Place {
   country: string
   region: string | null
   state_province: string | null
+  /** 'destination' | 'experience' */
   type: string
   description: string | null
   tags: string[] | null
@@ -113,6 +114,12 @@ export interface Place {
   /** WGS-84 coordinates — null means no map pin rendered. */
   lat: number | null
   lng: number | null
+  /** For experience type places: the destination they belong to. */
+  parent_place_id?: string | null
+  /** Duration of this experience e.g. "2 hours", "Half day" */
+  duration?: string | null
+  /** Whether advance booking is required */
+  needs_booking?: boolean | null
   must_do?: string | null
   hidden_gem?: string | null
   not_for_you?: string | null
@@ -125,8 +132,8 @@ export interface Place {
   top_tags?: string[]
 }
 
-export const DESTINATION_TYPES = ['city', 'nature'] as const
-export const EXPERIENCE_TYPES  = ['experience', 'food'] as const
+export const DESTINATION_TYPES = ['destination'] as const
+export const EXPERIENCE_TYPES  = ['experience'] as const
 
 export interface RecommendedPlace extends Place {
   recommendation_source: string
@@ -136,12 +143,29 @@ export interface RecommendedPlace extends Place {
 export type DestinationType = (typeof DESTINATION_TYPES)[number]
 export type ExperienceType  = (typeof EXPERIENCE_TYPES)[number]
 
+export type SubmissionKind = 'destination' | 'experience'
+
 export function isDestination(place: Place): boolean {
-  return DESTINATION_TYPES.includes(place.type as DestinationType)
+  return place.type === 'destination'
 }
 
 export function isExperience(place: Place): boolean {
-  return EXPERIENCE_TYPES.includes(place.type as ExperienceType)
+  return place.type === 'experience'
+}
+
+export function getDisplayType(place: Place & {
+  primary_category?: { slug: string } | null
+}): string {
+  const slug = place.primary_category?.slug ?? ''
+  if (slug === 'food-drink')        return 'food'
+  if (slug === 'city-escapes')      return 'city'
+  if (slug === 'nature-wilderness') return 'nature'
+  if (slug === 'adventure-sport')   return 'adventure'
+  if (slug === 'culture-history')   return 'culture'
+  if (slug === 'wellness-retreat')  return 'wellness'
+  if (slug === 'events-festivals')  return 'events'
+  if (slug === 'hidden-gems')       return 'hidden'
+  return place.type
 }
 
 export interface Event {

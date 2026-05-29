@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import Link from 'next/link'
-import { Plus } from 'lucide-react'
+import { Plus, FolderPlus } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import DiscoverContent from './DiscoverContent'
@@ -45,6 +45,10 @@ export default async function DiscoverPage({
   if (!user) redirect('/login')
 
   const params = await searchParams
+
+  const { data: profileData } = await supabase
+    .from('profiles').select('is_admin').eq('id', user.id).single()
+  const isAdmin = !!(profileData as { is_admin?: boolean } | null)?.is_admin
 
   // App uses symmetric friendships, not a follows table
   const [placesResult, friendshipsResult, bucketResult, collectionsResult] = await Promise.all([
@@ -122,7 +126,16 @@ export default async function DiscoverPage({
               DISCOVER
             </span>
           </div>
-          <div className="flex items-center justify-end">
+          <div className="flex items-center justify-end gap-2">
+            {isAdmin && (
+              <Link
+                href="/discover/collections/new"
+                aria-label="Create collection"
+                className="flex items-center justify-center w-9 h-9 rounded-full bg-[#fcd99a]/60 text-[#131936]"
+              >
+                <FolderPlus size={18} />
+              </Link>
+            )}
             <Link
               href="/submit"
               aria-label="Submit a place"

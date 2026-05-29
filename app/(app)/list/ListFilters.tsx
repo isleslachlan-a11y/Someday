@@ -7,9 +7,9 @@ import Link from 'next/link'
 import toast from 'react-hot-toast'
 import BucketListCard from '@/components/BucketListCard'
 import HomePlaceCard from '@/components/HomePlaceCard'
-import { updateListEntry, removeFromList } from '@/app/actions/bucketList'
+import { updateListEntry, removeFromList, addPlaceToList, removePlaceByPlaceId } from '@/app/actions/bucketList'
 import { logEvent } from '@/lib/events'
-import type { ListEntry, FriendBucketItem, BucketListStatus } from '@/lib/types'
+import type { ListEntry, FriendBucketItem, BucketListStatus, Place } from '@/lib/types'
 
 // ─── Search prompts ───────────────────────────────────────────────────────────
 
@@ -84,11 +84,12 @@ interface Props {
   entries: ListEntry[]
   userId: string
   friendItems: FriendBucketItem[]
+  suggestedPlaces?: Place[]
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function ListFilters({ entries: initialEntries, userId, friendItems }: Props) {
+export default function ListFilters({ entries: initialEntries, userId, friendItems, suggestedPlaces = [] }: Props) {
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
@@ -97,6 +98,30 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
   const [entries, setEntries] = useState<ListEntry[]>(initialEntries)
   const [selectedEntry, setSelectedEntry] = useState<ListEntry | null>(null)
   const [showFilterSheet, setShowFilterSheet] = useState(false)
+  const [savedIds, setSavedIds] = useState<Set<string>>(
+    new Set(initialEntries.map(e => e.place_id))
+  )
+
+  async function handleSuggestedSave(placeId: string) {
+    setSavedIds(prev => new Set([...prev, placeId]))
+    void logEvent(userId, 'place_saved', { place_id: placeId, source: 'empty_list_suggestion' })
+    const result = await addPlaceToList(placeId)
+    if (result.error) {
+      setSavedIds(prev => { const n = new Set(prev); n.delete(placeId); return n })
+      toast.error('Something went wrong.')
+    } else {
+      toast.success('Added to your list ✦')
+    }
+  }
+
+  async function handleSuggestedRemove(placeId: string) {
+    setSavedIds(prev => { const n = new Set(prev); n.delete(placeId); return n })
+    void logEvent(userId, 'item_removed', { place_id: placeId, source: 'empty_list_suggestion' })
+    const result = await removePlaceByPlaceId(placeId)
+    if (result.error) {
+      setSavedIds(prev => new Set([...prev, placeId]))
+    }
+  }
 
   // ── Typewriter placeholder ────────────────────────────────────────────────
   const [promptIndex, setPromptIndex] = useState(
@@ -341,7 +366,14 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
       </div>
 
       {/* ── Grid or empty states ────────────────────────────────────────── */}
-      {statusFiltered.length === 0 ? (
+      {entries.length === 0 ? (
+        <EmptyListWithSuggestions
+          suggestedPlaces={suggestedPlaces}
+          savedIds={savedIds}
+          onSave={handleSuggestedSave}
+          onRemove={handleSuggestedRemove}
+        />
+      ) : statusFiltered.length === 0 ? (
         <EmptyStatus status={status} />
       ) : filtered.length === 0 ? (
         <EmptySearch onClear={clearFilters} />
@@ -849,6 +881,67 @@ function ListItemSheet({
 }
 
 // ─── Empty states ─────────────────────────────────────────────────────────────
+
+function EmptyListWithSuggestions({
+  suggestedPlaces,
+  savedIds,
+  onSave,
+  onRemove,
+}: {
+  suggestedPlaces: Place[]
+  savedIds: Set<string>
+  onSave: (id: string) => void
+  onRemove: (id: string) => void
+}) {
+  return (
+    <div className="flex flex-col items-center pt-8 pb-4">
+      <div className="text-[48px] mb-4 select-none">✦</div>
+      <h2 className="font-syne font-bold text-[#131936] text-[20px] mb-2 text-center">
+        Your list is empty
+      </h2>
+      <p className="font-nunito text-[#131936]/50 text-[14px] text-center leading-relaxed max-w-[280px] mb-8">
+        Save places as you discover them. Start with a few that spark something.
+      </p>
+
+      {suggestedPlaces.length > 0 && (
+        <div className="w-full">
+          <p className="font-nunito text-[#131936]/40 text-[12px] text-center mb-4 uppercase tracking-wide">
+            Places to start with
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            {suggestedPlaces.map((place, i) => {
+              const p = place as unknown as Record<string, unknown>
+              const placeForCard = {
+                ...place,
+                region: null,
+                popularity: (p.popularity as number) ?? 0,
+                trending: false,
+                image_url: (p.image_url as string | null) ?? null,
+                image_thumb_url: (p.image_thumb_url as string | null) ?? null,
+                unsplash_photo_id: null,
+                unsplash_attribution: null,
+                created_at: new Date().toISOString(),
+                lat: (p.lat as number | null) ?? null,
+                lng: (p.lng as number | null) ?? null,
+              }
+              return (
+                <HomePlaceCard
+                  key={place.id}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  place={placeForCard as any}
+                  isAdded={savedIds.has(place.id)}
+                  onAdd={() => onSave(place.id)}
+                  onRemove={() => onRemove(place.id)}
+                  index={i % 4}
+                />
+              )
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
 
 function EmptyStatus({ status }: { status: 'all' | BucketListStatus }) {
   const content = {
