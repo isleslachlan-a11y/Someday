@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Search } from 'lucide-react'
@@ -62,6 +62,14 @@ export default function DiscoverContent({
 }: Props) {
   const collectionMap = new Map(collections.map(c => [c.slug, c]))
   const [savedIds, setSavedIds]           = useState<Set<string>>(new Set(initialSavedIds))
+  const scrollRefs = useRef<Map<string, HTMLDivElement>>(new Map())
+
+  function setScrollRef(id: string, el: HTMLDivElement | null) {
+    if (el) {
+      scrollRefs.current.set(id, el)
+      el.scrollLeft = 0
+    }
+  }
   const [searchQuery, setSearchQuery]     = useState(initialQuery)
   const [searchResults, setSearchResults] = useState<Place[] | null>(null)
 
@@ -256,7 +264,10 @@ export default function DiscoverContent({
                     </div>
                   )
                 })()}
-                <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-none">
+                <div
+                  ref={el => setScrollRef(category.id, el)}
+                  className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-none"
+                >
                   {categoryPlaces.slice(0, 6).map((place, index) => (
                     <DiscoverPlaceCard
                       key={place.id}

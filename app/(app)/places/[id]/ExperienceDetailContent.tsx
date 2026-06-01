@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ChevronLeft, Heart, Share2, MapPin, FolderPlus, X } from 'lucide-react'
+import { ChevronLeft, Heart, Upload, MapPin, FolderPlus, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { logEvent } from '@/lib/events'
 import { addPlaceToList, removePlaceByPlaceId } from '@/app/actions/bucketList'
@@ -89,11 +89,19 @@ export default function ExperienceDetailContent({
   const [showCollectionSheet, setShowCollectionSheet] = useState(false)
   const [collectionIds, setCollectionIds] = useState<Set<string>>(new Set(initialPlaceCollectionIds))
   const [togglingId, setTogglingId] = useState<string | null>(null)
-  const scrollRef = useRef<HTMLDivElement>(null)
+  const scrollRef           = useRef<HTMLDivElement>(null)
+  const stateScrollRef      = useRef<HTMLDivElement>(null)
+  const collectionScrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     logEvent(userId, 'page_viewed', { page: 'experience_detail', place_id: place.id })
   }, [userId, place.id])
+
+  useEffect(() => {
+    stateScrollRef.current      && (stateScrollRef.current.scrollLeft      = 0)
+    scrollRef.current           && (scrollRef.current.scrollLeft           = 0)
+    collectionScrollRef.current && (collectionScrollRef.current.scrollLeft = 0)
+  }, [])
 
   async function handleAdd() {
     setIsSaved(true)
@@ -229,7 +237,7 @@ export default function ExperienceDetailContent({
             className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center"
             aria-label="Share"
           >
-            <Share2 size={18} className="text-[#131936]" />
+            <Upload size={18} className="text-[#131936]" />
           </button>
         </div>
       </div>
@@ -426,8 +434,9 @@ export default function ExperienceDetailContent({
                 </Link>
               </div>
               <div
+                ref={stateScrollRef}
                 className="flex gap-3 overflow-x-auto pb-3 -mx-5 px-5"
-                style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}
+                style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch', scrollBehavior: 'auto' }}
               >
                 {statePlaces.map(sp => (
                   <ExpSimilarCard
@@ -454,7 +463,7 @@ export default function ExperienceDetailContent({
                 ref={scrollRef}
                 onScroll={handleScroll}
                 className="flex gap-3 overflow-x-auto pb-3 -mx-5 px-5"
-                style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}
+                style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch', scrollBehavior: 'auto' }}
               >
                 {similarPlaces.map(sp => (
                   <ExpSimilarCard
@@ -487,8 +496,9 @@ export default function ExperienceDetailContent({
                 </h2>
               </div>
               <div
+                ref={collectionScrollRef}
                 className="flex gap-3 overflow-x-auto pb-3 -mx-5 px-5"
-                style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}
+                style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch', scrollBehavior: 'auto' }}
               >
                 {collectionContext.places.map(sp => (
                   <ExpSimilarCard
@@ -518,7 +528,7 @@ export default function ExperienceDetailContent({
             className="w-12 h-12 rounded-full bg-white border border-[#fcd99a] flex items-center justify-center shrink-0"
             aria-label="Share"
           >
-            <Share2 size={18} className="text-[#131936]" />
+            <Upload size={18} className="text-[#131936]" />
           </button>
 
           {/* Add to Someday */}

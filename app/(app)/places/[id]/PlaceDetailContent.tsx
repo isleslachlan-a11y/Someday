@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ChevronLeft, Heart, Share2, Locate, FolderPlus, X } from 'lucide-react'
+import { ChevronLeft, Heart, Upload, Locate, FolderPlus, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import Map, { Marker, NavigationControl } from 'react-map-gl/mapbox'
 import 'mapbox-gl/dist/mapbox-gl.css'
@@ -110,12 +110,22 @@ export default function PlaceDetailContent({
   const [showCollectionSheet, setShowCollectionSheet] = useState(false)
   const [collectionIds, setCollectionIds] = useState<Set<string>>(new Set(initialPlaceCollectionIds))
   const [togglingId, setTogglingId] = useState<string | null>(null)
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const mapRef    = useRef<import('react-map-gl/mapbox').MapRef>(null)
+  const scrollRef           = useRef<HTMLDivElement>(null)
+  const stateScrollRef      = useRef<HTMLDivElement>(null)
+  const childScrollRef      = useRef<HTMLDivElement>(null)
+  const collectionScrollRef = useRef<HTMLDivElement>(null)
+  const mapRef              = useRef<import('react-map-gl/mapbox').MapRef>(null)
 
   useEffect(() => {
     logEvent(userId, 'page_viewed', { page: 'place_detail', place_id: place.id })
   }, [userId, place.id])
+
+  useEffect(() => {
+    stateScrollRef.current      && (stateScrollRef.current.scrollLeft      = 0)
+    childScrollRef.current      && (childScrollRef.current.scrollLeft      = 0)
+    scrollRef.current           && (scrollRef.current.scrollLeft           = 0)
+    collectionScrollRef.current && (collectionScrollRef.current.scrollLeft = 0)
+  }, [])
 
   // ── Save / remove ─────────────────────────────────────────────────────────
 
@@ -258,7 +268,7 @@ export default function PlaceDetailContent({
           className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/30 flex items-center justify-center"
           aria-label="Share"
         >
-          <Share2 size={18} className="text-white" />
+          <Upload size={18} className="text-white" />
         </button>
 
         {/* Place info overlay */}
@@ -274,23 +284,10 @@ export default function PlaceDetailContent({
       {/* ── Body ────────────────────────────────────────────────────────────── */}
       <div className="max-w-[480px] mx-auto">
 
-        {/* Tags */}
-        {(place.tags ?? []).length > 0 && (
-          <div className="flex flex-wrap gap-2 px-4 pt-4">
-            {(place.tags ?? []).map(tag => (
-              <span
-                key={tag}
-                className="px-3 py-1 rounded-full bg-[#fcd99a]/50 text-[#131936] font-nunito text-[11px]"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
-
         {/* Description */}
         {place.description && (
           <div className="px-4 pt-4">
+            <h2 className="font-syne font-bold text-[#131936] text-[16px] mb-3">Description</h2>
             <p
               className={`font-nunito text-[14px] text-[#131936]/70 leading-relaxed ${
                 descExpanded ? '' : 'line-clamp-3'
@@ -342,18 +339,6 @@ export default function PlaceDetailContent({
               </div>
             )}
 
-            {place.vibe_tags && place.vibe_tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 pt-1">
-                {place.vibe_tags.map(vibe => (
-                  <span
-                    key={vibe}
-                    className="px-3 py-1 rounded-full bg-[#fcd99a]/50 border border-[#fcd99a] font-nunito text-[12px] text-[#131936]"
-                  >
-                    {vibe}
-                  </span>
-                ))}
-              </div>
-            )}
           </div>
         )}
 
@@ -596,8 +581,9 @@ export default function PlaceDetailContent({
               </Link>
             </div>
             <div
+              ref={stateScrollRef}
               className="flex gap-3 overflow-x-auto px-4 pb-3"
-              style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}
+              style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch', scrollBehavior: 'auto' }}
             >
               {statePlaces.map(sp => (
                 <SimilarCard
@@ -619,7 +605,7 @@ export default function PlaceDetailContent({
                 Things to do here
               </h2>
             </div>
-            <div className="flex gap-3 overflow-x-auto px-4 pb-3 scrollbar-none" style={{ scrollSnapType: 'x mandatory' }}>
+            <div ref={childScrollRef} className="flex gap-3 overflow-x-auto px-4 pb-3 scrollbar-none" style={{ scrollSnapType: 'x mandatory', scrollBehavior: 'auto' }}>
               {childExperiencePlaces.map(exp => (
                 <SimilarCard
                   key={exp.id}
@@ -650,7 +636,7 @@ export default function PlaceDetailContent({
               ref={scrollRef}
               onScroll={handleScroll}
               className="flex gap-3 overflow-x-auto px-4 pb-3"
-              style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}
+              style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch', scrollBehavior: 'auto' }}
             >
               {similarPlaces.map(sp => (
                 <SimilarCard
@@ -683,8 +669,9 @@ export default function PlaceDetailContent({
               </h2>
             </div>
             <div
+              ref={collectionScrollRef}
               className="flex gap-3 overflow-x-auto px-4 pb-3"
-              style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}
+              style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch', scrollBehavior: 'auto' }}
             >
               {collectionContext.places.map(sp => (
                 <SimilarCard
@@ -754,7 +741,7 @@ export default function PlaceDetailContent({
             className="w-12 h-12 rounded-full bg-white border border-[#fcd99a] flex items-center justify-center shrink-0"
             aria-label="Share"
           >
-            <Share2 size={18} className="text-[#131936]" />
+            <Upload size={18} className="text-[#131936]" />
           </button>
 
           {/* Add to Someday */}
