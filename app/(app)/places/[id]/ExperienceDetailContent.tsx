@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ChevronLeft, Heart, Share2, Bookmark, MapPin, ChevronRight, FolderPlus, X } from 'lucide-react'
+import { ChevronLeft, Heart, Share2, MapPin, FolderPlus, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { logEvent } from '@/lib/events'
 import { addPlaceToList, removePlaceByPlaceId } from '@/app/actions/bucketList'
@@ -37,32 +37,6 @@ function getCost(popularity: number): string {
   if (popularity >= 40) return '$$'
   return '$'
 }
-
-function getSeasonalBadge(tags: string[] | null, type: string): string {
-  const t = tags ?? []
-  const seasonMap: Record<string, string> = {
-    winter: 'Dec', summer: 'Jun', spring: 'Mar', autumn: 'Sep', seasonal: 'Peak',
-  }
-  const season = Object.keys(seasonMap).find(s => t.includes(s))
-  if (season) return `✦ Seasonal · ${seasonMap[season]}`
-  const capitalised = type.charAt(0).toUpperCase() + type.slice(1)
-  return `✦ ${capitalised} experience`
-}
-
-function getFestiveBadge(tags: string[] | null, vibes: string[] | null): string {
-  const t = tags ?? []
-  if (t.includes('festive') || t.includes('christmas') || t.includes('holiday')) {
-    return '🎄 Festive Pick'
-  }
-  return vibes?.[0] ?? 'Must-do'
-}
-
-const STEP_SUBTITLES = [
-  'Getting there · first stop',
-  'Main experience · half day',
-  'Local culture · evening',
-  'Final day · departure',
-]
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -212,12 +186,9 @@ export default function ExperienceDetailContent({
     return getBestMonth(place.tags)
   })()
   const cost = getCost(place.popularity)
-  const seasonalBadge = getSeasonalBadge(place.tags, place.type)
-  const festiveBadge = getFestiveBadge(place.tags, place.vibes)
   const vibe = place.vibes?.[0] ?? place.type
   const vibeLabel = vibe.charAt(0).toUpperCase() + vibe.slice(1)
   const location = place.state_province ? `${place.state_province}, ${place.country}` : place.country
-  const steps = (place.tags ?? []).slice(0, 4)
   const countryCount = similarPlaces.filter(sp => sp.country === place.country).length
 
   return (
@@ -240,8 +211,8 @@ export default function ExperienceDetailContent({
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
 
-        {/* Top-left: back + share */}
-        <div className="absolute top-12 left-4 flex items-center gap-2">
+        {/* Top-left: back */}
+        <div className="absolute top-12 left-4">
           <button
             onClick={() => router.back()}
             className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center"
@@ -249,6 +220,10 @@ export default function ExperienceDetailContent({
           >
             <ChevronLeft size={20} className="text-[#131936]" />
           </button>
+        </div>
+
+        {/* Top-right: share */}
+        <div className="absolute top-12 right-4">
           <button
             onClick={handleShare}
             className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center"
@@ -256,35 +231,6 @@ export default function ExperienceDetailContent({
           >
             <Share2 size={18} className="text-[#131936]" />
           </button>
-        </div>
-
-        {/* Top-right: heart + bookmark */}
-        <div className="absolute top-12 right-4 flex items-center gap-2">
-          <button
-            onClick={isSaved ? handleRemove : handleAdd}
-            className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center"
-            aria-label={isSaved ? 'Remove from list' : 'Save to list'}
-          >
-            <Heart
-              size={18}
-              className={isSaved ? 'text-[#f08c21]' : 'text-[#131936]'}
-              fill={isSaved ? '#f08c21' : 'transparent'}
-            />
-          </button>
-          <button
-            onClick={isSaved ? handleRemove : handleAdd}
-            className="w-10 h-10 rounded-full bg-[#f08c21] flex items-center justify-center"
-            aria-label={isSaved ? 'Remove from list' : 'Save to list'}
-          >
-            <Bookmark size={18} className="text-white" />
-          </button>
-        </div>
-
-        {/* Bottom-left: seasonal badge */}
-        <div className="absolute bottom-20 left-4">
-          <span className="bg-white/90 text-[#131936] font-nunito text-[12px] font-semibold px-3 py-1.5 rounded-full">
-            {seasonalBadge}
-          </span>
         </div>
       </div>
 
@@ -321,30 +267,6 @@ export default function ExperienceDetailContent({
               </p>
             )}
 
-            {place.display_labels && place.display_labels.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mt-2">
-                {place.display_labels.slice(0, 3).map(label => (
-                  <span
-                    key={label}
-                    className="px-2 py-0.5 rounded-full bg-[#fcd99a]/60 text-[#131936] font-nunito"
-                    style={{ fontSize: 10 }}
-                  >
-                    {label}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            <div className="flex items-center gap-2 mt-2 flex-wrap">
-              <span className="font-nunito text-[13px] text-[#131936]">
-                <span className="text-[#f08c21]">★</span> 4.8
-              </span>
-              <span className="font-nunito text-[13px] text-[#131936]/50">(1,902 reviews)</span>
-              <span className="text-[#131936]/30">·</span>
-              <span className="bg-[#fcd99a] text-[#131936] font-nunito text-[11px] px-2 py-0.5 rounded-full">
-                {festiveBadge}
-              </span>
-            </div>
           </div>
 
           {/* ── Quick info tiles ───────────────────────────────────────────── */}
@@ -435,49 +357,6 @@ export default function ExperienceDetailContent({
                   {descExpanded ? 'Show less' : 'Read more'}
                 </button>
               )}
-            </div>
-          )}
-
-          {/* ── Categories ─────────────────────────────────────────────────── */}
-          {(place.tags ?? []).length > 0 && (
-            <div className="px-5 mt-6">
-              <h2 className="font-syne font-bold text-[#131936] text-[17px]">Categories</h2>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {(place.tags ?? []).map(tag => (
-                  <span
-                    key={tag}
-                    className="bg-[#131936] text-white font-nunito text-[12px] px-3 py-1.5 rounded-full capitalize"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* ── What to expect ─────────────────────────────────────────────── */}
-          {steps.length > 0 && (
-            <div className="px-5 mt-6">
-              <div className="flex items-center justify-between">
-                <h2 className="font-syne font-bold text-[#131936] text-[17px]">What to expect</h2>
-                <Link href="/discover" className="font-nunito text-[#f08c21] text-[13px]">
-                  Full guide →
-                </Link>
-              </div>
-              <div className="mt-3 space-y-2">
-                {steps.map((tag, i) => (
-                  <div key={tag} className="bg-white rounded-2xl p-3 flex items-center gap-3 border border-[#fcd99a]/40">
-                    <div className="w-9 h-9 rounded-full bg-[#fcd99a]/60 flex items-center justify-center shrink-0">
-                      <span className="font-syne font-bold text-[#131936] text-[14px]">{i + 1}</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-syne font-bold text-[#131936] text-[14px] capitalize">{tag}</p>
-                      <p className="font-nunito text-[#131936]/50 text-[12px]">{STEP_SUBTITLES[i]}</p>
-                    </div>
-                    <ChevronRight size={16} className="text-[#131936]/30 shrink-0" />
-                  </div>
-                ))}
-              </div>
             </div>
           )}
 
@@ -632,17 +511,14 @@ export default function ExperienceDetailContent({
         style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)' }}
       >
         <div className="max-w-[480px] mx-auto flex items-center gap-3">
-          {/* Heart */}
+
+          {/* Share */}
           <button
-            onClick={isSaved ? handleRemove : handleAdd}
+            onClick={handleShare}
             className="w-12 h-12 rounded-full bg-white border border-[#fcd99a] flex items-center justify-center shrink-0"
-            aria-label={isSaved ? 'Remove from list' : 'Save to list'}
+            aria-label="Share"
           >
-            <Heart
-              size={20}
-              className={isSaved ? 'text-[#f08c21]' : 'text-[#131936]'}
-              fill={isSaved ? '#f08c21' : 'transparent'}
-            />
+            <Share2 size={18} className="text-[#131936]" />
           </button>
 
           {/* Add to Someday */}
@@ -655,15 +531,7 @@ export default function ExperienceDetailContent({
             {isSaved ? 'Added to Someday ✦' : '+ Add to Someday'}
           </button>
 
-          {/* Plan it + */}
-          <Link
-            href="/plan"
-            className="px-5 h-12 rounded-full bg-[#f08c21] text-[#131936] font-syne font-bold text-[14px] flex items-center justify-center shrink-0"
-          >
-            Plan it +
-          </Link>
-
-          {/* Admin: collections */}
+          {/* Admin: collections — only when isAdmin */}
           {isAdmin && (
             <button
               onClick={() => setShowCollectionSheet(true)}
@@ -675,6 +543,7 @@ export default function ExperienceDetailContent({
               <FolderPlus size={18} className={collectionIds.size > 0 ? 'text-[#f08c21]' : 'text-[#131936]'} />
             </button>
           )}
+
         </div>
       </div>
 

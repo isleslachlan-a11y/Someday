@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ChevronLeft, Heart, Share2, Compass, Locate, FolderPlus, X } from 'lucide-react'
+import { ChevronLeft, Heart, Share2, Locate, FolderPlus, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import Map, { Marker, NavigationControl } from 'react-map-gl/mapbox'
 import 'mapbox-gl/dist/mapbox-gl.css'
@@ -252,25 +252,21 @@ export default function PlaceDetailContent({
           <ChevronLeft size={20} className="text-white" />
         </button>
 
+        {/* Share button */}
+        <button
+          onClick={handleShare}
+          className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/30 flex items-center justify-center"
+          aria-label="Share"
+        >
+          <Share2 size={18} className="text-white" />
+        </button>
+
         {/* Place info overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <p className="font-nunito text-white/70 text-[12px] capitalize mb-0.5">{place.type}</p>
           <h1 className="font-syne font-bold text-white text-[26px] leading-tight">{place.name}</h1>
           {location && (
             <p className="font-nunito text-white/70 text-[13px] mt-0.5">{location}</p>
-          )}
-          {place.display_labels && place.display_labels.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mt-2">
-              {place.display_labels.slice(0, 3).map(label => (
-                <span
-                  key={label}
-                  className="px-2 py-0.5 rounded-full bg-white/20 text-white font-nunito"
-                  style={{ fontSize: 10 }}
-                >
-                  {label}
-                </span>
-              ))}
-            </div>
           )}
         </div>
       </div>
@@ -746,24 +742,11 @@ export default function PlaceDetailContent({
       </div>
 
       {/* ── Fixed bottom CTA ─────────────────────────────────────────────────── */}
-      {/*
-        Sits above the AppShell bottom nav (h-16 = 64px) on mobile,
-        at the true bottom on desktop where the sidebar replaces the nav.
-      */}
       <div
-        className="fixed bottom-16 lg:bottom-0 left-0 right-0 bg-[#fff9f0] border-t border-[#fcd99a]/50 px-4 py-3 z-40"
+        className="fixed bottom-16 lg:bottom-0 left-0 right-0 bg-white border-t border-[#fcd99a]/50 px-5 py-3 z-40"
         style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)' }}
       >
-        <div className="max-w-[480px] mx-auto flex items-center gap-2">
-          {/* Save / saved button */}
-          <button
-            onClick={isSaved ? handleRemove : handleSave}
-            className={`flex-1 h-12 rounded-full font-syne font-bold text-[14px] transition-colors ${
-              isSaved ? 'bg-[#f08c21] text-[#131936]' : 'bg-[#131936] text-white'
-            }`}
-          >
-            {isSaved ? 'Saved ✦' : '+ Add to my Someday'}
-          </button>
+        <div className="max-w-[480px] mx-auto flex items-center gap-3">
 
           {/* Share */}
           <button
@@ -774,16 +757,17 @@ export default function PlaceDetailContent({
             <Share2 size={18} className="text-[#131936]" />
           </button>
 
-          {/* Explore */}
-          <Link
-            href={`/discover?type=${encodeURIComponent(place.type)}`}
-            className="w-12 h-12 rounded-full bg-[#f08c21] flex items-center justify-center shrink-0"
-            aria-label="Explore similar"
+          {/* Add to Someday */}
+          <button
+            onClick={isSaved ? handleRemove : handleSave}
+            className={`flex-1 h-12 rounded-full font-syne font-bold text-[14px] transition-colors ${
+              isSaved ? 'bg-[#f08c21] text-[#131936]' : 'bg-[#131936] text-white'
+            }`}
           >
-            <Compass size={18} className="text-[#131936]" />
-          </Link>
+            {isSaved ? 'Added to Someday ✦' : '+ Add to Someday'}
+          </button>
 
-          {/* Admin: collections */}
+          {/* Admin: collections — only when isAdmin */}
           {isAdmin && (
             <button
               onClick={() => setShowCollectionSheet(true)}
@@ -795,6 +779,7 @@ export default function PlaceDetailContent({
               <FolderPlus size={18} className={collectionIds.size > 0 ? 'text-[#f08c21]' : 'text-[#131936]'} />
             </button>
           )}
+
         </div>
       </div>
 
