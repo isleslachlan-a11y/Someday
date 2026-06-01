@@ -226,7 +226,7 @@ export default function ExperienceDetailContent({
       {/* ── Full-bleed hero ────────────────────────────────────────────────── */}
       <div
         className="relative w-full overflow-hidden"
-        style={{ height: 300, background: 'linear-gradient(135deg, #f08c21 0%, #f5b05a 50%, #fcd99a 100%)' }}
+        style={{ aspectRatio: '4/3', background: 'linear-gradient(135deg, #f08c21 0%, #f5b05a 50%, #fcd99a 100%)' }}
       >
         {place.image_url && (
           <Image
@@ -234,7 +234,7 @@ export default function ExperienceDetailContent({
             alt={place.name}
             fill
             sizes="100vw"
-            className="object-cover"
+            className="object-cover object-[center_30%]"
             priority
           />
         )}
@@ -319,6 +319,20 @@ export default function ExperienceDetailContent({
                 <MapPin size={14} className="text-[#f08c21] shrink-0" />
                 {location}
               </p>
+            )}
+
+            {place.display_labels && place.display_labels.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {place.display_labels.slice(0, 3).map(label => (
+                  <span
+                    key={label}
+                    className="px-2 py-0.5 rounded-full bg-[#fcd99a]/60 text-[#131936] font-nunito"
+                    style={{ fontSize: 10 }}
+                  >
+                    {label}
+                  </span>
+                ))}
+              </div>
             )}
 
             <div className="flex items-center gap-2 mt-2 flex-wrap">

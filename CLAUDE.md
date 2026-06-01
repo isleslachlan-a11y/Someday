@@ -42,6 +42,7 @@ Run `npm run build` after significant changes and fix all errors before committi
 cd Someday-summary-worker/someday-summary-worker
 npx wrangler dev     # local at http://localhost:8787
 npx wrangler deploy  # push to Cloudflare
+npm run test         # Vitest (uses @cloudflare/vitest-pool-workers)
 ```
 
 Required Worker secrets: `AUTH_TOKEN` (shared secret header `X-Auth-Token`), `ANTHROPIC_API_KEY`.
@@ -96,13 +97,17 @@ app/
     submit/       — nominate a destination for the catalogue
     places/[id]/  — place detail page (PlaceDetailContent.tsx); warm tangerine palette
     discover/     — search + filter by vibe/intensity/category (built)
+    discover/collections/[slug]/ — collection detail view (CollectionDetail.tsx)
+    discover/collections/new/    — admin collection editor with drag-drop place ordering
     profile/      — own profile; [username]/ for public profiles; edit/
-    admin/analytics/  — B2B analytics (gated by ADMIN_USER_ID env var)
-    admin/images/     — bulk Unsplash image linking (gated by NEXT_PUBLIC_ADMIN_EMAIL)
-    admin/places/     — create/edit curated places (gated by is_admin profile flag)
-    admin/submissions/— review + approve/reject user nominations (gated by is_admin)
-    admin/tags/       — manage tags taxonomy (gated by is_admin)
+    admin/analytics/    — B2B analytics (gated by ADMIN_USER_ID env var)
+    admin/collections/  — collections management (gated by is_admin)
+    admin/images/       — bulk Unsplash image linking (gated by NEXT_PUBLIC_ADMIN_EMAIL)
+    admin/places/       — create/edit curated places (gated by is_admin profile flag)
+    admin/submissions/  — review + approve/reject user nominations (gated by is_admin)
+    admin/tags/         — manage tags taxonomy (gated by is_admin)
   (auth)/         — public pages: login/, signup/
+  waitlist/       — public pre-launch email capture + place suggestion (no auth required)
   onboarding/     — onboarding flow (outside (app) to avoid redirect loop)
   actions/        — Server Actions ('use server'): auth.ts, bucketList.ts, friends.ts, messaging.ts, profile.ts, search.ts, trips.ts, submissions.ts, onboarding.ts, adminCollections.ts, adminTagging.ts, adminTags.ts, adminPlaces.ts, adminSubmissions.ts, unsplash-actions.ts
   page.tsx        — landing page (public)
@@ -117,6 +122,8 @@ Mutations use Server Actions (not API routes). API routes that exist:
 - `app/api/admin/activities/route.ts` — POST, creates activities for a place; requires `is_admin = true`
 - `app/api/unsplash/search/route.ts` — GET, proxies Unsplash search; server-only, requires `UNSPLASH_ACCESS_KEY`
 - `app/api/places/recommendations/route.ts` — GET, personalised recommendations via `get_recommendations_for_user` RPC, falls back to popularity sort; accepts `?offset=&sessionId=`; logs impressions server-side
+- `app/api/public/stats/route.ts` — GET, unauthenticated; returns `{ place_count }` for the waitlist page
+- `app/api/waitlist/suggest/route.ts` — POST, unauthenticated; accepts `{ placeId?, placeName?, email? }`, upserts into `waitlist_emails` and `waitlist_suggestions`
 
 On signup, always insert a row into `profiles` using the returned `user.id`.
 
@@ -134,7 +141,7 @@ On signup, always insert a row into `profiles` using the returned `user.id`.
 
 **Home feed realtime:** `HomeContent.tsx` subscribes to `bucket_list_items` updates via Supabase Realtime. When a friend's item changes to `status === 'completed'`, it surfaces a "New activity" banner. This is the established pattern for realtime UI on the home screen.
 
-**Personalised recommendations:** The `get_recommendations_for_user(p_user_id, p_limit)` Postgres RPC scores unsaved places using a weighted signal: category match (0.35), tag match (0.20), social graph/friends (0.20), trending flag (0.10), momentum/newness (0.15). Cold-start users (0 saves) see popular + new places instead. Impression/interaction tracking flows through `lib/recommendations.ts` → `log_recommendation_event` RPC.
+**Personalised recommendations:** The `get_recommendations_for_user(p_user_id, p_limit)` Postgres RPC scores unsaved places using a weighted signal: category match (0.30), tag match (0.18), social graph/friends (0.17), trending flag (0.08), momentum/newness (0.12), cross-sell (0.15 — experiences whose `parent_place_id` matches a saved destination get a boost). Cold-start users (0 saves) see trending + popular places. Impression/interaction tracking flows through `lib/recommendations.ts` → `log_recommendation_event` RPC.
 
 **Place detail routing:** `places/[id]/page.tsx` branches on `isDestination(place)`: destinations render `PlaceDetailContent.tsx` (warm tangerine palette, activities, similar places); experiences render `ExperienceDetailContent.tsx`. Both receive the same `Place` data but present different UI.
 
@@ -147,14 +154,14 @@ On signup, always insert a row into `profiles` using the returned `user.id`.
 | Table | Purpose | Status |
 |-------|---------|--------|
 | `profiles` | Public user profiles (extends `auth.users`); includes `map_city_preference`, `is_admin` (boolean, gates admin routes) | Built |
-| `places` | Curated catalogue of destinations (admin-seeded); includes `lat`, `lng`, `popularity`, `trending`, `image_url`, `image_thumb_url`, `unsplash_photo_id`, `unsplash_attribution` (JSONB), `image_keyword`, `vibes` (enum: Adventure/Culture/Foodie/Romantic/Chill/Epic/Peaceful/Wellness), `intensity` (low/medium/high), `state_province`, `must_do`, `hidden_gem`, `not_for_you`, `best_time`, `vibe_tags`, `submitted_photo_url` | Built |
+| `places` | Curated catalogue of destinations (admin-seeded); includes `lat`, `lng`, `popularity`, `trending`, `image_url`, `image_thumb_url`, `unsplash_photo_id`, `unsplash_attribution` (JSONB), `image_keyword`, `vibes` (enum: Adventure/Culture/Foodie/Romantic/Chill/Epic/Peaceful/Wellness), `intensity` (low/medium/high), `state_province`, `must_do`, `hidden_gem`, `not_for_you`, `best_time`, `vibe_tags`, `submitted_photo_url`, `parent_place_id` (FK → places; links an experience to its parent destination), `duration` (text), `needs_booking` (boolean) | Built |
 | `bucket_list_items` | A user's personal bucket list (user → place); includes `completed_at`, `completion_note`, `completion_photo_url` for Strava-style completion tracking | Built |
 | `events` | Every user action — feeds the B2B data product | Built |
 | `user_context` | Per-user flags: `completed_onboarding`, travel preferences | Built |
 | `trips` | Group trips; `members` is a `uuid[]` array; `created_by` is owner | Built |
 | `trip_items` | Places proposed for a trip | Built |
 | `trip_item_votes` | Member votes on trip destinations | Built |
-| `submissions` | User-nominated destinations pending admin review | Built |
+| `submissions` | User-nominated destinations pending admin review; includes `parent_place_id` (FK → places), `submission_kind` ('destination'/'experience'), `extra_metadata` (JSONB) | Built |
 | `past_trips` | Self-reported travel history (country, year, notes) | Built |
 | `friendships` | Symmetric friend relationships; status: `pending`/`accepted`/`declined`/`blocked` | Built |
 | `conversations` | Chat rooms — DMs, group chats, and trip-linked chats | Built |
@@ -168,10 +175,13 @@ On signup, always insert a row into `profiles` using the returned `user.id`.
 | `experiences_categories` | Join: place → category with `is_primary` flag. Used by `get_recommendations_for_user` RPC. | Built |
 | `experiences_tags` | Join: place → tag. Used by recommendations scoring. | Built |
 | `experiences_labels` | Join: place → label. | Built |
-| `collections` | Curated place collections for the Discover tab; columns: `name`, `slug`, `type`, `description`, `is_featured`, `is_active`. Managed via `adminCollections.ts`. | Built |
+| `collections` | Curated place collections for the Discover tab; columns: `name`, `slug`, `type` (region/theme/editorial/country), `description`, `cover_image`, `sort_order`, `is_featured`, `is_active`. Managed via `adminCollections.ts`. "Start Here" collection seeded by migration. | Built |
+| `collections_places` | Join: collection → place with `sort_order` for drag-drop reordering. Public read, admin write. | Built |
+| `waitlist_emails` | Pre-launch email capture; columns: `id`, `email` (UNIQUE), `created_at`. RLS: public insert allowed. | Built |
+| `waitlist_suggestions` | Place suggestions from waitlist sign-ups; columns: `id`, `email`, `place_id` (→ places, nullable), `place_name`, `created_at`. RLS: public insert. | Built |
 | `posts` | User-created Strava-style completion posts (distinct from `promotional_posts`) | Planned |
 
-Migrations live in `supabase/migrations/`. Key migrations: `003_profiles.sql`, `004_events_platform.sql`, `20260414120000_pivot_schema.sql` (places pivot), `20260414200000_trips_schema.sql`, `20260418_map_columns.sql`, `20260418200000_friendships.sql`, `20260421000000_messaging_schema.sql`, `20260429000000_promotional_posts.sql`, `20260429000001_completion_columns.sql` (adds completion fields to `bucket_list_items`), `20260512000000_add_is_admin_to_profiles.sql` (adds `is_admin` flag), `20260513000000_create_activities.sql` (activities table), `20260528000002_tagging_schema.sql` (taxonomy: categories+, place_labels, experiences_categories/tags/labels), `20260529000000_place_momentum_rpc.sql` (personalised recommendations RPC), `20260529000001_add_state_province.sql` (state_province on places), `20260529000002_place_images_bucket.sql` (place-images storage bucket).
+Migrations live in `supabase/migrations/`. Key migrations: `003_profiles.sql`, `004_events_platform.sql`, `20260414120000_pivot_schema.sql` (places pivot), `20260414200000_trips_schema.sql`, `20260418_map_columns.sql`, `20260418200000_friendships.sql`, `20260421000000_messaging_schema.sql`, `20260429000000_promotional_posts.sql`, `20260429000001_completion_columns.sql` (adds completion fields to `bucket_list_items`), `20260512000000_add_is_admin_to_profiles.sql` (adds `is_admin` flag), `20260513000000_create_activities.sql` (activities table), `20260528000002_tagging_schema.sql` (taxonomy: categories+, place_labels, experiences_categories/tags/labels), `20260529000000_place_momentum_rpc.sql` (personalised recommendations RPC), `20260529000001_add_state_province.sql` (state_province on places), `20260529000002_place_images_bucket.sql` (place-images storage bucket), `20260530000000_waitlist_tables.sql` (waitlist_emails + waitlist_suggestions), `20260530000001_start_here_collection.sql` (seeds "Start Here" collection).
 
 **Supabase Storage buckets:**
 - `place-images` — public read, admin-only write; 10 MB limit; JPEG/PNG/WebP. For admin-uploaded place photos (distinct from Unsplash CDN images).
@@ -182,6 +192,8 @@ Migrations live in `supabase/migrations/`. Key migrations: `003_profiles.sql`, `
 - `bucket_list_items`, `conversations`, `conversation_members`, `messages` — private read and write
 - `friendships` — public read (accepted), private write
 - `events` — insert only for users, read via service role on backend
+- `collections`, `collections_places` — public read (active only), admin write
+- `waitlist_emails`, `waitlist_suggestions` — public insert (no auth required), no public read
 
 ## Environment Variables
 
@@ -208,6 +220,7 @@ When adding new env variables, also add them to Vercel's environment settings. `
 - Mutations go in Server Actions under `app/actions/`.
 - Reusable components live in `components/`.
 - Use `react-hot-toast` for all user-facing success and error messages.
+- Use `@hello-pangea/dnd` for drag-and-drop ordering (e.g. collections editor). Import `DragDropContext`, `Droppable`, `Draggable` from that package.
 - Always handle Supabase errors:
   ```ts
   const { data, error } = await supabase.from('...').select('*')

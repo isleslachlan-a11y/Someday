@@ -29,7 +29,7 @@ export default function DiscoverPlaceCard({
     <div
       className={`relative rounded-2xl overflow-hidden ${gridMode ? 'w-full' : 'shrink-0'}`}
       style={{
-        height: 200,
+        height: 210,
         ...(gridMode ? {} : { width: 130 }),
         background: dark ? '#131936' : '#fcd99a',
       }}
@@ -43,7 +43,7 @@ export default function DiscoverPlaceCard({
           className="object-cover"
         />
       )}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
       <Link
         href={`/places/${place.id}`}
@@ -72,22 +72,15 @@ export default function DiscoverPlaceCard({
         <p className="font-syne font-bold text-white text-[13px] leading-tight line-clamp-2">
           {place.name}
         </p>
-        {place.top_tags && place.top_tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-1">
-            {place.top_tags.slice(0, 3).map(tag => (
-              <span
-                key={tag}
-                className="px-1.5 py-0.5 rounded-full bg-white/15 text-white/80 font-nunito"
-                style={{ fontSize: 9 }}
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
-        <p className="font-nunito text-white/70 text-[11px] mt-0.5 flex items-center gap-0.5">
+        <p className="font-nunito text-white/70 text-[10px] mt-1 flex items-center gap-0.5 truncate">
           <MapPin size={9} className="shrink-0" />
-          {place.state_province ? `${place.state_province}, ${place.country}` : place.country}
+          <span className="truncate">{place.state_province ? `${place.state_province}, ${place.country}` : place.country}</span>
+        </p>
+        <p className="font-nunito text-white/55 text-[10px] mt-0.5 flex items-center gap-0.5">
+          <Heart size={8} fill="currentColor" />
+          {place.popularity >= 1000
+            ? (place.popularity / 1000).toFixed(1).replace(/\.0$/, '') + 'k'
+            : String(place.popularity)} saves
         </p>
       </div>
     </div>

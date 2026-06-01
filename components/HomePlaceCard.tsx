@@ -65,7 +65,7 @@ export default function HomePlaceCard({ place, isAdded, onAdd, onRemove, index }
 
       {/* Gradient overlay so bottom text stays readable */}
       {place.image_url && (
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
       )}
 
       {/* Card body navigation */}
@@ -93,62 +93,25 @@ export default function HomePlaceCard({ place, isAdded, onAdd, onRemove, index }
       {/* Bottom text content — pointer-events-none so Link handles taps */}
       <div className="absolute bottom-0 left-0 right-0 p-3 pointer-events-none">
         <h3
-          className={`font-syne font-bold leading-tight truncate ${place.image_url || dark ? 'text-white' : 'text-[#131936]'}`}
-          style={{ fontSize: 14 }}
+          className={`font-syne font-bold leading-tight line-clamp-2 ${place.image_url || dark ? 'text-white' : 'text-[#131936]'}`}
+          style={{ fontSize: 13, lineHeight: 1.3 }}
         >
           {place.name}
         </h3>
-        {place.primary_category && (
-          <span
-            className={`inline-block rounded-full px-2 py-0.5 font-nunito mt-0.5 ${
-              dark ? 'bg-[#f08c21]/20 text-[#fcd99a]' : 'bg-[#131936]/10 text-[#131936]/70'
-            }`}
-            style={{ fontSize: 9 }}
-          >
-            {place.primary_category.icon} {place.primary_category.name}
-          </span>
-        )}
-        {!place.primary_category && place.type === 'experience' && (
-          <span
-            className={`inline-block rounded-full px-2 py-0.5 font-nunito mt-0.5 ${
-              dark ? 'bg-[#f08c21]/20 text-[#fcd99a]' : 'bg-[#131936]/10 text-[#131936]/70'
-            }`}
-            style={{ fontSize: 9 }}
-          >
-            ✨ Experience
-          </span>
-        )}
-        {place.display_labels && place.display_labels.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-1 pointer-events-none">
-            {place.display_labels.slice(0, 2).map(label => (
-              <span
-                key={label}
-                className="px-1.5 py-0.5 rounded-full font-nunito"
-                style={{
-                  fontSize: 9,
-                  background: dark ? 'rgba(252,217,154,0.2)' : 'rgba(19,25,54,0.08)',
-                  color: dark ? '#fcd99a' : '#131936',
-                }}
-              >
-                {label}
-              </span>
-            ))}
-          </div>
-        )}
         {location && (
           <p
-            className={`flex items-center gap-0.5 font-nunito mt-0.5 truncate ${place.image_url || dark ? 'text-white/75' : 'text-[#131936]/70'}`}
-            style={{ fontSize: 11 }}
+            className={`flex items-center gap-0.5 font-nunito mt-1 truncate ${place.image_url || dark ? 'text-white/70' : 'text-[#131936]/60'}`}
+            style={{ fontSize: 10 }}
           >
-            <MapPin size={10} className="shrink-0" />
+            <MapPin size={9} className="shrink-0" />
             <span className="truncate">{location}</span>
           </p>
         )}
         <p
-          className={`flex items-center gap-0.5 font-nunito mt-1 ${place.image_url || dark ? 'text-white/60' : 'text-[#131936]/50'}`}
+          className={`flex items-center gap-0.5 font-nunito mt-0.5 ${place.image_url || dark ? 'text-white/55' : 'text-[#131936]/45'}`}
           style={{ fontSize: 10 }}
         >
-          <Heart size={9} fill="currentColor" />
+          <Heart size={8} fill="currentColor" />
           {formatCount(place.popularity)} saves
         </p>
       </div>

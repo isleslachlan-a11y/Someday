@@ -230,14 +230,14 @@ export default function PlaceDetailContent({
     <div className="min-h-screen bg-[#fff9f0] pb-24">
 
       {/* ── Hero ────────────────────────────────────────────────────────────── */}
-      <div className="relative h-64 w-full bg-gradient-to-br from-[#f08c21] to-[#fcd99a]">
+      <div className="relative w-full bg-gradient-to-br from-[#f08c21] to-[#fcd99a]" style={{ aspectRatio: '4/3' }}>
         {place.image_url && (
           <Image
             src={place.image_url}
             alt={place.name}
             fill
             sizes="100vw"
-            className="object-cover"
+            className="object-cover object-[center_30%]"
             priority
           />
         )}
@@ -258,6 +258,19 @@ export default function PlaceDetailContent({
           <h1 className="font-syne font-bold text-white text-[26px] leading-tight">{place.name}</h1>
           {location && (
             <p className="font-nunito text-white/70 text-[13px] mt-0.5">{location}</p>
+          )}
+          {place.display_labels && place.display_labels.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {place.display_labels.slice(0, 3).map(label => (
+                <span
+                  key={label}
+                  className="px-2 py-0.5 rounded-full bg-white/20 text-white font-nunito"
+                  style={{ fontSize: 10 }}
+                >
+                  {label}
+                </span>
+              ))}
+            </div>
           )}
         </div>
       </div>
