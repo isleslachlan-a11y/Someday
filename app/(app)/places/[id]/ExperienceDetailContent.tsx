@@ -230,15 +230,37 @@ export default function ExperienceDetailContent({
           </button>
         </div>
 
-        {/* Top-right: share */}
-        <div className="absolute top-12 right-4">
+        {/* Top-right: share, save, collections */}
+        <div className="absolute top-12 right-4 flex items-center gap-2">
           <button
             onClick={handleShare}
-            className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center"
+            className="w-10 h-10 rounded-full bg-black/30 flex items-center justify-center"
             aria-label="Share"
           >
-            <Upload size={18} className="text-[#131936]" />
+            <Upload size={18} className="text-white" />
           </button>
+          <button
+            onClick={isSaved ? handleRemove : handleAdd}
+            className="w-10 h-10 rounded-full bg-black/30 flex items-center justify-center"
+            aria-label={isSaved ? 'Remove from Someday' : 'Add to Someday'}
+          >
+            <Heart
+              size={18}
+              className={isSaved ? 'text-[#f08c21]' : 'text-white'}
+              fill={isSaved ? '#f08c21' : 'transparent'}
+            />
+          </button>
+          {isAdmin && (
+            <button
+              onClick={() => setShowCollectionSheet(true)}
+              className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                collectionIds.size > 0 ? 'bg-[#f08c21]' : 'bg-black/30'
+              }`}
+              aria-label="Manage collections"
+            >
+              <FolderPlus size={18} className="text-white" />
+            </button>
+          )}
         </div>
       </div>
 
@@ -510,48 +532,6 @@ export default function ExperienceDetailContent({
                 ))}
               </div>
             </div>
-          )}
-
-        </div>
-      </div>
-
-      {/* ── Fixed bottom CTA bar ────────────────────────────────────────────── */}
-      <div
-        className="fixed bottom-16 lg:bottom-0 left-0 right-0 bg-white border-t border-[#fcd99a]/50 px-5 py-3 z-40"
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)' }}
-      >
-        <div className="max-w-[480px] mx-auto flex items-center gap-3">
-
-          {/* Share */}
-          <button
-            onClick={handleShare}
-            className="w-12 h-12 rounded-full bg-white border border-[#fcd99a] flex items-center justify-center shrink-0"
-            aria-label="Share"
-          >
-            <Upload size={18} className="text-[#131936]" />
-          </button>
-
-          {/* Add to Someday */}
-          <button
-            onClick={isSaved ? handleRemove : handleAdd}
-            className={`flex-1 h-12 rounded-full font-syne font-bold text-[14px] transition-colors ${
-              isSaved ? 'bg-[#f08c21] text-[#131936]' : 'bg-[#131936] text-white'
-            }`}
-          >
-            {isSaved ? 'Added to Someday ✦' : '+ Add to Someday'}
-          </button>
-
-          {/* Admin: collections — only when isAdmin */}
-          {isAdmin && (
-            <button
-              onClick={() => setShowCollectionSheet(true)}
-              className={`w-12 h-12 rounded-full border flex items-center justify-center shrink-0 ${
-                collectionIds.size > 0 ? 'bg-[#131936] border-[#131936]' : 'bg-white border-[#fcd99a]'
-              }`}
-              aria-label="Manage collections"
-            >
-              <FolderPlus size={18} className={collectionIds.size > 0 ? 'text-[#f08c21]' : 'text-[#131936]'} />
-            </button>
           )}
 
         </div>
