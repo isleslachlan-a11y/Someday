@@ -1,7 +1,33 @@
 import { updateSession } from '@/lib/supabase/middleware'
-import type { NextRequest } from 'next/server'
+import { NextResponse, type NextRequest } from 'next/server'
+
+// ── Pre-launch gate ───────────────────────────────────────────────────────────
+// While NEXT_PUBLIC_LAUNCHED is not 'true', every route outside this allowlist
+// redirects to /waitlist. Flip the flag in Vercel env vars to go live.
+
+const GATE_ALLOWLIST = ['/waitlist', '/admin', '/auth', '/api', '/_next']
+const STATIC_EXTENSION = /\.(?:ico|png|svg|jpg|jpeg|gif|webp|css|js|woff2?|ttf|eot)$/
+
+function isAllowlisted(pathname: string): boolean {
+  if (GATE_ALLOWLIST.some(p => pathname === p || pathname.startsWith(p + '/'))) return true
+  if (STATIC_EXTENSION.test(pathname)) return true
+  return false
+}
 
 export async function middleware(request: NextRequest) {
+  const launched = process.env.NEXT_PUBLIC_LAUNCHED === 'true'
+
+  if (!launched) {
+    const { pathname } = request.nextUrl
+    if (!isAllowlisted(pathname)) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/waitlist'
+      return NextResponse.redirect(url)
+    }
+  }
+
+  // Session refresh + auth redirects run unchanged for all allowlisted paths
+  // (and for every path when the app is launched).
   return await updateSession(request)
 }
 
