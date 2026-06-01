@@ -34,9 +34,14 @@ const REGIONS: Region[] = ['Asia', 'Europe', 'Americas', 'Africa', 'Oceania', 'G
 const VIBES_OPTIONS = ['Adventure', 'Culture', 'Foodie', 'Romantic', 'Chill', 'Epic', 'Peaceful', 'Wellness']
 const IMAGE_PAGE_SIZE = 9
 const CARD_VIBE_OPTIONS = ['Adventure', 'Romantic', 'Foodie', 'Chill', 'Epic', 'Peaceful', 'Cultural', 'Wellness', 'Off-grid', 'Party']
-const TAG_CATEGORY_LABELS: Record<string, string> = {
-  vibe: 'Vibe', activity: 'Activity', season: 'Season', budget: 'Budget',
-  travel_style: 'Travel Style', landscape: 'Landscape', food_drink: 'Food & Drink', general: 'General',
+const DIMENSION_ORDER = ['activity', 'landscape', 'vibe', 'setting', 'season', 'food-drink']
+const DIMENSION_LABELS: Record<string, string> = {
+  activity:     'Activity',
+  landscape:    'Landscape',
+  vibe:         'Vibe',
+  setting:      'Setting',
+  season:       'Season',
+  'food-drink': 'Food & Drink',
 }
 
 const INPUT_CLASS = 'w-full rounded-2xl border border-[#fcd99a] bg-white px-4 py-3 font-nunito text-[14px] text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:ring-2 focus:ring-[#f08c21]/30 transition'
@@ -482,17 +487,29 @@ export default function AdminExperienceForm({ userId: _userId, onBack }: Props) 
           <input id="exp-tag-search" name="exp-tag-search" type="text" value={tagSearch} onChange={e => setTagSearch(e.target.value)} placeholder="Filter tags…"
             className="w-full rounded-full border border-[#fcd99a] bg-white px-4 py-2 font-nunito text-[13px] text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:ring-2 focus:ring-[#f08c21]/30 mb-3" />
           <div className="space-y-4 max-h-64 overflow-y-auto pr-1">
-            {Array.from(new Set(visibleTags.map(t => t.category))).map(dim => (
-              <div key={dim}>
-                <p className="font-nunito text-[10px] font-bold uppercase tracking-wider text-[#131936]/40 mb-1.5">{TAG_CATEGORY_LABELS[dim] ?? dim}</p>
-                <div className="flex flex-wrap gap-2">
-                  {visibleTags.filter(t => t.category === dim).map(tag => {
-                    const active = selectedTags.includes(tag.id)
-                    return <button key={tag.id} type="button" onClick={() => setSelectedTags(prev => active ? prev.filter(id => id !== tag.id) : [...prev, tag.id])} className={pillClass(active)}>{tag.name}</button>
-                  })}
+            {DIMENSION_ORDER.map(dim => {
+              const dimTags = visibleTags.filter(t => t.category === dim)
+              if (dimTags.length === 0) return null
+              return (
+                <div key={dim}>
+                  <p className="font-nunito text-[10px] font-bold uppercase tracking-wider text-[#131936]/40 mb-1.5">
+                    {DIMENSION_LABELS[dim] ?? dim}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {dimTags.map(tag => {
+                      const active = selectedTags.includes(tag.id)
+                      return (
+                        <button key={tag.id} type="button"
+                          onClick={() => setSelectedTags(prev => active ? prev.filter(id => id !== tag.id) : [...prev, tag.id])}
+                          className={pillClass(active)}>
+                          {tag.name}
+                        </button>
+                      )
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
           {selectedTags.length > 0 && <p className="font-nunito text-[11px] text-[#131936]/50 mt-2">{selectedTags.length} tag{selectedTags.length !== 1 ? 's' : ''} selected — <button type="button" onClick={() => setSelectedTags([])} className="text-[#f08c21]">clear all</button></p>}
         </div>

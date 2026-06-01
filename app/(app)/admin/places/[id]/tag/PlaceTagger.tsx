@@ -41,15 +41,14 @@ interface Props {
   nextUntaggedName: string | null
 }
 
-const TAG_CATEGORY_LABELS: Record<string, string> = {
-  vibe:         'Vibe',
+const DIMENSION_ORDER = ['activity', 'landscape', 'vibe', 'setting', 'season', 'food-drink']
+const DIMENSION_LABELS: Record<string, string> = {
   activity:     'Activity',
-  season:       'Season',
-  budget:       'Budget',
-  travel_style: 'Travel Style',
   landscape:    'Landscape',
-  food_drink:   'Food & Drink',
-  general:      'General',
+  vibe:         'Vibe',
+  setting:      'Setting',
+  season:       'Season',
+  'food-drink': 'Food & Drink',
 }
 
 export default function PlaceTagger({
@@ -139,13 +138,11 @@ export default function PlaceTagger({
   // ── Group tags by their category dimension ─────────────────────────────────
 
   const tagGroups = tags.reduce<Record<string, TagRecord[]>>((acc, tag) => {
-    const key = tag.category || 'general'
+    const key = tag.category || 'activity'
     if (!acc[key]) acc[key] = []
     acc[key].push(tag)
     return acc
   }, {})
-
-  const tagGroupOrder = ['vibe', 'activity', 'season', 'budget', 'travel_style', 'landscape', 'food_drink', 'general']
 
   return (
     <div className="space-y-8">
@@ -201,15 +198,16 @@ export default function PlaceTagger({
           )}
         </h2>
         <div className="space-y-4">
-          {tagGroupOrder
-            .filter(key => tagGroups[key]?.length > 0)
-            .map(key => (
+          {DIMENSION_ORDER.map(key => {
+            const dimTags = tagGroups[key] ?? []
+            if (dimTags.length === 0) return null
+            return (
               <div key={key}>
                 <p className="font-nunito text-[#131936]/40 text-[11px] uppercase tracking-wider mb-2">
-                  {TAG_CATEGORY_LABELS[key] ?? key}
+                  {DIMENSION_LABELS[key] ?? key}
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {tagGroups[key].map(tag => {
+                  {dimTags.map(tag => {
                     const isSelected = selectedTagIds.has(tag.id)
                     return (
                       <button
@@ -227,32 +225,8 @@ export default function PlaceTagger({
                   })}
                 </div>
               </div>
-            ))}
-          {Object.keys(tagGroups).filter(k => !tagGroupOrder.includes(k)).map(key => (
-            <div key={key}>
-              <p className="font-nunito text-[#131936]/40 text-[11px] uppercase tracking-wider mb-2">
-                {key}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {tagGroups[key].map(tag => {
-                  const isSelected = selectedTagIds.has(tag.id)
-                  return (
-                    <button
-                      key={tag.id}
-                      onClick={() => toggleTag(tag.id)}
-                      className={`px-3 py-1.5 rounded-full border font-nunito text-[12px] transition-all ${
-                        isSelected
-                          ? 'bg-[#131936] border-[#131936] text-white'
-                          : 'bg-white border-[#fcd99a] text-[#131936]/60'
-                      }`}
-                    >
-                      {tag.name}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-          ))}
+            )
+          })}
           {tags.length === 0 && (
             <p className="font-nunito text-[#131936]/30 text-[13px]">
               No tags in library yet —{' '}

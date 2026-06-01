@@ -7,24 +7,22 @@ import { createTag, deleteTag, mergeTag, createLabel, deleteLabel, type TagRecor
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const CATEGORY_LABELS: Record<string, string> = {
-  vibe:         'Vibe',
   activity:     'Activity',
-  season:       'Season',
-  budget:       'Budget',
-  travel_style: 'Travel Style',
   landscape:    'Landscape',
-  food_drink:   'Food & Drink',
-  general:      'General',
+  vibe:         'Vibe',
+  setting:      'Setting',
+  season:       'Season',
+  'food-drink': 'Food & Drink',
 }
 
-const PLACE_TYPES = ['city', 'nature', 'experience', 'food'] as const
+const PLACE_TYPES = ['destination', 'experience'] as const
 type PlaceType = (typeof PLACE_TYPES)[number]
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
 const DIMENSIONS = [
-  'activity', 'landscape', 'culture', 'vibe',
-  'budget', 'season', 'duration', 'trend',
+  'activity', 'landscape', 'vibe',
+  'setting', 'season', 'food-drink',
 ] as const
 
 interface Props {
@@ -44,7 +42,7 @@ function CreateForm({ onCreated, onCancel }: CreateFormProps) {
   const [name, setName]           = useState('')
   const [slug, setSlug]           = useState('')
   const [slugEdited, setSlugEdited] = useState(false)
-  const [category, setCategory]   = useState('general')
+  const [category, setCategory]   = useState('activity')
   const [dimension, setDimension] = useState('activity')
   const [placeType, setPlaceType] = useState<PlaceType[]>([])
   const [saving, setSaving]       = useState(false)
@@ -356,7 +354,7 @@ export default function TagManager({ grouped: initial, categories, labels: initi
 
   function handleCreated(tag: TagRecord) {
     setGrouped(prev => {
-      const key = categories.includes(tag.category) ? tag.category : 'general'
+      const key = categories.includes(tag.category) ? tag.category : 'activity'
       return {
         ...prev,
         [key]: [...(prev[key] ?? []), tag].sort((a, b) => a.name.localeCompare(b.name)),

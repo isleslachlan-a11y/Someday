@@ -7,8 +7,8 @@ import TagManager from './TagManager'
 export const metadata = { title: 'Tag Library' }
 
 const CATEGORIES = [
-  'vibe', 'activity', 'season', 'budget',
-  'travel_style', 'landscape', 'food_drink', 'general',
+  'activity', 'landscape', 'vibe',
+  'setting', 'season', 'food-drink',
 ]
 
 export default async function AdminTagsPage() {
@@ -43,7 +43,7 @@ export default async function AdminTagsPage() {
   const grouped: Record<string, TagRecord[]> = {}
   for (const cat of CATEGORIES) grouped[cat] = []
   for (const tag of tags) {
-    const key = CATEGORIES.includes(tag.category) ? tag.category : 'general'
+    const key = CATEGORIES.includes(tag.category) ? tag.category : 'activity'
     grouped[key].push(tag)
   }
 
