@@ -12,6 +12,12 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'images.unsplash.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'jzusuvhdxzthspeghafm.supabase.co',
+        pathname: '/storage/v1/object/public/**',
+      },
+      // next.config.ts changes require a full dev server restart (not hot reload)
     ],
   },
 };

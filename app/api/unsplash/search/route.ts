@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
   const params = new URLSearchParams({
     query: searchQuery,
     per_page: '18',
-    orientation: 'landscape',
+    orientation: 'portrait',
     content_filter: 'high',
   })
 

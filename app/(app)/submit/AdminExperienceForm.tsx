@@ -536,7 +536,7 @@ export default function AdminExperienceForm({ userId: _userId, onBack }: Props) 
                 <div className="grid grid-cols-3 gap-2 mb-3">
                   {visibleImages.map(img => (
                     <button key={img.id} type="button" onClick={() => setSelectedImage(prev => prev?.id === img.id ? null : img)}
-                      className={`relative aspect-video rounded-xl overflow-hidden border-2 transition-all ${selectedImage?.id === img.id ? 'border-[#f08c21] scale-[0.97]' : 'border-transparent'}`}>
+                      className={`relative aspect-[2/3] rounded-xl overflow-hidden border-2 transition-all ${selectedImage?.id === img.id ? 'border-[#f08c21] scale-[0.97]' : 'border-transparent'}`}>
                       <Image src={img.image_thumb_url} alt={img.attribution.photographer_name} fill sizes="33vw" className="object-cover" />
                       {selectedImage?.id === img.id && <div className="absolute inset-0 bg-[#f08c21]/20 flex items-center justify-center"><span className="text-white text-[20px]">✓</span></div>}
                     </button>
@@ -547,7 +547,7 @@ export default function AdminExperienceForm({ userId: _userId, onBack }: Props) 
             )}
             {selectedImage && (
               <div className="rounded-2xl overflow-hidden border border-[#fcd99a] mb-2 mt-3">
-                <div className="relative h-40"><Image src={selectedImage.image_url} alt="Selected" fill sizes="480px" className="object-cover" /></div>
+                <div className="relative aspect-[2/3]"><Image src={selectedImage.image_url} alt="Selected" fill sizes="480px" className="object-cover" /></div>
                 <p className="font-nunito text-[#131936]/40 text-[10px] px-3 py-1.5">Photo by <a href={selectedImage.attribution.photographer_url} target="_blank" rel="noopener noreferrer" className="text-[#f08c21]">{selectedImage.attribution.photographer_name}</a> on Unsplash</p>
               </div>
             )}
@@ -565,7 +565,7 @@ export default function AdminExperienceForm({ userId: _userId, onBack }: Props) 
               </button>
             ) : (
               <div className="relative rounded-2xl overflow-hidden border border-[#fcd99a]">
-                <div className="relative h-48"><Image src={uploadPreview} alt="Upload preview" fill className="object-cover" /></div>
+                <div className="relative aspect-[2/3]"><Image src={uploadPreview} alt="Upload preview" fill className="object-cover" /></div>
                 <button type="button" onClick={() => { setUploadFile(null); setUploadPreview(null); setUploadedImageUrl(null); setUploadConsent(false) }}
                   className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center text-[14px]">×</button>
               </div>
@@ -587,7 +587,7 @@ export default function AdminExperienceForm({ userId: _userId, onBack }: Props) 
           <div className="space-y-3">
             <input type="url" value={manualImageUrl} onChange={e => { setManualImageUrl(e.target.value); setManualImageValid(false) }} placeholder="https://example.com/photo.jpg" className={INPUT_CLASS} />
             {manualImageUrl && !manualImageValid && <button type="button" onClick={() => setManualImageValid(true)} className="font-nunito text-[13px] text-[#f08c21]">Preview image →</button>}
-            {manualImageValid && manualImageUrl && <div className="rounded-2xl overflow-hidden border border-[#fcd99a]"><div className="relative h-40"><Image src={manualImageUrl} alt="Preview" fill className="object-cover" onError={() => { toast.error('Could not load image.'); setManualImageValid(false) }} /></div></div>}
+            {manualImageValid && manualImageUrl && <div className="rounded-2xl overflow-hidden border border-[#fcd99a]"><div className="relative aspect-[2/3]"><Image src={manualImageUrl} alt="Preview" fill className="object-cover" onError={() => { toast.error('Could not load image.'); setManualImageValid(false) }} /></div></div>}
           </div>
         )}
       </div>
