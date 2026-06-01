@@ -63,15 +63,33 @@ const CARDS = [
     type: 'logistics' as const,
   },
   {
-    id: 'photo',
+    id: 'cost',
     step: 5,
+    prompt: 'What does it cost?',
+    subprompt: 'Optional — free, paid, ballpark price.',
+    type: 'text' as const,
+    placeholder: 'e.g. Free, $20 entry, $50–80 per person',
+    maxLength: 80,
+  },
+  {
+    id: 'not_for_you',
+    step: 6,
+    prompt: 'Not for you if…',
+    subprompt: 'Optional — who should skip this?',
+    type: 'text' as const,
+    placeholder: 'e.g. Not for you if you hate crowds or long queues',
+    maxLength: 120,
+  },
+  {
+    id: 'photo',
+    step: 7,
     prompt: 'Got a photo?',
     subprompt: 'Optional — helps us review faster.',
     type: 'photo' as const,
   },
   {
     id: 'review',
-    step: 6,
+    step: 8,
     prompt: 'Why does this belong on Someday?',
     subprompt: 'Make someone add it to their list. Two sentences is enough.',
     type: 'text' as const,
@@ -104,6 +122,8 @@ export default function ExperienceSubmitForm({ userId, onBack }: Props) {
   const [placeRegion, setPlaceRegion]   = useState('')
   const [stateProv, setStateProv]       = useState('')
   const [mustDo, setMustDo]             = useState('')
+  const [cost, setCost]                 = useState('')
+  const [notForYou, setNotForYou]       = useState('')
   const [duration, setDuration]         = useState('')
   const [needsBooking, setNeedsBooking] = useState(false)
   const [description, setDescription]   = useState('')
@@ -141,6 +161,8 @@ export default function ExperienceSubmitForm({ userId, onBack }: Props) {
       case 'parent':    return true
       case 'must_do':   return mustDo.trim().length > 10
       case 'logistics': return true
+      case 'cost':      return true
+      case 'not_for_you': return true
       case 'photo':     return true
       case 'review':    return description.trim().length > 20
       default:          return true
@@ -261,7 +283,8 @@ export default function ExperienceSubmitForm({ userId, onBack }: Props) {
       image_url:       photo_url,
       must_do:         mustDo || null,
       hidden_gem:      null,
-      not_for_you:     null,
+      not_for_you:     notForYou || null,
+      cost:            cost || null,
       best_time:       null,
       vibe_tags:       [],
       photo_url,
@@ -283,7 +306,7 @@ export default function ExperienceSubmitForm({ userId, onBack }: Props) {
   function resetForm() {
     setCurrentStep(0); setSubmitted(false)
     setPlaceName(''); setPlaceCountry(''); setPlaceRegion(''); setStateProv('')
-    setMustDo(''); setDuration(''); setNeedsBooking(false); setDescription('')
+    setMustDo(''); setCost(''); setNotForYou(''); setDuration(''); setNeedsBooking(false); setDescription('')
     setPhotoFile(null); setPhotoPreview(null); setPhotoConsent(false)
     setLocationLocked(false); setResolvedLat(null); setResolvedLng(null)
     setSuggestions([]); setParentId(null); setParentName(''); setParentSearch('')
@@ -462,10 +485,10 @@ export default function ExperienceSubmitForm({ userId, onBack }: Props) {
         )
 
       default: {
-        type TextCardId = 'must_do' | 'review'
+        type TextCardId = 'must_do' | 'review' | 'cost' | 'not_for_you'
         const textCard = card as { id: TextCardId; type: 'text'; placeholder: string; maxLength: number }
-        const valueMap: Record<TextCardId, string> = { must_do: mustDo, review: description }
-        const setterMap: Record<TextCardId, (v: string) => void> = { must_do: setMustDo, review: setDescription }
+        const valueMap: Record<TextCardId, string> = { must_do: mustDo, review: description, cost, not_for_you: notForYou }
+        const setterMap: Record<TextCardId, (v: string) => void> = { must_do: setMustDo, review: setDescription, cost: setCost, not_for_you: setNotForYou }
         const value = valueMap[textCard.id]
         const setter = setterMap[textCard.id]
         const isLong = textCard.id === 'review'
@@ -484,7 +507,7 @@ export default function ExperienceSubmitForm({ userId, onBack }: Props) {
             )}
             <p className="absolute bottom-3 right-4 font-nunito text-[11px] text-[#131936]/30">{value.length}/{textCard.maxLength}</p>
             {(() => {
-              const minimums: Record<string, number> = { must_do: 10, review: 20 }
+              const minimums: Record<string, number> = { must_do: 10, review: 20, cost: 0, not_for_you: 0 }
               const remaining = (minimums[textCard.id] ?? 0) - value.length
               if (remaining <= 0 || value.length === 0) return null
               return <p className="font-nunito text-[12px] text-[#131936]/40 mt-1.5">{remaining} more character{remaining !== 1 ? 's' : ''} to continue</p>
@@ -527,7 +550,7 @@ export default function ExperienceSubmitForm({ userId, onBack }: Props) {
           <ChevronLeft size={22} className="text-[#131936]" />
         </button>
         <span className="font-nunito text-[#131936]/40 text-[13px]">{currentStep + 1} of {totalSteps}</span>
-        {(card.id === 'photo' || card.id === 'parent' || card.id === 'logistics') ? (
+        {(card.id === 'photo' || card.id === 'parent' || card.id === 'logistics' || card.id === 'cost' || card.id === 'not_for_you') ? (
           <button onClick={goNext} className="font-nunito text-[#131936]/40 text-[13px] hover:text-[#131936] transition-colors px-2">Skip</button>
         ) : (
           <div className="w-10" />

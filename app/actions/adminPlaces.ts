@@ -29,6 +29,7 @@ interface AdminPlaceInput {
   must_do?: string | null
   hidden_gem?: string | null
   not_for_you?: string | null
+  cost?: string | null
   best_time?: string | null
   vibe_tags?: string[]
   submitted_photo_url?: string | null
@@ -87,6 +88,7 @@ export async function adminCreatePlace(input: AdminPlaceInput): Promise<{ error?
       must_do:              input.must_do ?? null,
       hidden_gem:           input.hidden_gem ?? null,
       not_for_you:          input.not_for_you ?? null,
+      cost:                 input.cost ?? null,
       best_time:            input.best_time ?? null,
       vibe_tags:            input.vibe_tags ?? [],
       submitted_photo_url:  input.submitted_photo_url ?? null,

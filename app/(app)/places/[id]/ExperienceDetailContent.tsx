@@ -9,34 +9,9 @@ import toast from 'react-hot-toast'
 import { logEvent } from '@/lib/events'
 import { addPlaceToList, removePlaceByPlaceId } from '@/app/actions/bucketList'
 import { addPlaceToCollection, removePlaceFromCollection } from '@/app/actions/adminCollections'
-import { parseBestTimeToMonths } from '@/lib/bestTimeParser'
 import Avatar from '@/components/Avatar'
 import type { Place } from '@/lib/types'
 import type { FriendVisitor, Activity } from './PlaceDetailContent'
-
-// ── Derived value helpers ──────────────────────────────────────────────────────
-
-function getDuration(intensity: string | null): string {
-  if (intensity === 'low') return '1-2 days'
-  if (intensity === 'medium') return '3-5 days'
-  if (intensity === 'high') return '5-7 days'
-  return 'Varies'
-}
-
-function getBestMonth(tags: string[] | null): string {
-  const t = tags ?? []
-  if (t.includes('winter')) return 'Dec–Feb'
-  if (t.includes('summer')) return 'Jun–Aug'
-  if (t.includes('spring')) return 'Mar–May'
-  if (t.includes('autumn')) return 'Sep–Nov'
-  return 'Year-round'
-}
-
-function getCost(popularity: number): string {
-  if (popularity >= 70) return '$$$'
-  if (popularity >= 40) return '$$'
-  return '$'
-}
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -184,18 +159,6 @@ export default function ExperienceDetailContent({
   }
 
   // Derived values
-  const duration = getDuration(place.intensity)
-  const bestMonth = (() => {
-    const parsed = parseBestTimeToMonths(place.best_time)
-    if (parsed) {
-      const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-      return [...parsed.peak].map(m => monthNames[m]).join('–')
-    }
-    return getBestMonth(place.tags)
-  })()
-  const cost = getCost(place.popularity)
-  const vibe = place.vibes?.[0] ?? place.type
-  const vibeLabel = vibe.charAt(0).toUpperCase() + vibe.slice(1)
   const location = place.state_province ? `${place.state_province}, ${place.country}` : place.country
   const countryCount = similarPlaces.filter(sp => sp.country === place.country).length
 
@@ -217,7 +180,7 @@ export default function ExperienceDetailContent({
             priority
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/20" />
 
         {/* Top-left: back */}
         <div className="absolute top-12 left-4">
@@ -262,64 +225,76 @@ export default function ExperienceDetailContent({
             </button>
           )}
         </div>
+
+        {/* Bottom overlay: name + location */}
+        <div className="absolute bottom-0 left-0 right-0 px-5 pb-5 pointer-events-none">
+          <h1 className="font-syne font-bold text-white text-[26px] leading-tight line-clamp-2">
+            {place.name}
+          </h1>
+          {location && (
+            <p className="flex items-center gap-1 font-nunito text-[13px] text-white/80 mt-1">
+              <MapPin size={12} className="shrink-0" />
+              {location}
+            </p>
+          )}
+        </div>
       </div>
 
-      {/* ── White content sheet ────────────────────────────────────────────── */}
-      <div className="bg-white rounded-t-3xl -mt-16 relative z-10 pb-48">
+      {/* ── Parent breadcrumb ──────────────────────────────────────────────── */}
+      {parentPlace && (
+        <Link
+          href={`/places/${parentPlace.id}`}
+          className="flex items-center gap-1.5 px-5 py-3 font-nunito text-[12px] text-[#f08c21] bg-[#fff9f0] hover:opacity-80 transition-opacity"
+        >
+          <span>🗺</span>
+          <span>Part of {parentPlace.name}</span>
+          <span className="text-[10px]">→</span>
+        </Link>
+      )}
 
-        {/* Drag handle */}
-        <div className="w-10 h-1 rounded-full bg-[#131936]/20 mx-auto mt-3 mb-4" />
-
+      {/* ── Flat content ───────────────────────────────────────────────────── */}
+      <div className="bg-[#fff9f0] pb-24">
         <div className="max-w-[480px] mx-auto">
-
-          {/* ── Identity block ─────────────────────────────────────────────── */}
-          <div className="px-5">
-            {/* Parent destination breadcrumb */}
-            {parentPlace && (
-              <Link
-                href={`/places/${parentPlace.id}`}
-                className="inline-flex items-center gap-1.5 mb-3 font-nunito text-[12px] text-[#f08c21] hover:opacity-80 transition-opacity"
-              >
-                <span>🗺</span>
-                <span>Part of {parentPlace.name}</span>
-                <span className="text-[10px]">→</span>
-              </Link>
-            )}
-
-            <h1 className="font-syne font-bold text-[#131936] text-[26px] leading-tight">
-              {place.name}
-            </h1>
-
-            {location && (
-              <p className="flex items-center gap-1 font-nunito text-[13px] text-[#131936]/60 mt-1">
-                <MapPin size={14} className="text-[#f08c21] shrink-0" />
-                {location}
-              </p>
-            )}
-
-          </div>
 
           {/* ── Quick info tiles ───────────────────────────────────────────── */}
           <div className="flex gap-2 px-5 mt-4">
             {[
-              { value: duration, label: 'Duration' },
-              { value: vibeLabel, label: 'Vibe' },
-              { value: bestMonth, label: 'Best month' },
-              { value: cost, label: 'Cost' },
+              { value: place.duration ?? '—', label: 'Duration' },
+              { value: place.cost ?? '—', label: 'Cost' },
+              { value: place.must_do ? place.must_do.slice(0, 40) + (place.must_do.length > 40 ? '…' : '') : '—', label: 'Tip' },
+              { value: place.not_for_you ? place.not_for_you.slice(0, 40) + (place.not_for_you.length > 40 ? '…' : '') : '—', label: 'Avoid if' },
             ].map(({ value, label }) => (
               <div
                 key={label}
-                className="bg-[#fff9f0] rounded-2xl p-3 flex-1 text-center border border-[#fcd99a]/50"
+                className="bg-white rounded-2xl p-3 flex-1 text-center border border-[#fcd99a]/50"
               >
-                <p className="font-syne font-bold text-[#131936] text-[15px] leading-tight">{value}</p>
+                <p className="font-syne font-bold text-[#131936] text-[11px] leading-tight line-clamp-2">{value}</p>
                 <p className="font-nunito text-[#131936]/50 text-[10px] mt-0.5">{label}</p>
               </div>
             ))}
           </div>
 
+          {/* ── Description ────────────────────────────────────────────────── */}
+          {place.description && (
+            <div className="px-5 mt-6">
+              <h2 className="font-syne font-bold text-[#131936] text-[17px]">Description</h2>
+              <p className={`font-nunito text-[14px] text-[#131936]/70 leading-relaxed mt-2 ${descExpanded ? '' : 'line-clamp-3'}`}>
+                {place.description}
+              </p>
+              {place.description.length > 120 && (
+                <button
+                  onClick={() => setDescExpanded(v => !v)}
+                  className="mt-1 font-nunito text-[13px] text-[#f08c21] font-medium min-h-[44px] flex items-center"
+                >
+                  {descExpanded ? 'Show less' : 'Read more'}
+                </button>
+              )}
+            </div>
+          )}
+
           {/* ── Friends who've done this ───────────────────────────────────── */}
           <div className="px-5 mt-6">
-            <div className="bg-[#fff9f0] rounded-2xl p-4 border border-[#fcd99a]/40">
+            <div className="bg-white rounded-2xl p-4 border border-[#fcd99a]/40">
               {friendVisitors.length > 0 ? (
                 <>
                   <div className="flex items-center gap-3">
@@ -371,24 +346,6 @@ export default function ExperienceDetailContent({
               )}
             </div>
           </div>
-
-          {/* ── About this experience ──────────────────────────────────────── */}
-          {place.description && (
-            <div className="px-5 mt-6">
-              <h2 className="font-syne font-bold text-[#131936] text-[17px]">About this experience</h2>
-              <p className={`font-nunito text-[14px] text-[#131936]/70 leading-relaxed mt-2 ${descExpanded ? '' : 'line-clamp-3'}`}>
-                {place.description}
-              </p>
-              {place.description.length > 120 && (
-                <button
-                  onClick={() => setDescExpanded(v => !v)}
-                  className="mt-1 font-nunito text-[13px] text-[#f08c21] font-medium min-h-[44px] flex items-center"
-                >
-                  {descExpanded ? 'Show less' : 'Read more'}
-                </button>
-              )}
-            </div>
-          )}
 
           {/* ── What to do here (activities) ──────────────────────────────── */}
           {activities.length > 0 && (

@@ -123,6 +123,7 @@ export interface Place {
   must_do?: string | null
   hidden_gem?: string | null
   not_for_you?: string | null
+  cost?: string | null
   best_time?: string | null
   vibe_tags?: string[] | null
   submitted_photo_url?: string | null

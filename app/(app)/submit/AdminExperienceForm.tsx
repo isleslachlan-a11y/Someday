@@ -76,7 +76,7 @@ export default function AdminExperienceForm({ userId: _userId, onBack }: Props) 
     state_province: '', description: '', vibes: [] as string[],
   })
   const [hingeFields, setHingeFields] = useState({
-    must_do: '', not_for_you: '', vibe_tags: [] as string[],
+    must_do: '', not_for_you: '', cost: '', vibe_tags: [] as string[],
   })
   const [duration, setDuration]         = useState('')
   const [needsBooking, setNeedsBooking] = useState(false)
@@ -286,6 +286,7 @@ export default function AdminExperienceForm({ userId: _userId, onBack }: Props) 
       must_do:         hingeFields.must_do.trim() || null,
       hidden_gem:      null,
       not_for_you:     hingeFields.not_for_you.trim() || null,
+      cost:            hingeFields.cost.trim() || null,
       best_time:       null,
       vibe_tags:       hingeFields.vibe_tags,
       parent_place_id: parentId,
@@ -312,7 +313,7 @@ export default function AdminExperienceForm({ userId: _userId, onBack }: Props) 
       toast.success(`${form.name} added to the database ✦`)
       setSavedPlaceId(placeId); setSavedPlaceName(form.name)
       setForm({ name: '', country: '', region: 'Europe', state_province: '', description: '', vibes: [] })
-      setHingeFields({ must_do: '', not_for_you: '', vibe_tags: [] })
+      setHingeFields({ must_do: '', not_for_you: '', cost: '', vibe_tags: [] })
       setDuration(''); setNeedsBooking(false)
       setParentId(null); setParentName(''); setParentSearch(''); setParentLocked(false)
       setSelectedTags([]); setSelectedCategoryIds(new Set()); setPrimaryCategoryId(null); setSelectedLabelIds(new Set())
@@ -459,6 +460,10 @@ export default function AdminExperienceForm({ userId: _userId, onBack }: Props) 
         <div>
           <label htmlFor="admin-exp-not-for-you" className="font-nunito text-[12px] text-[#131936]/50 mb-1 block">Not for you if…</label>
           <input id="admin-exp-not-for-you" name="admin-exp-not-for-you" type="text" value={hingeFields.not_for_you} onChange={e => setHingeFields(prev => ({ ...prev, not_for_you: e.target.value }))} placeholder="Who this isn't for" className={INPUT_CLASS} />
+        </div>
+        <div>
+          <label htmlFor="admin-exp-cost" className="font-nunito text-[12px] text-[#131936]/50 mb-1 block">Cost</label>
+          <input id="admin-exp-cost" name="admin-exp-cost" type="text" value={hingeFields.cost} onChange={e => setHingeFields(prev => ({ ...prev, cost: e.target.value }))} placeholder="e.g. Free, $20 entry, $50–80 per person" className={INPUT_CLASS} />
         </div>
         <div>
           <p className="font-nunito text-[12px] text-[#131936]/50 mb-2">Card vibe tags</p>

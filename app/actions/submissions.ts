@@ -25,6 +25,7 @@ export interface SubmitPlaceData {
   must_do: string | null
   hidden_gem: string | null
   not_for_you: string | null
+  cost?: string | null
   best_time: string | null
   vibe_tags: string[]
   photo_url: string | null
@@ -55,6 +56,7 @@ export async function submitPlace(data: SubmitPlaceData): Promise<{ error?: stri
     must_do:         data.must_do || null,
     hidden_gem:      data.hidden_gem || null,
     not_for_you:     data.not_for_you || null,
+    cost:            data.cost || null,
     best_time:       data.best_time || null,
     vibe_tags:       data.vibe_tags.length > 0 ? data.vibe_tags : null,
     photo_url:       data.photo_url,
