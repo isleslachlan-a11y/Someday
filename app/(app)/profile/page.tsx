@@ -79,6 +79,8 @@ export default async function ProfilePage() {
   const profile = profileResult.data as UserProfile | null
   if (!profile) redirect('/login')
 
+  const isAdmin = (profileResult.data as { is_admin?: boolean } | null)?.is_admin === true
+
   const entries: BucketEntry[] = []
   for (const row of itemsResult.data ?? []) {
     const place = row.places as unknown as Record<string, unknown> | null
@@ -227,6 +229,35 @@ export default async function ProfilePage() {
               </p>
             )}
           </section>
+
+          {isAdmin && (
+            <section className="mt-8 pt-6 border-t border-[#fcd99a]/50">
+              <p className="font-nunito text-[11px] text-[#131936]/40 uppercase tracking-wider mb-3">
+                Admin
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { href: '/admin/tags',        label: 'Tag Library',   icon: '🏷' },
+                  { href: '/admin/places',      label: 'Places',        icon: '🗺' },
+                  { href: '/admin/collections', label: 'Collections',   icon: '🗂' },
+                  { href: '/admin/submissions', label: 'Submissions',   icon: '📥' },
+                  { href: '/admin/analytics',   label: 'Analytics',     icon: '📊' },
+                  { href: '/admin/images',      label: 'Images',        icon: '🖼' },
+                ].map(item => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="flex items-center gap-2.5 rounded-2xl border border-[#fcd99a]/50 bg-white px-4 py-3 hover:border-[#f08c21]/40 transition-colors"
+                  >
+                    <span className="text-[18px]">{item.icon}</span>
+                    <span className="font-nunito font-semibold text-[#131936] text-[13px]">
+                      {item.label}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
 
         </div>
       </main>
