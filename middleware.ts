@@ -15,7 +15,15 @@ function isAllowlisted(pathname: string): boolean {
 }
 
 export async function middleware(request: NextRequest) {
-  const launched = process.env.NEXT_PUBLIC_LAUNCHED === 'true'
+  const isDev = process.env.NODE_ENV === 'development'
+  const launched = isDev || process.env.NEXT_PUBLIC_LAUNCHED === 'true'
+
+  // TEMP: remove once the gate is confirmed working.
+  console.log('[launch-gate]', {
+    NODE_ENV: process.env.NODE_ENV,
+    NEXT_PUBLIC_LAUNCHED: JSON.stringify(process.env.NEXT_PUBLIC_LAUNCHED),
+    launched,
+  })
 
   if (!launched) {
     const { pathname } = request.nextUrl
