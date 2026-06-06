@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Barlow, Barlow_Semi_Condensed, Barlow_Condensed, Nunito } from 'next/font/google'
+import { brice, briceCondensed, briceTight, nunito } from '@/lib/fonts'
 import './globals.css'
 
 export const viewport: Viewport = {
@@ -7,34 +7,6 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
 }
-
-// Brice stand-in: Barlow family (swap for self-hosted Brice files when available)
-const brice = Barlow({
-  variable: '--font-brice',
-  subsets: ['latin'],
-  weight: ['400', '600', '700', '800'],
-  style: ['normal', 'italic'],
-})
-
-const briceCondensed = Barlow_Semi_Condensed({
-  variable: '--font-brice-condensed',
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  style: ['normal'],
-})
-
-const briceTight = Barlow_Condensed({
-  variable: '--font-brice-tight',
-  subsets: ['latin'],
-  weight: ['400', '600', '700'],
-  style: ['normal'],
-})
-
-const nunito = Nunito({
-  variable: '--font-nunito',
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-})
 
 export const metadata: Metadata = {
   title: {
