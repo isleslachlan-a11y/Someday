@@ -134,7 +134,7 @@ export default async function ProfilePage() {
           <div className="max-w-[480px] mx-auto px-4 h-14 grid grid-cols-3 items-center">
             <div />
             <div className="flex justify-center">
-              <span className="font-syne font-bold text-[#131936] text-[20px] tracking-widest uppercase">
+              <span className="font-brice font-bold text-[#131936] text-[20px] tracking-widest uppercase">
                 PROFILE
               </span>
             </div>
@@ -154,7 +154,7 @@ export default async function ProfilePage() {
           {/* Avatar + name block */}
           <div className="flex flex-col items-center text-center mb-6">
             <Avatar avatarUrl={profile.avatar_url} username={profile.username ?? ''} size={80} />
-            <h1 className="font-syne text-[22px] font-bold text-[#131936] mt-3">
+            <h1 className="font-brice text-[22px] font-bold text-[#131936] mt-3">
               @{profile.username}
             </h1>
             {profile.bio ? (
@@ -182,14 +182,14 @@ export default async function ProfilePage() {
               href="/list"
               className="flex flex-col items-center gap-0.5 rounded-2xl border border-[#fcd99a]/40 bg-white px-4 py-5 text-center"
             >
-              <p className="font-syne text-[28px] font-bold text-[#f08c21]">{placeCount}</p>
+              <p className="font-brice text-[28px] font-bold text-[#f08c21]">{placeCount}</p>
               <p className="font-nunito text-[#131936]/50 text-[11px] mt-0.5">Places</p>
             </Link>
             <Link
               href="/plan"
               className="flex flex-col items-center gap-0.5 rounded-2xl border border-[#fcd99a]/40 bg-white px-4 py-5 text-center"
             >
-              <p className="font-syne text-[28px] font-bold text-[#f08c21]">{tripCount}</p>
+              <p className="font-brice text-[28px] font-bold text-[#f08c21]">{tripCount}</p>
               <p className="font-nunito text-[#131936]/50 text-[11px] mt-0.5">Trips</p>
             </Link>
           </div>
@@ -203,7 +203,7 @@ export default async function ProfilePage() {
           {/* Bucket list grid */}
           <section className="mt-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-syne font-bold text-[#131936] text-[17px]">Your list</h2>
+              <h2 className="font-brice font-bold text-[#131936] text-[17px]">Your list</h2>
               <Link href="/list" className="font-nunito text-[#f08c21] text-[13px]">
                 Manage →
               </Link>
@@ -293,7 +293,7 @@ function ProfilePlaceCard({ entry }: { entry: BucketEntry }) {
         {TYPE_ICON[entry.place.type] ?? '✦'}
       </span>
       <div className="flex-1 min-w-0">
-        <p className="font-syne text-sm font-semibold text-[#131936] truncate">
+        <p className="font-brice text-sm font-semibold text-[#131936] truncate">
           {entry.place.name}
         </p>
         <p className="text-xs text-[#131936]/50">{entry.place.country}</p>

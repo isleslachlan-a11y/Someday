@@ -30,7 +30,7 @@ export function HeroSection({ count }: Props) {
           </div>
 
           {/* Headline */}
-          <h1 className="font-syne font-extrabold text-[#131936] text-5xl md:text-7xl leading-[1.05] tracking-tight">
+          <h1 className="font-brice font-extrabold text-[#131936] text-5xl md:text-7xl leading-[1.05] tracking-tight">
             Your list of<br />someday trips.
           </h1>
 
@@ -69,7 +69,7 @@ export function HeroSection({ count }: Props) {
           <div className="max-w-5xl mx-auto mt-16 rounded-2xl overflow-hidden aspect-video">
             {/* TODO: replace with app screenshot or Lottie animation */}
             <div className="w-full h-full bg-gradient-to-br from-[#fcd99a] to-[#f08c21] flex items-center justify-center min-h-[200px]">
-              <span className="font-syne text-sm text-[#131936]/40">
+              <span className="font-brice text-sm text-[#131936]/40">
                 [ App screenshots coming soon ]
               </span>
             </div>

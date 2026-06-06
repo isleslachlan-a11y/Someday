@@ -93,7 +93,7 @@ export default function HomePlaceCard({ place, isAdded, onAdd, onRemove, index }
       {/* Bottom text content — pointer-events-none so Link handles taps */}
       <div className="absolute bottom-0 left-0 right-0 p-3 pointer-events-none">
         <h3
-          className={`font-syne font-bold leading-tight line-clamp-2 ${place.image_url || dark ? 'text-white' : 'text-[#131936]'}`}
+          className={`font-brice-condensed font-bold leading-tight line-clamp-2 ${place.image_url || dark ? 'text-white' : 'text-[#131936]'}`}
           style={{ fontSize: 13, lineHeight: 1.3 }}
         >
           {place.name}

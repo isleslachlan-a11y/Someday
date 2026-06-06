@@ -57,7 +57,7 @@ export function AppTourSection() {
             Features
           </p>
           {/* TODO: refine heading copy */}
-          <h2 className="font-syne font-bold text-[#131936] text-3xl md:text-5xl max-w-2xl leading-tight">
+          <h2 className="font-brice font-bold text-[#131936] text-3xl md:text-5xl max-w-2xl leading-tight">
             Everything a trip needs, before it starts.
           </h2>
 
@@ -69,7 +69,7 @@ export function AppTourSection() {
               >
                 {/* Image placeholder */}
                 <div className={`aspect-[4/3] bg-gradient-to-br ${tile.gradient} flex items-center justify-center`}>
-                  <span className={`font-syne text-xs ${tile.lightText ? 'text-white/30' : 'text-[#131936]/30'}`}>
+                  <span className={`font-brice text-xs ${tile.lightText ? 'text-white/30' : 'text-[#131936]/30'}`}>
                     [ Screenshot coming soon ]
                   </span>
                 </div>
@@ -79,7 +79,7 @@ export function AppTourSection() {
                   <p className="font-nunito uppercase tracking-widest text-xs text-[#f08c21] mb-2">
                     {tile.label}
                   </p>
-                  <h3 className="font-syne font-semibold text-[#131936] text-xl mb-2">
+                  <h3 className="font-brice-condensed font-semibold text-[#131936] text-xl mb-2">
                     {tile.heading}
                   </h3>
                   <p className="font-nunito text-sm text-[rgba(19,25,54,0.5)] leading-relaxed">

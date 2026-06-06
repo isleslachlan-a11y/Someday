@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Syne, Nunito } from 'next/font/google'
+import { Barlow, Barlow_Semi_Condensed, Barlow_Condensed, Nunito } from 'next/font/google'
 import './globals.css'
 
 export const viewport: Viewport = {
@@ -8,10 +8,26 @@ export const viewport: Viewport = {
   maximumScale: 1,
 }
 
-const syne = Syne({
-  variable: '--font-syne',
+// Brice stand-in: Barlow family (swap for self-hosted Brice files when available)
+const brice = Barlow({
+  variable: '--font-brice',
   subsets: ['latin'],
   weight: ['400', '600', '700', '800'],
+  style: ['normal', 'italic'],
+})
+
+const briceCondensed = Barlow_Semi_Condensed({
+  variable: '--font-brice-condensed',
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  style: ['normal'],
+})
+
+const briceTight = Barlow_Condensed({
+  variable: '--font-brice-tight',
+  subsets: ['latin'],
+  weight: ['400', '600', '700'],
+  style: ['normal'],
 })
 
 const nunito = Nunito({
@@ -40,7 +56,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${syne.variable} ${nunito.variable} h-full antialiased`}>
+    <html lang="en" className={`${brice.variable} ${briceCondensed.variable} ${briceTight.variable} ${nunito.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-indigo-deep text-white-soft font-nunito">
         {children}
       </body>

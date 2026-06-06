@@ -113,7 +113,7 @@ export default function EditProfileForm({ profile }: Props) {
               />
             ) : (
               <div
-                className="rounded-full bg-[#f08c21]/20 border border-[#f08c21]/30 flex items-center justify-center font-syne font-bold text-[#f08c21]"
+                className="rounded-full bg-[#f08c21]/20 border border-[#f08c21]/30 flex items-center justify-center font-brice font-bold text-[#f08c21]"
                 style={{ width: 72, height: 72, fontSize: 25 }}
               >
                 {username.slice(0, 2).toUpperCase()}
@@ -186,7 +186,7 @@ export default function EditProfileForm({ profile }: Props) {
         <button
           type="submit"
           disabled={isPending}
-          className="flex-1 rounded-xl bg-[#f08c21] hover:bg-[#f08c21]/90 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2.5 font-syne font-semibold text-[#131936] text-sm transition-colors"
+          className="flex-1 rounded-xl bg-[#f08c21] hover:bg-[#f08c21]/90 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2.5 font-brice font-semibold text-[#131936] text-sm transition-colors"
         >
           {isPending ? 'Saving…' : 'Save changes'}
         </button>

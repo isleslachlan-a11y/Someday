@@ -17,7 +17,7 @@ export function VideoSection() {
             See it in action
           </p>
           {/* TODO: refine heading copy */}
-          <h2 className="font-syne font-bold text-[#131936] text-3xl md:text-5xl leading-tight">
+          <h2 className="font-brice font-bold text-[#131936] text-3xl md:text-5xl leading-tight">
             A 60-second look at Someday.
           </h2>
 

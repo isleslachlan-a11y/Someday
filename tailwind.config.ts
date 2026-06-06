@@ -24,8 +24,10 @@ const config: Config = {
         'muted': '#7A7A9A',
       },
       fontFamily: {
-        syne: ['var(--font-syne)', 'sans-serif'],
-        nunito: ['var(--font-nunito)', 'sans-serif'],
+        brice:            ['var(--font-brice)',            'sans-serif'],
+        'brice-condensed': ['var(--font-brice-condensed)', 'sans-serif'],
+        'brice-tight':    ['var(--font-brice-tight)',      'sans-serif'],
+        nunito:           ['var(--font-nunito)',           'sans-serif'],
       },
     },
   },

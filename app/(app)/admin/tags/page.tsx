@@ -51,7 +51,7 @@ export default async function AdminTagsPage() {
     <main className="min-h-screen bg-[#fff9f0]">
       <header className="sticky top-0 z-30 bg-[#fff9f0] border-b border-[#fcd99a]/50">
         <div className="max-w-[480px] mx-auto px-4 h-14 flex items-center gap-3">
-          <h1 className="font-syne font-bold text-[#131936] text-[17px] flex-1">Tag Library</h1>
+          <h1 className="font-brice font-bold text-[#131936] text-[17px] flex-1">Tag Library</h1>
           <span className="px-2.5 py-1 rounded-full bg-[#fcd99a]/50 font-nunito text-[12px] text-[#131936]">
             {tags.length} tags
           </span>

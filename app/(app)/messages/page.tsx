@@ -28,7 +28,7 @@ export default async function MessagesPage() {
         <div className="max-w-[480px] mx-auto px-4 h-14 grid grid-cols-3 items-center">
           <div />
           <div className="flex justify-center">
-            <span className="font-syne font-bold text-[#131936] text-[20px] tracking-widest uppercase">
+            <span className="font-brice font-bold text-[#131936] text-[20px] tracking-widest uppercase">
               MESSAGES
             </span>
           </div>

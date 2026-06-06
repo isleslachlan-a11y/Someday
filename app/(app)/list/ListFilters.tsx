@@ -5,7 +5,6 @@ import { Search, SlidersHorizontal } from 'lucide-react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
-import BucketListCard from '@/components/BucketListCard'
 import HomePlaceCard from '@/components/HomePlaceCard'
 import { updateListEntry, removeFromList, addPlaceToList, removePlaceByPlaceId } from '@/app/actions/bucketList'
 import { logEvent } from '@/lib/events'
@@ -212,21 +211,6 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
     navigate({ q: null, type: null, sort: null, status: null })
   }
 
-  // ── Social proof map ───────────────────────────────────────────────────────
-
-  const friendsByPlace = useMemo(() => {
-    const map = new Map<string, FriendBucketItem[]>()
-    for (const fi of friendItems) {
-      if (!fi.place_id) continue
-      const existing = map.get(fi.place_id) ?? []
-      map.set(fi.place_id, [...existing, fi])
-    }
-    return map
-  }, [friendItems])
-
-  // Suppress unused warning — friendsByPlace is kept for BucketListCard compatibility
-  void friendsByPlace
-
   // ── Filtering + sorting ───────────────────────────────────────────────────
 
   const statusFiltered = useMemo(
@@ -402,7 +386,7 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
                 place={placeForCard as any}
                 isAdded
                 onAdd={() => {}}
-                onRemove={() => setSelectedEntry(entry)}
+                onRemove={() => void handleRemove(entry.id)}
                 index={index % 4}
               />
             )
@@ -443,7 +427,7 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
 
               {/* Header row */}
               <div className="flex items-center justify-between">
-                <h2 className="font-syne font-bold text-[#131936] text-[18px]">Filter & Sort</h2>
+                <h2 className="font-brice font-bold text-[#131936] text-[18px]">Filter & Sort</h2>
                 {hasActiveFilters && (
                   <button
                     onClick={() => {
@@ -460,7 +444,7 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
 
               {/* Status */}
               <div>
-                <p className="font-syne font-bold text-[#131936] text-[13px] uppercase tracking-wider mb-3">
+                <p className="font-brice font-bold text-[#131936] text-[13px] uppercase tracking-wider mb-3">
                   Status
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -485,7 +469,7 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
 
               {/* Type */}
               <div>
-                <p className="font-syne font-bold text-[#131936] text-[13px] uppercase tracking-wider mb-3">
+                <p className="font-brice font-bold text-[#131936] text-[13px] uppercase tracking-wider mb-3">
                   Type
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -511,7 +495,7 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
 
               {/* Sort */}
               <div>
-                <p className="font-syne font-bold text-[#131936] text-[13px] uppercase tracking-wider mb-3">
+                <p className="font-brice font-bold text-[#131936] text-[13px] uppercase tracking-wider mb-3">
                   Sort by
                 </p>
                 <div className="flex gap-2">
@@ -537,7 +521,7 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
               {/* Apply */}
               <button
                 onClick={() => setShowFilterSheet(false)}
-                className="w-full h-12 rounded-full bg-[#131936] text-white font-syne font-bold text-[15px]"
+                className="w-full h-12 rounded-full bg-[#131936] text-white font-brice font-bold text-[15px]"
               >
                 Show results
               </button>
@@ -660,7 +644,7 @@ function ListItemSheet({
           {/* Header */}
           <div className="flex items-start justify-between gap-4 pt-2 pb-5 border-b border-[#fcd99a]/50 mb-5">
             <div>
-              <h2 className="font-syne text-xl font-bold text-[#131936] leading-tight">
+              <h2 className="font-brice text-xl font-bold text-[#131936] leading-tight">
                 {entry.place.name}
               </h2>
               <p className="text-[#131936]/50 text-sm mt-1">
@@ -752,7 +736,7 @@ function ListItemSheet({
             {/* Completion prompt */}
             {showCompletionPrompt && (
               <div className="rounded-2xl border border-[#f08c21]/20 bg-[#f08c21]/5 p-4">
-                <p className="font-syne font-bold text-[#131936] text-sm mb-1">
+                <p className="font-brice font-bold text-[#131936] text-sm mb-1">
                   You did it. ✦
                 </p>
                 <p className="text-xs text-[#131936]/50 mb-3">
@@ -833,7 +817,7 @@ function ListItemSheet({
               <button
                 onClick={() => handleSave()}
                 disabled={saving || removing}
-                className="w-full rounded-xl bg-[#131936] hover:bg-[#131936]/90 disabled:opacity-50 py-3.5 font-syne font-semibold text-white text-sm transition-all active:scale-[0.98]"
+                className="w-full rounded-xl bg-[#131936] hover:bg-[#131936]/90 disabled:opacity-50 py-3.5 font-brice font-semibold text-white text-sm transition-all active:scale-[0.98]"
               >
                 {saving ? 'Saving…' : 'Save changes'}
               </button>
@@ -896,7 +880,7 @@ function EmptyListWithSuggestions({
   return (
     <div className="flex flex-col items-center pt-8 pb-4">
       <div className="text-[48px] mb-4 select-none">✦</div>
-      <h2 className="font-syne font-bold text-[#131936] text-[20px] mb-2 text-center">
+      <h2 className="font-brice font-bold text-[#131936] text-[20px] mb-2 text-center">
         Your list is empty
       </h2>
       <p className="font-nunito text-[#131936]/50 text-[14px] text-center leading-relaxed max-w-[280px] mb-8">
@@ -954,7 +938,7 @@ function EmptyStatus({ status }: { status: 'all' | BucketListStatus }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center">
       <div className="text-5xl mb-4 select-none">{content.icon}</div>
-      <h2 className="font-syne text-xl font-bold text-[#131936] mb-2">{content.heading}</h2>
+      <h2 className="font-brice text-xl font-bold text-[#131936] mb-2">{content.heading}</h2>
       <p className="text-[#131936]/50 text-sm max-w-xs">{content.body}</p>
     </div>
   )
@@ -964,7 +948,7 @@ function EmptySearch({ onClear }: { onClear: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center">
       <div className="text-5xl mb-4 select-none">🔍</div>
-      <h2 className="font-syne text-xl font-bold text-[#131936] mb-2">No results</h2>
+      <h2 className="font-brice text-xl font-bold text-[#131936] mb-2">No results</h2>
       <p className="text-[#131936]/50 text-sm max-w-xs mb-6">
         Try a different search or remove some filters.
       </p>
@@ -978,5 +962,3 @@ function EmptySearch({ onClear }: { onClear: () => void }) {
   )
 }
 
-// Keep BucketListCard referenced to avoid tree-shaking — used for type compatibility
-export { BucketListCard as _BucketListCard }

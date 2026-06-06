@@ -18,7 +18,7 @@ export function WaitlistFormSection() {
             Early access
           </p>
           {/* TODO: refine heading copy */}
-          <h2 className="font-syne font-bold text-[#131936] text-3xl md:text-5xl leading-tight text-center">
+          <h2 className="font-brice font-bold text-[#131936] text-3xl md:text-5xl leading-tight text-center">
             Be first to explore Someday.
           </h2>
           <p className="font-nunito text-base text-[rgba(19,25,54,0.5)] max-w-md mx-auto mt-4 text-center leading-relaxed">

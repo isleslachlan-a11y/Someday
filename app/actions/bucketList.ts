@@ -209,17 +209,30 @@ export async function addPlaceToList(
 ): Promise<{ error?: string }> {
   const { supabase, user } = await getAuthenticatedUser()
 
+  const { data: existing } = await supabase
+    .from('bucket_list_items')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('place_id', placeId)
+    .maybeSingle()
+
+  if (existing) return {}
+
   const { error } = await supabase.from('bucket_list_items').insert({
     user_id: user.id,
     place_id: placeId,
     status: 'wishlist',
   })
 
-  if (error) return { error: error.message }
+  if (error) {
+    if (error.code === '23505') return {}
+    return { error: error.message }
+  }
 
   await logEvent(supabase, user.id, 'place_saved', { place_id: placeId, source })
 
   revalidatePath('/home')
+  revalidatePath('/list')
   return {}
 }
 

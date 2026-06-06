@@ -69,7 +69,7 @@ export default function DiscoverPlaceCard({
 
       {/* Bottom text */}
       <div className="absolute bottom-0 left-0 right-0 p-3 pointer-events-none">
-        <p className="font-syne font-bold text-white text-[13px] leading-tight line-clamp-2">
+        <p className="font-brice-condensed font-bold text-white text-[13px] leading-tight line-clamp-2">
           {place.name}
         </p>
         <p className="font-nunito text-white/70 text-[10px] mt-1 flex items-center gap-0.5 truncate">

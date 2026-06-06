@@ -79,7 +79,7 @@ Required Worker secrets: `AUTH_TOKEN` (shared secret header `X-Auth-Token`), `AN
 - `lib/unsplash.ts` — `searchUnsplashImage(query)` and `linkImageToPlace(placeId, query?)`. Server-side only. Used by admin image seeding scripts and `app/actions/unsplash-actions.ts`. Never call client-side.
 - `lib/bestTimeParser.ts` — `parseBestTimeToMonths(bestTime)`: parses a free-text `best_time` string from a `Place` into `{ peak: Set<number>, shoulder: Set<number> }` month sets (0 = January). Used for calendar UI on place detail pages.
 - `lib/recommendations.ts` — `logRecommendationEvent` and `logImpressions`: client-side helpers that call the `log_recommendation_event` RPC to track which recommendations were shown, clicked, saved, or dismissed. Feeds the B2B recommendation signal.
-- `middleware.ts` — route protection; redirects unauthenticated users to `/login`.
+- `middleware.ts` — two-stage gate: (1) **launch gate** — if `NEXT_PUBLIC_LAUNCHED !== 'true'`, all routes outside the allowlist (`/waitlist`, `/admin`, `/auth`, `/api`, `/_next`, static files) redirect to `/waitlist`; (2) **auth gate** — calls `updateSession()` to refresh the Supabase session and redirect unauthenticated users to `/login`.
 - `components/AppShell.tsx` — authenticated layout with desktop sidebar + mobile bottom tab bar.
 - `components/ui/UnsplashAttribution.tsx` — **required** on any page/component displaying Unsplash images (API compliance). Shows photographer credit with UTM-tagged links.
 
@@ -154,14 +154,14 @@ On signup, always insert a row into `profiles` using the returned `user.id`.
 | Table | Purpose | Status |
 |-------|---------|--------|
 | `profiles` | Public user profiles (extends `auth.users`); includes `map_city_preference`, `is_admin` (boolean, gates admin routes) | Built |
-| `places` | Curated catalogue of destinations (admin-seeded); includes `lat`, `lng`, `popularity`, `trending`, `image_url`, `image_thumb_url`, `unsplash_photo_id`, `unsplash_attribution` (JSONB), `image_keyword`, `vibes` (enum: Adventure/Culture/Foodie/Romantic/Chill/Epic/Peaceful/Wellness), `intensity` (low/medium/high), `state_province`, `must_do`, `hidden_gem`, `not_for_you`, `best_time`, `vibe_tags`, `submitted_photo_url`, `parent_place_id` (FK → places; links an experience to its parent destination), `duration` (text), `needs_booking` (boolean) | Built |
-| `bucket_list_items` | A user's personal bucket list (user → place); includes `completed_at`, `completion_note`, `completion_photo_url` for Strava-style completion tracking | Built |
+| `places` | Curated catalogue of destinations (admin-seeded); includes `lat`, `lng`, `popularity`, `trending`, `image_url`, `image_thumb_url`, `unsplash_photo_id`, `unsplash_attribution` (JSONB), `image_keyword`, `vibes` (enum: Adventure/Culture/Foodie/Romantic/Chill/Epic/Peaceful/Wellness), `intensity` (low/medium/high), `state_province`, `must_do`, `hidden_gem`, `not_for_you`, `best_time`, `vibe_tags`, `submitted_photo_url`, `parent_place_id` (FK → places; links an experience to its parent destination), `duration` (text), `needs_booking` (boolean), `cost` (text) | Built |
+| `bucket_list_items` | A user's personal bucket list (user → place); includes `completed_at`, `completion_note`, `completion_photo_url` for Strava-style completion tracking. Has a DB-level `UNIQUE (user_id, place_id)` constraint — use `ON CONFLICT DO NOTHING` or check existence before inserting | Built |
 | `events` | Every user action — feeds the B2B data product | Built |
 | `user_context` | Per-user flags: `completed_onboarding`, travel preferences | Built |
 | `trips` | Group trips; `members` is a `uuid[]` array; `created_by` is owner | Built |
 | `trip_items` | Places proposed for a trip | Built |
 | `trip_item_votes` | Member votes on trip destinations | Built |
-| `submissions` | User-nominated destinations pending admin review; includes `parent_place_id` (FK → places), `submission_kind` ('destination'/'experience'), `extra_metadata` (JSONB) | Built |
+| `submissions` | User-nominated destinations pending admin review; includes `parent_place_id` (FK → places), `submission_kind` ('destination'/'experience'), `extra_metadata` (JSONB), `cost` (text) | Built |
 | `past_trips` | Self-reported travel history (country, year, notes) | Built |
 | `friendships` | Symmetric friend relationships; status: `pending`/`accepted`/`declined`/`blocked` | Built |
 | `conversations` | Chat rooms — DMs, group chats, and trip-linked chats | Built |
@@ -177,11 +177,11 @@ On signup, always insert a row into `profiles` using the returned `user.id`.
 | `experiences_labels` | Join: place → label. | Built |
 | `collections` | Curated place collections for the Discover tab; columns: `name`, `slug`, `type` (region/theme/editorial/country), `description`, `cover_image`, `sort_order`, `is_featured`, `is_active`. Managed via `adminCollections.ts`. "Start Here" collection seeded by migration. | Built |
 | `collections_places` | Join: collection → place with `sort_order` for drag-drop reordering. Public read, admin write. | Built |
-| `waitlist_emails` | Pre-launch email capture; columns: `id`, `email` (UNIQUE), `created_at`. RLS: public insert allowed. | Built |
-| `waitlist_suggestions` | Place suggestions from waitlist sign-ups; columns: `id`, `email`, `place_id` (→ places, nullable), `place_name`, `created_at`. RLS: public insert. | Built |
+| `waitlist_emails` | Pre-launch email capture; columns: `id`, `email` (UNIQUE), `name`, `created_at`. RLS: public insert allowed. | Built |
+| `waitlist_suggestions` | Place suggestions from waitlist sign-ups; columns: `id`, `email`, `place_id` (→ places, nullable), `place_name`, `submission_type` ('destination'/'experience'), `must_do` (text), `created_at`. RLS: public insert. | Built |
 | `posts` | User-created Strava-style completion posts (distinct from `promotional_posts`) | Planned |
 
-Migrations live in `supabase/migrations/`. Key migrations: `003_profiles.sql`, `004_events_platform.sql`, `20260414120000_pivot_schema.sql` (places pivot), `20260414200000_trips_schema.sql`, `20260418_map_columns.sql`, `20260418200000_friendships.sql`, `20260421000000_messaging_schema.sql`, `20260429000000_promotional_posts.sql`, `20260429000001_completion_columns.sql` (adds completion fields to `bucket_list_items`), `20260512000000_add_is_admin_to_profiles.sql` (adds `is_admin` flag), `20260513000000_create_activities.sql` (activities table), `20260528000002_tagging_schema.sql` (taxonomy: categories+, place_labels, experiences_categories/tags/labels), `20260529000000_place_momentum_rpc.sql` (personalised recommendations RPC), `20260529000001_add_state_province.sql` (state_province on places), `20260529000002_place_images_bucket.sql` (place-images storage bucket), `20260530000000_waitlist_tables.sql` (waitlist_emails + waitlist_suggestions), `20260530000001_start_here_collection.sql` (seeds "Start Here" collection).
+Migrations live in `supabase/migrations/`. Key migrations: `003_profiles.sql`, `004_events_platform.sql`, `20260414120000_pivot_schema.sql` (places pivot), `20260414200000_trips_schema.sql`, `20260418_map_columns.sql`, `20260418200000_friendships.sql`, `20260421000000_messaging_schema.sql`, `20260429000000_promotional_posts.sql`, `20260429000001_completion_columns.sql` (adds completion fields to `bucket_list_items`), `20260512000000_add_is_admin_to_profiles.sql` (adds `is_admin` flag), `20260513000000_create_activities.sql` (activities table), `20260528000002_tagging_schema.sql` (taxonomy: categories+, place_labels, experiences_categories/tags/labels), `20260529000000_place_momentum_rpc.sql` (personalised recommendations RPC), `20260529000001_add_state_province.sql` (state_province on places), `20260529000002_place_images_bucket.sql` (place-images storage bucket), `20260530000000_waitlist_tables.sql` (waitlist_emails + waitlist_suggestions), `20260530000001_start_here_collection.sql` (seeds "Start Here" collection), `20260531000000_destination_experience_types.sql` (formalises destination/experience type distinction, adds `duration`/`needs_booking` to places), `20260531000001_recommendations_crosssell.sql` (cross-sell signal for recommendations RPC), `20260601000000_update_affinity_tag_mappings.sql` (affinity tag weight tuning), `20260601000001_add_cost_to_places.sql` (adds `cost` to places + submissions), `20260601000002_waitlist_name_and_submission_fields.sql` (adds `name` to waitlist_emails; `submission_type`, `must_do` to waitlist_suggestions), `20260602000000_bucket_list_unique.sql` (deduplicates existing rows and enforces `UNIQUE (user_id, place_id)` on `bucket_list_items`).
 
 **Supabase Storage buckets:**
 - `place-images` — public read, admin-only write; 10 MB limit; JPEG/PNG/WebP. For admin-uploaded place photos (distinct from Unsplash CDN images).
@@ -206,6 +206,7 @@ ADMIN_USER_ID=                   # Supabase user UUID — gates /admin/analytics
 NEXT_PUBLIC_ADMIN_EMAIL=         # Email address — gates /admin/images
 NEXT_PUBLIC_MAPBOX_TOKEN=        # Required for the Map tab (mapbox-gl / react-map-gl)
 UNSPLASH_ACCESS_KEY=             # Used by seed scripts only — not required at runtime
+NEXT_PUBLIC_LAUNCHED=            # Set to 'true' in Vercel to open the full app; unset/false funnels all traffic to /waitlist
 ```
 
 When adding new env variables, also add them to Vercel's environment settings. `vercel.json` only covers `SUPABASE_SERVICE_ROLE_KEY` and `ADMIN_USER_ID` via secret references — all others (`NEXT_PUBLIC_MAPBOX_TOKEN`, `NEXT_PUBLIC_ADMIN_EMAIL`, etc.) must be set manually in the Vercel dashboard.

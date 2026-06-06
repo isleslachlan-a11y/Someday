@@ -76,7 +76,7 @@ export default function NewDMSheet() {
 
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-[#fcd99a]/40 shrink-0">
-              <h2 className="font-syne text-lg font-bold text-[#131936]">New message</h2>
+              <h2 className="font-brice text-lg font-bold text-[#131936]">New message</h2>
               <button
                 onClick={() => setIsOpen(false)}
                 className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-white text-[#131936]/50 hover:text-[#131936] transition-colors"

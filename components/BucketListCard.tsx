@@ -66,7 +66,7 @@ export default function BucketListCard({ entry, friendMatches, onClick }: Props)
         </div>
 
         {/* Place name */}
-        <h3 className="font-syne font-bold text-white-soft leading-snug line-clamp-2 mb-0.5">
+        <h3 className="font-brice-condensed font-bold text-white-soft leading-snug line-clamp-2 mb-0.5">
           {place.name}
         </h3>
 

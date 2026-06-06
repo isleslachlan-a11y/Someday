@@ -66,7 +66,7 @@ export default function PlaceCard({ place, isAdded, onAdd, index = 0 }: Props) {
             />
           ) : place.image_keyword ? (
             <span
-              className="absolute font-syne font-black text-white select-none pointer-events-none whitespace-nowrap"
+              className="absolute font-brice-condensed font-black text-white select-none pointer-events-none whitespace-nowrap"
               style={{ fontSize: '100px', opacity: 0.04 }}
               aria-hidden
             >
@@ -99,7 +99,7 @@ export default function PlaceCard({ place, isAdded, onAdd, index = 0 }: Props) {
 
       {/* Content */}
       <div className="px-4 py-4">
-        <h3 className="font-syne text-[18px] font-bold text-[#F0EEFF] leading-tight mb-0.5">
+        <h3 className="font-brice-condensed text-[18px] font-bold text-[#F0EEFF] leading-tight mb-0.5">
           {place.name}
         </h3>
         <p className="text-[12px] font-nunito text-[#9b8fc4] mb-2">

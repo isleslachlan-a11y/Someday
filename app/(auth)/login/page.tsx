@@ -52,7 +52,7 @@ export default function LoginPage() {
 
   return (
     <>
-      <h2 className="font-syne text-[22px] font-bold text-[#131936] mb-6">
+      <h2 className="font-brice text-[22px] font-bold text-[#131936] mb-6">
         Welcome back
       </h2>
 
@@ -97,7 +97,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-xl bg-[#f08c21] hover:bg-[#d97a1b] disabled:opacity-60 px-4 py-2.5 font-syne font-semibold text-white transition-colors mt-2 flex items-center justify-center gap-2"
+          className="w-full rounded-xl bg-[#f08c21] hover:bg-[#d97a1b] disabled:opacity-60 px-4 py-2.5 font-brice font-semibold text-white transition-colors mt-2 flex items-center justify-center gap-2"
         >
           {loading && (
             <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin shrink-0" />

@@ -86,7 +86,7 @@ export function WaitlistForm() {
             type="button"
             onClick={() => void handleJoin()}
             disabled={submitting || !canJoin}
-            className="w-full rounded-2xl bg-[#f08c21] text-white font-syne font-bold text-[16px] px-8 py-4 disabled:opacity-40 transition-opacity active:scale-[0.98]"
+            className="w-full rounded-2xl bg-[#f08c21] text-white font-brice font-bold text-[16px] px-8 py-4 disabled:opacity-40 transition-opacity active:scale-[0.98]"
           >
             {submitting ? 'Joining…' : 'Join the waitlist ✦'}
           </button>
@@ -170,7 +170,7 @@ export function WaitlistForm() {
 
           {suggestionOpen && suggestionDone && (
             <div className="px-5 pb-5 pt-4 border-t border-[rgba(252,217,154,0.5)] text-center">
-              <p className="font-syne font-bold text-[#f08c21] text-[14px] mb-1">✦ Noted.</p>
+              <p className="font-brice font-bold text-[#f08c21] text-[14px] mb-1">✦ Noted.</p>
               <p className="font-nunito text-[rgba(19,25,54,0.5)] text-[13px]">
                 We&apos;ll make sure {placeName} is in the catalogue.
               </p>
@@ -188,7 +188,7 @@ export function WaitlistForm() {
         <div className="w-16 h-16 rounded-full bg-[#f08c21]/10 flex items-center justify-center mx-auto mb-4">
           <span className="text-[#f08c21] text-[28px] leading-none">✦</span>
         </div>
-        <h2 className="font-syne font-bold text-[#131936] text-[22px] mb-2">
+        <h2 className="font-brice font-bold text-[#131936] text-[22px] mb-2">
           You&apos;re on the list{userName ? `, ${userName.split(' ')[0]}` : ''}.
         </h2>
         <p className="font-nunito text-[rgba(19,25,54,0.55)] text-[14px]">
@@ -197,7 +197,7 @@ export function WaitlistForm() {
       </div>
 
       <div className="rounded-2xl border border-[rgba(252,217,154,0.5)] bg-white p-6 mb-5 text-center">
-        <p className="font-syne font-bold text-[#131936] text-[15px] mb-1">Follow along while we build</p>
+        <p className="font-brice font-bold text-[#131936] text-[15px] mb-1">Follow along while we build</p>
         <p className="font-nunito text-[rgba(19,25,54,0.5)] text-[13px] mb-5">
           Behind-the-scenes, new destinations, and early access news.
         </p>
@@ -206,7 +206,7 @@ export function WaitlistForm() {
 
       {!suggestionDone ? (
         <div className="rounded-2xl border border-[rgba(252,217,154,0.5)] bg-white p-5">
-          <p className="font-syne font-bold text-[#131936] text-[15px] mb-1">
+          <p className="font-brice font-bold text-[#131936] text-[15px] mb-1">
             Know somewhere worth adding?
           </p>
           <p className="font-nunito text-[rgba(19,25,54,0.5)] text-[12px] mb-4">
@@ -252,7 +252,7 @@ export function WaitlistForm() {
         </div>
       ) : (
         <div className="rounded-2xl border border-[rgba(252,217,154,0.5)] bg-white p-5 text-center">
-          <p className="font-syne font-bold text-[#f08c21] text-[16px] mb-1">✦ Noted.</p>
+          <p className="font-brice font-bold text-[#f08c21] text-[16px] mb-1">✦ Noted.</p>
           <p className="font-nunito text-[rgba(19,25,54,0.5)] text-[13px]">
             We&apos;ll make sure {placeName} makes it into the catalogue.
           </p>

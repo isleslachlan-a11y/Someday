@@ -9,7 +9,7 @@ export function WaitlistNav() {
     <nav className="sticky top-0 z-50 bg-[#fff9f0] border-b border-[rgba(252,217,154,0.5)] h-14 flex items-center px-6">
       <div className="max-w-6xl mx-auto w-full flex items-center justify-between">
 
-        <span className="font-syne font-bold text-[#131936] text-lg tracking-tight select-none">
+        <span className="font-brice font-bold text-[#131936] text-lg tracking-tight select-none">
           Someday
         </span>
 

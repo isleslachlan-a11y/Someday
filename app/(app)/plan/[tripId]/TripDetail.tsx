@@ -170,7 +170,7 @@ export default function TripDetail({
             {trip.icon}
           </span>
           <div className="flex-1 min-w-0">
-            <h1 className="font-syne text-2xl font-bold text-[#131936] leading-snug">
+            <h1 className="font-brice text-2xl font-bold text-[#131936] leading-snug">
               {trip.title}
             </h1>
             {trip.destination && (
@@ -233,7 +233,7 @@ export default function TripDetail({
       {activeTab === 'experiences' && (
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-syne font-bold text-[#131936]">Experiences</h2>
+            <h2 className="font-brice font-bold text-[#131936]">Experiences</h2>
             <button
               onClick={() => setShowAdd(true)}
               className="text-xs font-semibold text-[#f08c21] hover:text-[#131936] transition-colors flex items-center gap-1"
@@ -245,13 +245,13 @@ export default function TripDetail({
           {tripItems.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-[#fcd99a]/50 p-8 text-center">
               <p className="text-3xl mb-3">🌍</p>
-              <p className="text-[#131936] font-syne font-bold mb-1">No experiences yet</p>
+              <p className="text-[#131936] font-brice font-bold mb-1">No experiences yet</p>
               <p className="text-[#131936]/50 text-sm mb-4">
                 Add places you want to visit on this trip.
               </p>
               <button
                 onClick={() => setShowAdd(true)}
-                className="rounded-xl bg-[#f08c21] hover:bg-[#f08c21]/90 px-4 py-2 text-sm font-syne font-semibold text-[#131936] transition-colors"
+                className="rounded-xl bg-[#f08c21] hover:bg-[#f08c21]/90 px-4 py-2 text-sm font-brice font-semibold text-[#131936] transition-colors"
               >
                 Add first experience
               </button>
@@ -456,14 +456,14 @@ function TripChatPanel({
     return (
       <div className="rounded-2xl border border-[#fcd99a]/40 bg-white p-8 text-center mb-6">
         <p className="text-3xl mb-3">💬</p>
-        <p className="font-syne font-bold text-[#131936] mb-1">No group chat yet</p>
+        <p className="font-brice font-bold text-[#131936] mb-1">No group chat yet</p>
         <p className="text-[#131936]/50 text-sm mb-5">
           Start a group chat to coordinate with your trip crew.
         </p>
         <button
           onClick={handleCreateChat}
           disabled={isCreatingChat}
-          className="rounded-xl bg-[#f08c21] hover:bg-[#f08c21]/90 disabled:opacity-50 px-5 py-2.5 font-syne font-semibold text-[#131936] text-sm transition-colors"
+          className="rounded-xl bg-[#f08c21] hover:bg-[#f08c21]/90 disabled:opacity-50 px-5 py-2.5 font-brice font-semibold text-[#131936] text-sm transition-colors"
         >
           {isCreatingChat ? 'Creating…' : 'Start group chat'}
         </button>
@@ -707,7 +707,7 @@ function InviteFriendsSheet({
         </div>
 
         <div className="px-5 pb-3 shrink-0">
-          <h2 className="font-syne font-bold text-xl text-[#131936] mb-1">Invite to Trip</h2>
+          <h2 className="font-brice font-bold text-xl text-[#131936] mb-1">Invite to Trip</h2>
           <p className="text-[#131936]/50 text-sm">Add friends to this trip and group chat.</p>
         </div>
 
@@ -786,7 +786,7 @@ function ExperienceCard({
           {TYPE_ICON[item.place.type] ?? '✦'}
         </span>
         <div className="flex-1 min-w-0">
-          <h3 className="font-syne font-bold text-[#131936] leading-snug">{item.place.name}</h3>
+          <h3 className="font-brice font-bold text-[#131936] leading-snug">{item.place.name}</h3>
           <p className="text-xs text-[#131936]/50">{item.place.country}</p>
           {item.proposed_date && (
             <p className="text-xs text-[#131936]/50 mt-0.5">
@@ -946,7 +946,7 @@ function AddExperienceSheet({
         </div>
 
         <div className="px-5 pb-2 shrink-0">
-          <h2 className="font-syne font-bold text-xl text-[#131936] mb-4">Add Experience</h2>
+          <h2 className="font-brice font-bold text-xl text-[#131936] mb-4">Add Experience</h2>
           <input
             autoFocus
             value={query}

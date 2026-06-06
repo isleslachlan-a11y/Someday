@@ -10,9 +10,11 @@
   --color-white-soft: #F0EEFF;
   --color-muted: #7A7A9A;
 
-  /* Typography */
-  --font-syne: var(--font-syne);
-  --font-nunito: var(--font-nunito);
+  /* Typography — Brice family (Barlow stand-in) */
+  --font-brice:            var(--font-brice);
+  --font-brice-condensed:  var(--font-brice-condensed);
+  --font-brice-tight:      var(--font-brice-tight);
+  --font-nunito:           var(--font-nunito);
 }
 
 :root {

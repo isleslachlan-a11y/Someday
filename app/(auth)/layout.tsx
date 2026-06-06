@@ -30,7 +30,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               <circle cx="24" cy="24" r="5" fill="#fcd99a" />
             </svg>
           </div>
-          <h1 className="font-syne text-3xl font-bold tracking-tight text-[#131936]">
+          <h1 className="font-brice text-3xl font-bold tracking-tight text-[#131936]">
             Someday
           </h1>
           <p className="font-nunito text-sm text-[#131936]/50 mt-1">Your travel bucket list</p>

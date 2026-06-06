@@ -50,7 +50,7 @@ export default function DailyHighlightCard({ place, isAdded, onAdd, index = 0 }:
             />
           ) : place.image_keyword ? (
             <span
-              className="absolute font-syne font-black text-white select-none pointer-events-none whitespace-nowrap"
+              className="absolute font-brice-condensed font-black text-white select-none pointer-events-none whitespace-nowrap"
               style={{ fontSize: '120px', opacity: 0.04 }}
               aria-hidden
             >
@@ -70,7 +70,7 @@ export default function DailyHighlightCard({ place, isAdded, onAdd, index = 0 }:
 
           {/* Place name over image */}
           <div className="absolute bottom-0 left-0 right-0 px-4 pb-4">
-            <h2 className="font-syne text-2xl font-bold text-white leading-tight">
+            <h2 className="font-brice-condensed text-2xl font-bold text-white leading-tight">
               {place.name}
             </h2>
             <p className="text-[13px] font-nunito text-[#9b8fc4] mt-0.5">

@@ -25,7 +25,7 @@ export default async function EditProfilePage() {
         <div className="max-w-[480px] mx-auto px-4 h-14 grid grid-cols-3 items-center">
           <EditBackButton />
           <div className="flex justify-center">
-            <span className="font-syne font-bold text-[#131936] text-[20px] tracking-widest uppercase whitespace-nowrap">
+            <span className="font-brice font-bold text-[#131936] text-[20px] tracking-widest uppercase whitespace-nowrap">
               EDIT PROFILE
             </span>
           </div>

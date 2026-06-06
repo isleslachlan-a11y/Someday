@@ -44,7 +44,7 @@ export default function PlanContent({ trips, overlaps, memberProfiles, userId, t
         <div className="max-w-[480px] mx-auto px-4 h-14 grid grid-cols-3 items-center">
           <div />
           <div className="flex justify-center">
-            <span className="font-syne font-bold text-[#131936] text-[20px] tracking-widest uppercase">
+            <span className="font-brice font-bold text-[#131936] text-[20px] tracking-widest uppercase">
               PLAN
             </span>
           </div>
@@ -139,7 +139,7 @@ function OverlapState({
         <p className="text-xs text-[#f08c21] font-semibold uppercase tracking-wider mb-1">
           ✦ Overlap
         </p>
-        <p className="text-[#131936] font-syne font-bold text-lg leading-snug mb-1">
+        <p className="text-[#131936] font-brice font-bold text-lg leading-snug mb-1">
           People you follow who want to go to the same places as you.
         </p>
         <p className="text-[#131936]/50 text-sm">
@@ -217,7 +217,7 @@ function PlaceOverlapCard({
       </span>
 
       <div className="flex-1 min-w-0">
-        <h3 className="font-syne font-bold text-[#131936] leading-snug">{place.name}</h3>
+        <h3 className="font-brice font-bold text-[#131936] leading-snug">{place.name}</h3>
         <p className="text-xs text-[#131936]/50 mb-2">{place.country}</p>
 
         {/* Friends */}
@@ -272,7 +272,7 @@ function FriendOverlapCard({
     >
       <Avatar avatarUrl={friend.avatar_url} username={friend.username} size={44} />
       <div className="flex-1 min-w-0">
-        <p className="font-syne font-bold text-[#131936]">{friend.username}</p>
+        <p className="font-brice font-bold text-[#131936]">{friend.username}</p>
         <p className="text-xs text-[#131936]/50 truncate">
           You both want:{' '}
           <span className="text-[#f08c21]">
@@ -313,7 +313,7 @@ function FriendDetail({
       <div className="flex items-center gap-3 mb-6">
         <Avatar avatarUrl={friend.avatar_url} username={friend.username} size={48} />
         <div>
-          <p className="font-syne font-bold text-[#131936]">{friend.username}</p>
+          <p className="font-brice font-bold text-[#131936]">{friend.username}</p>
           <p className="text-xs text-[#131936]/50">
             {places.length} shared destination{places.length !== 1 ? 's' : ''}
           </p>
@@ -330,7 +330,7 @@ function FriendDetail({
               {TYPE_ICON[place.type] ?? '✦'}
             </span>
             <div className="flex-1 min-w-0">
-              <h3 className="font-syne font-bold text-[#131936]">{place.name}</h3>
+              <h3 className="font-brice font-bold text-[#131936]">{place.name}</h3>
               <p className="text-xs text-[#131936]/50">{place.country}</p>
               {place.vibes && place.vibes.length > 0 && (
                 <div className="flex gap-1.5 flex-wrap mt-2">
@@ -364,14 +364,14 @@ function EmptyOverlap({ onCreateTrip }: { onCreateTrip: () => void }) {
   return (
     <div className="text-center py-16">
       <p className="text-4xl mb-4">🌍</p>
-      <p className="font-syne font-bold text-[#131936] mb-2">No overlaps yet</p>
+      <p className="font-brice font-bold text-[#131936] mb-2">No overlaps yet</p>
       <p className="text-[#131936]/50 text-sm mb-6 max-w-xs mx-auto">
         Follow friends and add places to your list — overlaps appear when you both want the same
         destination.
       </p>
       <button
         onClick={onCreateTrip}
-        className="rounded-xl bg-[#f08c21] hover:bg-[#f08c21]/90 px-5 py-2.5 font-syne font-semibold text-[#131936] text-sm transition-colors"
+        className="rounded-xl bg-[#f08c21] hover:bg-[#f08c21]/90 px-5 py-2.5 font-brice font-semibold text-[#131936] text-sm transition-colors"
       >
         Start a trip anyway
       </button>
@@ -416,7 +416,7 @@ function TripListState({
           <p className="text-xs text-[#f08c21] font-semibold uppercase tracking-wider mb-1">
             ✦ Overlap
           </p>
-          <p className="text-[#131936] text-sm font-syne font-bold mb-1">
+          <p className="text-[#131936] text-sm font-brice font-bold mb-1">
             {Object.keys(overlaps.byPlace).length} destination
             {Object.keys(overlaps.byPlace).length !== 1 ? 's' : ''} shared with friends
           </p>
@@ -489,7 +489,7 @@ function TripCard({
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
-            <h3 className="font-syne font-bold text-[#131936] leading-snug">{trip.title}</h3>
+            <h3 className="font-brice font-bold text-[#131936] leading-snug">{trip.title}</h3>
             {unreadCount > 0 && (
               <span className="w-2 h-2 rounded-full bg-pink-accent shrink-0" aria-label="Unread messages" />
             )}
@@ -591,7 +591,7 @@ function CreateTripSheet({ onClose }: { onClose: () => void }) {
         </div>
 
         <div className="px-5 pb-8">
-          <h2 className="font-syne font-bold text-xl text-[#131936] mb-5">New Trip</h2>
+          <h2 className="font-brice font-bold text-xl text-[#131936] mb-5">New Trip</h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Icon picker */}
@@ -682,7 +682,7 @@ function CreateTripSheet({ onClose }: { onClose: () => void }) {
               <button
                 type="submit"
                 disabled={isPending || !title.trim()}
-                className="flex-1 rounded-xl bg-[#f08c21] hover:bg-[#f08c21]/90 disabled:opacity-50 py-3 text-sm font-syne font-semibold text-[#131936] transition-colors"
+                className="flex-1 rounded-xl bg-[#f08c21] hover:bg-[#f08c21]/90 disabled:opacity-50 py-3 text-sm font-brice font-semibold text-[#131936] transition-colors"
               >
                 {isPending ? 'Creating…' : 'Create Trip'}
               </button>

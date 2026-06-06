@@ -316,7 +316,7 @@ export default function SubmitForm({ userId }: Props) {
                 placeholder="Start typing…"
                 autoComplete="off"
                 className="w-full rounded-2xl border-2 border-[#fcd99a] bg-white
-                  px-5 py-4 font-syne font-bold text-[#131936] text-[20px]
+                  px-5 py-4 font-brice font-bold text-[#131936] text-[20px]
                   placeholder:text-[#131936]/20 placeholder:font-nunito
                   placeholder:font-normal placeholder:text-[16px]
                   focus:outline-none focus:border-[#f08c21] transition-colors"
@@ -339,7 +339,7 @@ export default function SubmitForm({ userId }: Props) {
                     className="w-full text-left px-5 py-4 hover:bg-[#fcd99a]/20
                       transition-colors border-b border-[#fcd99a]/30 last:border-0"
                   >
-                    <p className="font-syne font-bold text-[#131936] text-[16px]">
+                    <p className="font-brice font-bold text-[#131936] text-[16px]">
                       {s.main_text}
                     </p>
                     <p className="font-nunito text-[#131936]/50 text-[13px] mt-0.5">
@@ -406,7 +406,7 @@ export default function SubmitForm({ userId }: Props) {
               >
                 <span className="text-[32px]">{opt.icon}</span>
                 <div>
-                  <p className={`font-syne font-bold text-[15px] ${
+                  <p className={`font-brice font-bold text-[15px] ${
                     placeType === opt.value ? 'text-[#f08c21]' : 'text-[#131936]'
                   }`}>
                     {opt.label}
@@ -454,7 +454,7 @@ export default function SubmitForm({ userId }: Props) {
                   gap-3 hover:border-[#f08c21]/60 transition-colors group"
               >
                 <span className="text-[40px]">📷</span>
-                <p className="font-syne font-bold text-[#131936]/40 text-[15px] group-hover:text-[#131936] transition-colors">
+                <p className="font-brice font-bold text-[#131936]/40 text-[15px] group-hover:text-[#131936] transition-colors">
                   Add a photo
                 </p>
                 <p className="font-nunito text-[#131936]/30 text-[12px]">
@@ -541,7 +541,7 @@ export default function SubmitForm({ userId }: Props) {
                 placeholder={textCard.placeholder}
                 maxLength={textCard.maxLength}
                 className="w-full rounded-2xl border-2 border-[#fcd99a] bg-white
-                  px-5 py-4 font-syne font-bold text-[#131936] text-[18px]
+                  px-5 py-4 font-brice font-bold text-[#131936] text-[18px]
                   placeholder:text-[#131936]/20 placeholder:font-nunito
                   placeholder:font-normal placeholder:text-[15px]
                   focus:outline-none focus:border-[#f08c21] transition-colors"
@@ -619,7 +619,7 @@ export default function SubmitForm({ userId }: Props) {
 
         {/* Question */}
         <div className="mb-8">
-          <h2 className="font-syne font-bold text-[#131936] text-[26px] leading-tight mb-2">
+          <h2 className="font-brice font-bold text-[#131936] text-[26px] leading-tight mb-2">
             {card.prompt}
           </h2>
           <p className="font-nunito text-[#131936]/50 text-[14px] leading-relaxed">
@@ -641,7 +641,7 @@ export default function SubmitForm({ userId }: Props) {
             onClick={() => void handleSubmit()}
             disabled={!canAdvance() || submitting}
             className="w-full h-14 rounded-full bg-[#131936] text-white
-              font-syne font-bold text-[16px] disabled:opacity-40
+              font-brice font-bold text-[16px] disabled:opacity-40
               transition-opacity active:scale-[0.98]"
           >
             {uploadingPhoto
@@ -656,7 +656,7 @@ export default function SubmitForm({ userId }: Props) {
             onClick={goNext}
             disabled={!canAdvance()}
             className="w-full h-14 rounded-full bg-[#f08c21] text-[#131936]
-              font-syne font-bold text-[16px] disabled:opacity-40
+              font-brice font-bold text-[16px] disabled:opacity-40
               transition-opacity active:scale-[0.98]"
           >
             Continue →
@@ -683,7 +683,7 @@ function SuccessCard({
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center">
       <div className="text-[56px] mb-4">★</div>
-      <h2 className="font-syne font-bold text-[#131936] text-[26px] mb-3">
+      <h2 className="font-brice font-bold text-[#131936] text-[26px] mb-3">
         {placeName} is in the queue.
       </h2>
       <p className="font-nunito text-[#131936]/50 text-[15px] leading-relaxed max-w-xs mb-8">
@@ -691,13 +691,13 @@ function SuccessCard({
       </p>
       <button
         onClick={onReset}
-        className="px-8 py-3 rounded-full bg-[#f08c21] text-[#131936] font-syne font-bold text-[15px]"
+        className="px-8 py-3 rounded-full bg-[#f08c21] text-[#131936] font-brice font-bold text-[15px]"
       >
         Submit another place
       </button>
       {isExperienceType && (
         <div className="mt-4 p-4 rounded-2xl border border-[#fcd99a] bg-white text-left max-w-xs">
-          <p className="font-syne font-bold text-[#131936] text-[15px] mb-1">
+          <p className="font-brice font-bold text-[#131936] text-[15px] mb-1">
             Know what to do there?
           </p>
           <p className="font-nunito text-[#131936]/50 text-[13px] mb-3">

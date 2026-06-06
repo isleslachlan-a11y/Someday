@@ -73,9 +73,7 @@ export default async function PlaceDetailPage({
     supabase
       .from('bucket_list_items')
       .select('place_id')
-      .eq('user_id', user.id)
-      .eq('place_id', id)
-      .maybeSingle(),
+      .eq('user_id', user.id),
     supabase
       .from('places')
       .select('id')
@@ -130,7 +128,8 @@ export default async function PlaceDetailPage({
     ? new Set(((placeCollectionsResult.data ?? []) as { collection_id: string }[]).map(r => r.collection_id))
     : new Set<string>()
 
-  const initialIsSaved = !!bucketResult.data
+  const savedPlaceIds = (bucketResult.data ?? []).map(r => r.place_id as string)
+  const initialIsSaved = savedPlaceIds.includes(id)
   const activities = (activitiesResult.data ?? []) as Activity[]
   const parentPlace = parentPlaceResult.data as { id: string; name: string; type: string; image_thumb_url: string | null; country: string } | null
   const childExperiences = (childExperiencesResult.data ?? []) as unknown as Place[]
@@ -219,6 +218,7 @@ export default async function PlaceDetailPage({
           place={place}
           userId={user.id}
           initialIsSaved={initialIsSaved}
+          initialSavedIds={savedPlaceIds}
           similarPlaces={categoryPlaces}
           statePlaces={statePlaces}
           collectionContext={collectionContext}
@@ -234,6 +234,7 @@ export default async function PlaceDetailPage({
           place={place}
           userId={user.id}
           initialIsSaved={initialIsSaved}
+          initialSavedIds={savedPlaceIds}
           similarPlaces={categoryPlaces}
           statePlaces={statePlaces}
           collectionContext={collectionContext}

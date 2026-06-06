@@ -265,7 +265,7 @@ export default function CollectionsManager({ collections: initial, places, colle
       <div>
         <button
           onClick={startCreate}
-          className="w-full mb-4 h-11 rounded-2xl bg-[#f08c21] text-white font-syne font-bold text-[15px]"
+          className="w-full mb-4 h-11 rounded-2xl bg-[#f08c21] text-white font-brice font-bold text-[15px]"
         >
           + New Collection
         </button>
@@ -298,7 +298,7 @@ export default function CollectionsManager({ collections: initial, places, colle
 
                         {/* Name + badges */}
                         <div className="flex-1 min-w-0">
-                          <p className="font-syne font-bold text-[#131936] text-[14px] truncate">{col.name}</p>
+                          <p className="font-brice font-bold text-[#131936] text-[14px] truncate">{col.name}</p>
                           <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                             <span className={`px-2 py-0.5 rounded-full font-nunito text-[10px] font-medium capitalize ${TYPE_COLORS[col.type] ?? TYPE_COLORS.editorial}`}>
                               {col.type}
@@ -426,7 +426,7 @@ export default function CollectionsManager({ collections: initial, places, colle
 
       {/* ── Place picker ─────────────────────────────────────────────────────── */}
       <div className="mb-6">
-        <p className="font-syne font-bold text-[#131936] text-[15px] mb-3">
+        <p className="font-brice font-bold text-[#131936] text-[15px] mb-3">
           Places
           <span className="font-nunito font-normal text-[12px] text-[#131936]/50 ml-2">
             {selectedPlaceIds.length} selected
@@ -541,7 +541,7 @@ export default function CollectionsManager({ collections: initial, places, colle
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex-[2] h-11 rounded-2xl bg-[#f08c21] text-white font-syne font-bold text-[14px] disabled:opacity-50"
+          className="flex-[2] h-11 rounded-2xl bg-[#f08c21] text-white font-brice font-bold text-[14px] disabled:opacity-50"
         >
           {saving ? 'Saving…' : editingCollection ? 'Save Changes' : 'Save Collection'}
         </button>
