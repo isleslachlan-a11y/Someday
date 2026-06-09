@@ -2,19 +2,15 @@
 @config "../tailwind.config.ts";
 
 /*
- * BRICE FONT — MANUAL INSTALLATION REQUIRED
- * Place the following files in /public/fonts/brice/ after purchasing the
- * commercial app licence from Studio Sun (https://www.fontspring.com/fonts/studio-sun/brice):
- *   - BriceSemiCondensed-ExtraBold.woff2
- *   - BriceSemiCondensed-ExtraBold.woff
- * The @font-face block below will activate once those files are present.
+ * BRICE — Self-hosted display font (Studio Sun / Fontspring commercial licence)
+ * File location: /public/fonts/Brice-Bold-Semi-Expanded.woff2
+ * Used only for: top-of-page screen titles and hero headings (24px+)
+ * Do NOT use for body copy, labels, navigation, buttons, or inputs.
  */
 
 @font-face {
   font-family: 'Brice';
-  src:
-    url('/fonts/brice/BriceSemiCondensed-ExtraBold.woff2') format('woff2'),
-    url('/fonts/brice/BriceSemiCondensed-ExtraBold.woff') format('woff');
+  src: url('/fonts/Brice-Bold-Semi-Expanded.woff2') format('woff2');
   font-weight: 800;
   font-style: normal;
   font-display: swap;
@@ -88,6 +84,17 @@ body {
 .font-display {
   font-family: var(--font-display);
   font-weight: 800;
+}
+
+/*
+ * .font-brice — apply to top-of-page screen title headings only (24px+)
+ * Never use on body copy, card text, labels, or navigation.
+ */
+.font-brice {
+  font-family: 'Brice', serif;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
 }
 
 /* UI headings — DM Sans */

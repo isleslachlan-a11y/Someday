@@ -48,7 +48,7 @@ export function FAQSection() {
             FAQ
           </p>
           {/* TODO: refine — the "answered honestly" framing is from Alloovium; keep if it fits Someday voice */}
-          <h2 className="font-display font-bold text-[#131936] text-3xl md:text-4xl leading-tight">
+          <h2 className="font-brice font-display font-bold text-[#131936] text-3xl md:text-4xl leading-tight">
             Common questions,<br />answered honestly.
           </h2>
 

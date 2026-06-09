@@ -30,7 +30,7 @@ export function HeroSection({ count }: Props) {
           </div>
 
           {/* Headline */}
-          <h1 className="font-display font-extrabold text-[#131936] text-5xl md:text-7xl leading-[1.05] tracking-tight">
+          <h1 className="font-brice font-display font-extrabold text-[#131936] text-5xl md:text-7xl leading-[1.05] tracking-tight">
             Your list of<br />someday trips.
           </h1>
 

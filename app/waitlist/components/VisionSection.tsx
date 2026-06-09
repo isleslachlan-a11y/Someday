@@ -38,7 +38,7 @@ export function VisionSection() {
             Why Someday
           </p>
           {/* TODO: refine heading with Sophia */}
-          <h2 className="font-display font-bold text-[#131936] text-3xl md:text-5xl max-w-2xl leading-tight">
+          <h2 className="font-brice font-display font-bold text-[#131936] text-3xl md:text-5xl max-w-2xl leading-tight">
             The trips you keep putting off deserve a better home.
           </h2>
 

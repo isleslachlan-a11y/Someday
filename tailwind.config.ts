@@ -41,6 +41,7 @@ const config: Config = {
       },
       fontFamily: {
         display: ['Brice', 'serif'],                          // hero headings, wordmark only — 24px+
+        brice:   ['Brice', 'serif'],                          // alias for explicit display usage
         heading: ['var(--font-dm-sans)', 'sans-serif'],       // screen titles, card headings
         body:    ['var(--font-nunito)', 'sans-serif'],        // body copy, labels, inputs
         mono:    ['var(--font-dm-mono)', 'monospace'],        // numbers, distances, stats

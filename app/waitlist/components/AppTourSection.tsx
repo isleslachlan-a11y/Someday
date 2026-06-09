@@ -57,7 +57,7 @@ export function AppTourSection() {
             Features
           </p>
           {/* TODO: refine heading copy */}
-          <h2 className="font-display font-bold text-[#131936] text-3xl md:text-5xl max-w-2xl leading-tight">
+          <h2 className="font-brice font-display font-bold text-[#131936] text-3xl md:text-5xl max-w-2xl leading-tight">
             Everything a trip needs, before it starts.
           </h2>
 
