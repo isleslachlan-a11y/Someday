@@ -24,7 +24,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="mb-8 text-center select-none">
           <div className="flex justify-center mb-3">
             <Image
-              src="/images/logo-gradient.png"
+              src="/Logo.png"
               alt="Someday"
               width={56}
               height={56}

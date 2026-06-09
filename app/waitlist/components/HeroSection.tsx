@@ -24,7 +24,7 @@ export function HeroSection({ count }: Props) {
 
           {/* Logo */}
           <Image
-            src="/images/logo-gradient.png"
+            src="/Logo.png"
             alt="Someday"
             width={64}
             height={64}
