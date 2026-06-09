@@ -1,0 +1,6 @@
+name = "someday-social-import"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[vars]
+# Non-secret config only. Secrets go via `wrangler secret put`.
