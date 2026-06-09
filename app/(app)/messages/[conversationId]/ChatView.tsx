@@ -202,14 +202,14 @@ export default function ChatView({ conversation, initialMessages, currentUserId 
               username={conversation.other_user.username ?? ''}
               size={32}
             />
-            <span className="font-display font-bold text-[#131936] truncate text-sm">{title}</span>
+            <span className="font-syne font-bold text-[#131936] truncate text-sm">{title}</span>
           </Link>
         ) : (
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <div className="w-8 h-8 rounded-full bg-[#f89a14]/10 border border-[#f89a14]/25 flex items-center justify-center shrink-0">
               <span className="text-xs select-none">{conversation.type === 'trip' ? '✈️' : '👥'}</span>
             </div>
-            <span className="font-display font-bold text-[#131936] truncate text-sm">{title}</span>
+            <span className="font-syne font-bold text-[#131936] truncate text-sm">{title}</span>
           </div>
         )}
       </div>
@@ -364,7 +364,7 @@ function PlaceCard({ message, isOwn }: { message: Message; isOwn: boolean }) {
             {TYPE_ICON[placeType] ?? '✦'}
           </span>
           <div className="min-w-0">
-            <p className="text-sm font-display font-bold text-[#131936] truncate">{placeName}</p>
+            <p className="text-sm font-syne font-bold text-[#131936] truncate">{placeName}</p>
             {country && <p className="text-xs text-[#131936]/50">{country}</p>}
           </div>
         </div>

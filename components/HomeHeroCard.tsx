@@ -91,7 +91,7 @@ export default function HomeHeroCard({ place, isAdded, onAdd, onRemove, userId }
         {/* Bottom row */}
         <div className="flex items-end justify-between gap-3">
           <div className="min-w-0">
-            <h2 className="font-heading font-bold text-white leading-tight line-clamp-2" style={{ fontSize: 24 }}>
+            <h2 className="font-syne font-bold text-white leading-tight line-clamp-2" style={{ fontSize: 24 }}>
               {place.name}
             </h2>
             {location && (

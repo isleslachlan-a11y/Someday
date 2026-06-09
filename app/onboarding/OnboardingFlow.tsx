@@ -302,7 +302,7 @@ function StepWelcome({ onNext }: { onNext: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center min-h-[70vh] text-center">
       <div className="text-5xl mb-8 text-[#f89a14] select-none">✦</div>
-      <h1 className="font-display text-4xl font-bold text-[#131936] mb-4 leading-tight">
+      <h1 className="font-syne text-4xl font-bold text-[#131936] mb-4 leading-tight">
         Welcome to Someday.
       </h1>
       <p className="font-nunito text-[#131936]/60 text-lg mb-14 leading-relaxed">
@@ -310,7 +310,7 @@ function StepWelcome({ onNext }: { onNext: () => void }) {
       </p>
       <button
         onClick={onNext}
-        className="inline-flex items-center gap-2 rounded-2xl bg-[#f89a14] hover:bg-[#d97a1b] active:scale-95 px-10 py-4 font-display font-bold text-white text-lg transition-all"
+        className="inline-flex items-center gap-2 rounded-2xl bg-[#f89a14] hover:bg-[#d97a1b] active:scale-95 px-10 py-4 font-syne font-bold text-white text-lg transition-all"
       >
         Let&apos;s go <span aria-hidden>→</span>
       </button>
@@ -342,7 +342,7 @@ function StepTravelStyle({
   return (
     <div>
       <BackBtn onClick={onBack} />
-      <h2 className="font-display text-2xl font-bold text-[#131936] mt-5 mb-2">
+      <h2 className="font-syne text-2xl font-bold text-[#131936] mt-5 mb-2">
         What kind of traveller are you?
       </h2>
       <p className="font-nunito text-[#131936]/40 text-sm mb-8">Pick up to 3.</p>
@@ -389,7 +389,7 @@ function StepSingleSelect({
   return (
     <div>
       <BackBtn onClick={onBack} />
-      <h2 className="font-display text-2xl font-bold text-[#131936] mt-5 mb-8">
+      <h2 className="font-syne text-2xl font-bold text-[#131936] mt-5 mb-8">
         {question}
       </h2>
 
@@ -426,7 +426,7 @@ function StepBudget({
   return (
     <div>
       <BackBtn onClick={onBack} />
-      <h2 className="font-display text-2xl font-bold text-[#131936] mt-5 mb-8">
+      <h2 className="font-syne text-2xl font-bold text-[#131936] mt-5 mb-8">
         What&apos;s your travel budget usually like?
       </h2>
 
@@ -437,7 +437,7 @@ function StepBudget({
             onClick={() => onChange(opt.value)}
             className={`w-full ${PILL_BASE} px-5 ${value === opt.value ? PILL_ON : PILL_OFF}`}
           >
-            <span className="block font-heading font-semibold text-[14px]">
+            <span className="block font-syne font-semibold text-[14px]">
               {opt.label}
             </span>
             <span className="block font-nunito text-sm text-[#131936]/40 mt-0.5">{opt.sub}</span>
@@ -470,7 +470,7 @@ function StepPastTrip({
   return (
     <div>
       <BackBtn onClick={onBack} />
-      <h2 className="font-display text-2xl font-bold text-[#131936] mt-5 mb-2">
+      <h2 className="font-syne text-2xl font-bold text-[#131936] mt-5 mb-2">
         Where&apos;s somewhere you&apos;ve already been that you loved?
       </h2>
       <p className="font-nunito text-[#131936]/40 text-sm mb-8">Optional — you can add more later.</p>
@@ -540,7 +540,7 @@ function StepBucketSeed({
   return (
     <div>
       <BackBtn onClick={onBack} />
-      <h2 className="font-display text-2xl font-bold text-[#131936] mt-5 mb-2">
+      <h2 className="font-syne text-2xl font-bold text-[#131936] mt-5 mb-2">
         Pick at least 3 places you&apos;d love to go someday.
       </h2>
       <p className="font-nunito text-[#131936]/40 text-sm mb-8">
@@ -574,7 +574,7 @@ function StepBucketSeed({
                 <span className="block text-xl mb-2 select-none" aria-hidden>
                   {TYPE_ICONS[place.type] ?? '✦'}
                 </span>
-                <span className="block font-heading font-semibold text-[#131936] text-sm leading-snug">
+                <span className="block font-syne font-semibold text-[#131936] text-sm leading-snug">
                   {place.name}
                 </span>
                 <span className="block font-nunito text-xs text-[#131936]/40 mt-1">{place.country}</span>
@@ -607,7 +607,7 @@ function StepDone({
   return (
     <div className="flex flex-col items-center justify-center min-h-[70vh] text-center">
       <div className="text-5xl mb-8 select-none">🌍</div>
-      <h1 className="font-display text-4xl font-bold text-[#131936] mb-4 leading-tight">
+      <h1 className="font-syne text-4xl font-bold text-[#131936] mb-4 leading-tight">
         Your Someday starts now.
       </h1>
 
@@ -616,7 +616,7 @@ function StepDone({
           <p className="font-nunito text-[#131936]/40 text-sm mb-8">Something went wrong saving your profile.</p>
           <button
             onClick={onRetry}
-            className="inline-flex items-center gap-2 rounded-2xl bg-[#f89a14] hover:bg-[#d97a1b] active:scale-95 px-8 py-4 font-display font-bold text-white transition-all"
+            className="inline-flex items-center gap-2 rounded-2xl bg-[#f89a14] hover:bg-[#d97a1b] active:scale-95 px-8 py-4 font-syne font-bold text-white transition-all"
           >
             Try again
           </button>
@@ -659,7 +659,7 @@ function NextBtn({
     <button
       onClick={onClick}
       disabled={disabled}
-      className="w-full rounded-2xl bg-[#f89a14] hover:bg-[#d97a1b] active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed px-6 py-4 font-display font-bold text-white transition-all"
+      className="w-full rounded-2xl bg-[#f89a14] hover:bg-[#d97a1b] active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed px-6 py-4 font-syne font-bold text-white transition-all"
     >
       {label}
     </button>

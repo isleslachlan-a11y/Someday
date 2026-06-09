@@ -45,7 +45,7 @@ const DIMENSION_LABELS: Record<string, string> = {
 }
 
 const INPUT_CLASS = 'w-full rounded-2xl border border-[#fcd99a] bg-white px-4 py-3 font-nunito text-[14px] text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:ring-2 focus:ring-[#f89a14]/30 transition'
-const SECTION_HEADING = 'font-display font-bold text-[#131936] text-[15px] mb-3'
+const SECTION_HEADING = 'font-syne font-bold text-[#131936] text-[15px] mb-3'
 
 function pillClass(active: boolean) {
   return `px-4 py-2 rounded-full border font-nunito text-[13px] font-medium transition-all ${active ? 'bg-[#f89a14] text-[#131936] border-[#f89a14]' : 'bg-white text-[#131936]/60 border-[#fcd99a]'}`
@@ -339,7 +339,7 @@ export default function AdminExperienceForm({ userId: _userId, onBack }: Props) 
 
       <div className="flex items-center gap-2">
         <span className="text-[20px]">✨</span>
-        <p className="font-display font-bold text-[#131936] text-[17px]">Add an Experience</p>
+        <p className="font-syne font-bold text-[#131936] text-[17px]">Add an Experience</p>
       </div>
 
       {/* ── Section 1: Basic info ─────────────────────────────────────────── */}
@@ -582,7 +582,7 @@ export default function AdminExperienceForm({ userId: _userId, onBack }: Props) 
               <button type="button" onClick={() => adminFileInputRef.current?.click()}
                 className="w-full rounded-2xl border-2 border-dashed border-[#fcd99a] bg-white py-12 flex flex-col items-center gap-3 hover:border-[#f89a14]/60 transition-colors">
                 <span className="text-[36px]">📷</span>
-                <p className="font-display font-bold text-[#131936]/50 text-[14px]">Upload a photo</p>
+                <p className="font-syne font-bold text-[#131936]/50 text-[14px]">Upload a photo</p>
                 <p className="font-nunito text-[#131936]/30 text-[12px]">JPG, PNG or WebP · up to 10 MB</p>
               </button>
             ) : (
@@ -593,7 +593,7 @@ export default function AdminExperienceForm({ userId: _userId, onBack }: Props) 
               </div>
             )}
             {uploadFile && <label className="flex items-start gap-3 cursor-pointer"><input type="checkbox" checked={uploadConsent} onChange={e => setUploadConsent(e.target.checked)} className="mt-0.5 w-4 h-4 accent-[#f89a14] shrink-0 cursor-pointer" /><span className="font-nunito text-[#131936]/60 text-[13px] leading-relaxed">This photo is licensed for use. I confirm Someday may display it in the app.</span></label>}
-            {uploadFile && uploadConsent && !uploadedImageUrl && <button type="button" onClick={() => void handleAdminUpload()} disabled={uploading} className="w-full h-11 rounded-full bg-[#131936] text-white font-display font-bold text-[14px] disabled:opacity-50">{uploading ? 'Uploading…' : 'Use this photo'}</button>}
+            {uploadFile && uploadConsent && !uploadedImageUrl && <button type="button" onClick={() => void handleAdminUpload()} disabled={uploading} className="w-full h-11 rounded-full bg-[#131936] text-white font-syne font-bold text-[14px] disabled:opacity-50">{uploading ? 'Uploading…' : 'Use this photo'}</button>}
             {uploadedImageUrl && <p className="font-nunito text-[12px] text-[#16a34a]">✓ Photo uploaded</p>}
             <input ref={adminFileInputRef} type="file" accept="image/jpeg,image/png,image/webp"
               onChange={e => {
@@ -618,7 +618,7 @@ export default function AdminExperienceForm({ userId: _userId, onBack }: Props) 
       {error && <div className="rounded-2xl bg-red-50 border border-red-200 px-4 py-3"><p className="font-nunito text-[13px] text-red-600">{error}</p></div>}
 
       <button type="button" onClick={() => void handleSubmit()} disabled={saving}
-        className="w-full h-14 rounded-full bg-[#131936] text-white font-display font-bold text-[16px] disabled:opacity-50 transition-opacity">
+        className="w-full h-14 rounded-full bg-[#131936] text-white font-syne font-bold text-[16px] disabled:opacity-50 transition-opacity">
         {saving ? 'Adding to database…' : 'Add Experience to Someday ✦'}
       </button>
 

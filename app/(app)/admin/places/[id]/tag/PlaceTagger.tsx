@@ -154,7 +154,7 @@ export default function PlaceTagger({
 
       {/* ── Categories ────────────────────────────────────────────────────────── */}
       <section>
-        <h2 className="font-display font-bold text-[#131936] text-[15px] mb-3">
+        <h2 className="font-syne font-bold text-[#131936] text-[15px] mb-3">
           Categories
           {selectedCategoryIds.size > 0 && (
             <span className="ml-2 font-nunito font-normal text-[12px] text-[#f89a14]">
@@ -189,7 +189,7 @@ export default function PlaceTagger({
 
       {/* ── Tags ──────────────────────────────────────────────────────────────── */}
       <section>
-        <h2 className="font-display font-bold text-[#131936] text-[15px] mb-3">
+        <h2 className="font-syne font-bold text-[#131936] text-[15px] mb-3">
           Tags
           {selectedTagIds.size > 0 && (
             <span className="ml-2 font-nunito font-normal text-[12px] text-[#f89a14]">
@@ -238,7 +238,7 @@ export default function PlaceTagger({
 
       {/* ── Labels ────────────────────────────────────────────────────────────── */}
       <section>
-        <h2 className="font-display font-bold text-[#131936] text-[15px] mb-3">
+        <h2 className="font-syne font-bold text-[#131936] text-[15px] mb-3">
           Labels
           {selectedLabelIds.size > 0 && (
             <span className="ml-2 font-nunito font-normal text-[12px] text-[#f89a14]">

@@ -182,7 +182,7 @@ export default function DiscoverContent({
             </div>
           ) : searchResults !== null ? (
             <div className="flex flex-col items-center py-16 text-center">
-              <p className="font-display font-bold text-[#131936] text-[16px]">No results</p>
+              <p className="font-syne font-bold text-[#131936] text-[16px]">No results</p>
               <p className="font-nunito text-[#131936]/50 text-[13px] mt-1">Try a different search</p>
             </div>
           ) : null}
@@ -190,7 +190,7 @@ export default function DiscoverContent({
       ) : (
         <>
           {/* ── People row ────────────────────────────────────────────────── */}
-          <p className="font-display font-bold text-[#131936] text-[15px] mt-5 mb-3">People</p>
+          <p className="font-syne font-bold text-[#131936] text-[15px] mt-5 mb-3">People</p>
           {allPeople.length > 0 ? (
             <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-none">
               {allPeople.map(person => (
@@ -209,7 +209,7 @@ export default function DiscoverContent({
                     />
                   ) : (
                     <div className="w-14 h-14 rounded-full bg-[#131936] border-2 border-[#fcd99a] flex items-center justify-center">
-                      <span className="font-display font-bold text-[#f89a14] text-[18px]">
+                      <span className="font-syne font-bold text-[#f89a14] text-[18px]">
                         {person.username.slice(0, 1).toUpperCase()}
                       </span>
                     </div>
@@ -237,7 +237,7 @@ export default function DiscoverContent({
                   return (
                     <div className="mb-3">
                       <div className="flex items-center justify-between">
-                        <h2 className="font-display font-bold text-[#131936] text-[16px]">
+                        <h2 className="font-syne font-bold text-[#131936] text-[16px]">
                           {category.label}
                         </h2>
                         {col ? (

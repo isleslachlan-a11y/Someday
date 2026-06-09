@@ -14,7 +14,7 @@ export default function ConversationList({ conversations, currentUserId }: Props
     return (
       <div className="flex flex-col items-center justify-center px-6 py-20 text-center">
         <div className="text-4xl mb-4 select-none">✉️</div>
-        <p className="font-display font-bold text-[#131936] mb-1">No messages yet</p>
+        <p className="font-syne font-bold text-[#131936] mb-1">No messages yet</p>
         <p className="text-sm text-[#131936]/50">Start a conversation with a friend</p>
       </div>
     )

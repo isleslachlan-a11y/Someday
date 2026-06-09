@@ -186,7 +186,7 @@ export default async function ListPage() {
         <div className="max-w-[480px] mx-auto px-4 h-14 grid grid-cols-3 items-center">
           <div />
           <div className="flex justify-center">
-            <h1 className="font-display font-bold text-[#131936] text-[20px] tracking-widest uppercase whitespace-nowrap">
+            <h1 className="font-brice font-syne font-bold text-[#131936] text-[20px] tracking-widest uppercase whitespace-nowrap">
               MY SOMEDAY&apos;S
             </h1>
           </div>

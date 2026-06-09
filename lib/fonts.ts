@@ -6,7 +6,15 @@
  * No next/font entry is needed for it.
  */
 
-import { DM_Sans, Nunito, DM_Mono } from 'next/font/google'
+import { DM_Sans, Nunito, DM_Mono, Syne } from 'next/font/google'
+
+// Display headings — 5 app page titles only (font-syne)
+export const syne = Syne({
+  subsets: ['latin'],
+  weight: ['400', '700', '800'],
+  variable: '--font-syne',
+  display: 'swap',
+})
 
 // UI headings, card headings, screen titles (font-heading)
 export const dmSans = DM_Sans({

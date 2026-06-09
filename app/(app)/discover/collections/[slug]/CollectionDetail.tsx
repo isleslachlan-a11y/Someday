@@ -70,7 +70,7 @@ export default function CollectionDetail({ collection, places, userId, initialSa
             ←
           </Link>
           <div className="flex-1 min-w-0">
-            <p className="font-display font-bold text-[#131936] text-[16px] truncate">
+            <p className="font-syne font-bold text-[#131936] text-[16px] truncate">
               {collection.name}
             </p>
           </div>
@@ -98,7 +98,7 @@ export default function CollectionDetail({ collection, places, userId, initialSa
         {/* Place grid */}
         {places.length === 0 ? (
           <div className="flex flex-col items-center py-20 text-center">
-            <p className="font-display font-bold text-[#131936] text-[16px]">Nothing here yet</p>
+            <p className="font-syne font-bold text-[#131936] text-[16px]">Nothing here yet</p>
             <p className="font-nunito text-[#131936]/40 text-[13px] mt-1">
               This collection is being curated.
             </p>

@@ -23,7 +23,7 @@ export default function PastTripsSection({ trips: initialTrips }: Props) {
   return (
     <section className="mb-8">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="font-display font-bold text-[#131936]">Past Trips</h2>
+        <h2 className="font-syne font-bold text-[#131936]">Past Trips</h2>
         <button
           onClick={() => setShowAdd(true)}
           className="text-xs font-semibold text-[#f89a14] hover:text-[#131936] transition-colors"
@@ -191,7 +191,7 @@ function AddTripModal({
         </div>
 
         <div className="px-5 pb-10">
-          <h2 className="font-display font-bold text-xl text-[#131936] mb-5">Add Past Trip</h2>
+          <h2 className="font-syne font-bold text-xl text-[#131936] mb-5">Add Past Trip</h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -246,7 +246,7 @@ function AddTripModal({
               <button
                 type="submit"
                 disabled={isPending || !placeName.trim()}
-                className="flex-1 rounded-xl bg-[#f89a14] hover:bg-[#f89a14]/90 disabled:opacity-50 py-3 text-sm font-heading font-semibold text-[#131936] transition-colors"
+                className="flex-1 rounded-xl bg-[#f89a14] hover:bg-[#f89a14]/90 disabled:opacity-50 py-3 text-sm font-syne font-semibold text-[#131936] transition-colors"
               >
                 {isPending ? 'Adding…' : 'Add Trip'}
               </button>

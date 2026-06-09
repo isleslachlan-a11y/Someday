@@ -313,7 +313,7 @@ export default function PlaceDetailContent({
         {/* Place info overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <p className="font-nunito text-white/70 text-[12px] capitalize mb-0.5">{place.type}</p>
-          <h1 className="font-display font-bold text-white text-[26px] leading-tight">{place.name}</h1>
+          <h1 className="font-syne font-bold text-white text-[26px] leading-tight">{place.name}</h1>
           {location && (
             <p className="font-nunito text-white/70 text-[13px] mt-0.5">{location}</p>
           )}
@@ -326,7 +326,7 @@ export default function PlaceDetailContent({
         {/* Description */}
         {place.description && (
           <div className="px-4 pt-4">
-            <h2 className="font-display font-bold text-[#131936] text-[16px] mb-3">Description</h2>
+            <h2 className="font-syne font-bold text-[#131936] text-[16px] mb-3">Description</h2>
             <p
               className={`font-nunito text-[14px] text-[#131936]/70 leading-relaxed ${
                 descExpanded ? '' : 'line-clamp-3'
@@ -348,32 +348,32 @@ export default function PlaceDetailContent({
         {/* ── About this place (Hinge fields) ──────────────────────────────── */}
         {(place.must_do || place.hidden_gem || place.not_for_you || place.best_time || (place.vibe_tags && place.vibe_tags.length > 0)) && (
           <div className="px-4 pt-6 space-y-2">
-            <h2 className="font-display font-bold text-[#131936] text-[16px] mb-3">About this place</h2>
+            <h2 className="font-syne font-bold text-[#131936] text-[16px] mb-3">About this place</h2>
 
             {place.must_do && (
               <div className="rounded-2xl border border-[#fcd99a] bg-white px-4 py-3">
-                <p className="font-display font-bold text-[#131936] text-[13px] mb-1">🎯 Must do</p>
+                <p className="font-syne font-bold text-[#131936] text-[13px] mb-1">🎯 Must do</p>
                 <p className="font-nunito text-[#131936] text-[15px] leading-snug">{place.must_do}</p>
               </div>
             )}
 
             {place.hidden_gem && (
               <div className="rounded-2xl border border-[#fcd99a] bg-white px-4 py-3">
-                <p className="font-display font-bold text-[#131936] text-[13px] mb-1">💎 Local secret</p>
+                <p className="font-syne font-bold text-[#131936] text-[13px] mb-1">💎 Local secret</p>
                 <p className="font-nunito text-[#131936] text-[15px] leading-snug">{place.hidden_gem}</p>
               </div>
             )}
 
             {place.not_for_you && (
               <div className="rounded-2xl border border-[#fcd99a] bg-white px-4 py-3">
-                <p className="font-display font-bold text-[#131936] text-[13px] mb-1">⚠️ Not for you if</p>
+                <p className="font-syne font-bold text-[#131936] text-[13px] mb-1">⚠️ Not for you if</p>
                 <p className="font-nunito text-[#131936] text-[15px] leading-snug">{place.not_for_you}</p>
               </div>
             )}
 
             {place.best_time && (
               <div className="rounded-2xl border border-[#fcd99a] bg-white px-4 py-3">
-                <p className="font-display font-bold text-[#131936] text-[13px] mb-1">🗓 Best time</p>
+                <p className="font-syne font-bold text-[#131936] text-[13px] mb-1">🗓 Best time</p>
                 <p className="font-nunito text-[#131936] text-[15px] leading-snug">{place.best_time}</p>
               </div>
             )}
@@ -384,7 +384,7 @@ export default function PlaceDetailContent({
         {/* ── Map ──────────────────────────────────────────────────────────── */}
         <div className="pt-6">
           <div className="flex items-center justify-between px-4 mb-3">
-            <h2 className="font-display font-bold text-[#131936] text-[16px]">Where the magic is</h2>
+            <h2 className="font-syne font-bold text-[#131936] text-[16px]">Where the magic is</h2>
             {place.lat && place.lng && (
               <Link
                 href={`/map?lat=${place.lat}&lng=${place.lng}&name=${encodeURIComponent(place.name)}`}
@@ -517,7 +517,7 @@ export default function PlaceDetailContent({
         <div className="px-4 pt-6">
           <div className="bg-white rounded-2xl p-4">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="font-display font-bold text-[#131936] text-[16px]">Best time to visit</h2>
+              <h2 className="font-syne font-bold text-[#131936] text-[16px]">Best time to visit</h2>
               {seasonTags.length > 0 && (
                 <span className="font-nunito text-[12px] text-[#f89a14] capitalize">
                   {seasonTags.join(' · ')}
@@ -565,7 +565,7 @@ export default function PlaceDetailContent({
         {statePlaces.length > 0 && (
           <div className="pt-6">
             <div className="flex items-center justify-between px-4 mb-3">
-              <h2 className="font-display font-bold text-[#131936] text-[16px]">
+              <h2 className="font-syne font-bold text-[#131936] text-[16px]">
                 More in {place.state_province}
               </h2>
               <Link
@@ -596,7 +596,7 @@ export default function PlaceDetailContent({
         {(childExperiencePlaces.length > 0 || isAdmin) && (
           <div className="pt-6">
             <div className="flex items-center justify-between px-4 mb-3">
-              <h2 className="font-display font-bold text-[#131936] text-[16px]">
+              <h2 className="font-syne font-bold text-[#131936] text-[16px]">
                 Things to do here
               </h2>
               <span className="font-nunito text-[#131936]/40 text-[12px]">
@@ -629,7 +629,7 @@ export default function PlaceDetailContent({
         {similarPlaces.length > 0 && (
           <div className="pt-6">
             <div className="flex items-center justify-between px-4 mb-3">
-              <h2 className="font-display font-bold text-[#131936] text-[16px]">
+              <h2 className="font-syne font-bold text-[#131936] text-[16px]">
                 More like this
               </h2>
               <Link
@@ -671,7 +671,7 @@ export default function PlaceDetailContent({
         {collectionContext && collectionContext.places.length > 0 && (
           <div className="pt-6">
             <div className="px-4 mb-3">
-              <h2 className="font-display font-bold text-[#131936] text-[16px]">
+              <h2 className="font-syne font-bold text-[#131936] text-[16px]">
                 More from {collectionContext.name}
               </h2>
             </div>
@@ -695,7 +695,7 @@ export default function PlaceDetailContent({
         {/* ── Friends who've been ───────────────────────────────────────────── */}
         <div className="px-4 pt-6">
           <div className="bg-white rounded-2xl p-4">
-            <h2 className="font-display font-bold text-[#131936] text-[16px] mb-3">
+            <h2 className="font-syne font-bold text-[#131936] text-[16px] mb-3">
               Your friends who&apos;ve been
             </h2>
             {friendVisitors.length > 0 ? (
@@ -741,7 +741,7 @@ export default function PlaceDetailContent({
           <div className="absolute inset-0 bg-black/40" onClick={() => setShowCollectionSheet(false)} />
           <div className="relative w-full bg-[#fff9f0] rounded-t-3xl px-4 pt-5 pb-10 max-h-[70vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-display font-bold text-[#131936] text-[16px]">Collections</h3>
+              <h3 className="font-syne font-bold text-[#131936] text-[16px]">Collections</h3>
               <button
                 onClick={() => setShowCollectionSheet(false)}
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-[#131936]/10"
@@ -852,7 +852,7 @@ function SimilarCard({
 
       {/* Bottom text */}
       <div className="absolute bottom-0 left-0 right-0 p-2 pointer-events-none">
-        <p className="font-display font-bold text-white text-[13px] leading-tight line-clamp-2">
+        <p className="font-syne font-bold text-white text-[13px] leading-tight line-clamp-2">
           {place.name}
         </p>
         <p className="font-nunito text-white/70 text-[11px] mt-0.5">{place.country}</p>

@@ -49,7 +49,7 @@ const DIMENSION_LABELS: Record<string, string> = {
 // ── Style helpers ─────────────────────────────────────────────────────────────
 
 const INPUT_CLASS = 'w-full rounded-2xl border border-[#fcd99a] bg-white px-4 py-3 font-nunito text-[14px] text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:ring-2 focus:ring-[#f89a14]/30 transition'
-const SECTION_HEADING = 'font-display font-bold text-[#131936] text-[15px] mb-3'
+const SECTION_HEADING = 'font-syne font-bold text-[#131936] text-[15px] mb-3'
 
 function pillClass(active: boolean) {
   return `px-4 py-2 rounded-full border font-nunito text-[13px] font-medium transition-all ${active ? 'bg-[#f89a14] text-[#131936] border-[#f89a14]' : 'bg-white text-[#131936]/60 border-[#fcd99a]'}`
@@ -103,7 +103,7 @@ function ActivityAdder({ placeId }: { placeId: string }) {
       <div className="flex flex-wrap gap-2">
         {ACTIVITY_CATEGORIES.map(c => <button key={c} type="button" onClick={() => setCategory(prev => prev === c ? '' : c)} className={pillClass(category === c)}>{c}</button>)}
       </div>
-      <button type="button" onClick={() => void addActivity()} disabled={saving || !name.trim()} className="w-full h-11 rounded-full bg-[#f89a14] text-[#131936] font-display font-bold text-[14px] disabled:opacity-50">
+      <button type="button" onClick={() => void addActivity()} disabled={saving || !name.trim()} className="w-full h-11 rounded-full bg-[#f89a14] text-[#131936] font-syne font-bold text-[14px] disabled:opacity-50">
         {saving ? 'Adding…' : '+ Add activity'}
       </button>
     </div>
@@ -357,7 +357,7 @@ export default function AdminDestinationForm({ userId: _userId, onBack }: Props)
 
       <div className="flex items-center gap-2">
         <span className="text-[20px]">🗺</span>
-        <p className="font-display font-bold text-[#131936] text-[17px]">Add a Destination</p>
+        <p className="font-syne font-bold text-[#131936] text-[17px]">Add a Destination</p>
       </div>
 
       {/* ── Section 1: Basic info ─────────────────────────────────────────── */}
@@ -597,7 +597,7 @@ export default function AdminDestinationForm({ userId: _userId, onBack }: Props)
               <button type="button" onClick={() => adminFileInputRef.current?.click()}
                 className="w-full rounded-2xl border-2 border-dashed border-[#fcd99a] bg-white py-12 flex flex-col items-center gap-3 hover:border-[#f89a14]/60 transition-colors">
                 <span className="text-[36px]">📷</span>
-                <p className="font-display font-bold text-[#131936]/50 text-[14px]">Upload a place photo</p>
+                <p className="font-syne font-bold text-[#131936]/50 text-[14px]">Upload a place photo</p>
                 <p className="font-nunito text-[#131936]/30 text-[12px]">JPG, PNG or WebP · up to 10 MB</p>
               </button>
             ) : (
@@ -614,7 +614,7 @@ export default function AdminDestinationForm({ userId: _userId, onBack }: Props)
               </label>
             )}
             {uploadFile && uploadConsent && !uploadedImageUrl && (
-              <button type="button" onClick={() => void handleAdminUpload()} disabled={uploading} className="w-full h-11 rounded-full bg-[#131936] text-white font-display font-bold text-[14px] disabled:opacity-50">
+              <button type="button" onClick={() => void handleAdminUpload()} disabled={uploading} className="w-full h-11 rounded-full bg-[#131936] text-white font-syne font-bold text-[14px] disabled:opacity-50">
                 {uploading ? 'Uploading…' : 'Use this photo'}
               </button>
             )}
@@ -650,7 +650,7 @@ export default function AdminDestinationForm({ userId: _userId, onBack }: Props)
       {error && <div className="rounded-2xl bg-red-50 border border-red-200 px-4 py-3"><p className="font-nunito text-[13px] text-red-600">{error}</p></div>}
 
       <button type="button" onClick={() => void handleSubmit()} disabled={saving}
-        className="w-full h-14 rounded-full bg-[#131936] text-white font-display font-bold text-[16px] disabled:opacity-50 transition-opacity">
+        className="w-full h-14 rounded-full bg-[#131936] text-white font-syne font-bold text-[16px] disabled:opacity-50 transition-opacity">
         {saving ? 'Adding to database…' : 'Add Destination to Someday ✦'}
       </button>
 

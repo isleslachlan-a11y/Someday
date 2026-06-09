@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { dmSans, nunito, dmMono } from '@/lib/fonts'
+import { syne, dmSans, nunito, dmMono } from '@/lib/fonts'
 import './globals.css'
 
 export const viewport: Viewport = {
@@ -29,7 +29,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full antialiased">
-      <body className={`${dmSans.variable} ${nunito.variable} ${dmMono.variable} min-h-full flex flex-col bg-indigo-deep text-white-soft font-body`}>
+      <body className={`${syne.variable} ${dmSans.variable} ${nunito.variable} ${dmMono.variable} min-h-full flex flex-col bg-indigo-deep text-white-soft font-body`}>
         {children}
       </body>
     </html>

@@ -75,7 +75,7 @@ export default function TravelProfileSection({ context }: Props) {
   return (
     <section className="mb-8">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="font-display font-bold text-[#131936]">Travel Profile</h2>
+        <h2 className="font-syne font-bold text-[#131936]">Travel Profile</h2>
         <button
           onClick={() => setShowEdit(true)}
           className="text-xs font-semibold text-[#f89a14] hover:text-[#131936] transition-colors"
@@ -213,7 +213,7 @@ function EditModal({
         </div>
 
         <div className="px-5 pb-10">
-          <h2 className="font-display font-bold text-xl text-[#131936] mb-6">Travel Profile</h2>
+          <h2 className="font-syne font-bold text-xl text-[#131936] mb-6">Travel Profile</h2>
 
           {/* Travel style */}
           <div className="mb-6">
@@ -321,7 +321,7 @@ function EditModal({
               type="button"
               onClick={handleSave}
               disabled={isPending}
-              className="flex-1 rounded-xl bg-[#f89a14] hover:bg-[#f89a14]/90 disabled:opacity-50 py-3 text-sm font-heading font-semibold text-[#131936] transition-colors"
+              className="flex-1 rounded-xl bg-[#f89a14] hover:bg-[#f89a14]/90 disabled:opacity-50 py-3 text-sm font-syne font-semibold text-[#131936] transition-colors"
             >
               {isPending ? 'Saving…' : 'Save'}
             </button>

@@ -44,7 +44,7 @@ export default function OverlapCard({ overlap, isAdded, onAdd, index = 0 }: Prop
       </p>
 
       {/* Place name */}
-      <h3 className="font-heading text-[20px] font-bold text-[#F0EEFF] leading-tight mb-0.5">
+      <h3 className="font-syne text-[20px] font-bold text-[#F0EEFF] leading-tight mb-0.5">
         {place.name}
       </h3>
       <p className="text-[12px] font-nunito text-[#9b8fc4] mb-4">

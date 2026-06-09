@@ -43,7 +43,7 @@ export default async function AnalyticsDashboardPage() {
       <div className="max-w-4xl mx-auto">
 
         <div className="mb-8">
-          <h1 className="font-display text-3xl font-bold text-[#131936]">Analytics</h1>
+          <h1 className="font-syne text-3xl font-bold text-[#131936]">Analytics</h1>
           <p className="text-[#131936]/50 text-sm mt-1">Last 30 days · Internal only</p>
         </div>
 
@@ -117,7 +117,7 @@ function StatCard({ label, value, sub }: { label: string; value: string; sub: st
   return (
     <div className="rounded-2xl border border-[#fcd99a]/40 bg-white px-5 py-5">
       <p className="text-[#131936]/50 text-xs mb-1">{label}</p>
-      <p className="font-display text-4xl font-bold text-[#f89a14]">{value}</p>
+      <p className="font-syne text-4xl font-bold text-[#f89a14]">{value}</p>
       <p className="text-[#131936]/50 text-xs mt-1">{sub}</p>
     </div>
   )
@@ -126,7 +126,7 @@ function StatCard({ label, value, sub }: { label: string; value: string; sub: st
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="mb-8">
-      <h2 className="font-display text-lg font-bold text-[#131936] mb-4">{title}</h2>
+      <h2 className="font-syne text-lg font-bold text-[#131936] mb-4">{title}</h2>
       {children}
     </section>
   )

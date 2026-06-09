@@ -37,7 +37,7 @@ export default async function AdminPlacesPage() {
     <main className="min-h-screen bg-[#fff9f0]">
       <header className="sticky top-0 z-30 bg-[#fff9f0] border-b border-[#fcd99a]/50">
         <div className="max-w-[480px] mx-auto px-4 h-14 flex items-center justify-between">
-          <span className="font-display font-bold text-[#131936] text-[18px]">
+          <span className="font-syne font-bold text-[#131936] text-[18px]">
             Places Database
           </span>
           <span className="px-2 py-0.5 rounded-full bg-[#f89a14] text-[#131936] font-nunito font-bold text-[10px] uppercase tracking-wider">

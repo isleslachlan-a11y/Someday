@@ -40,7 +40,7 @@ export default function OverlapBanner({ places, username, viewerUserId }: Props)
           <p className="text-xs text-[#f89a14] font-semibold uppercase tracking-wider mb-0.5">
             ✦ Overlap
           </p>
-          <p className="font-display font-bold text-[#131936]">
+          <p className="font-syne font-bold text-[#131936]">
             {count} place{count !== 1 ? 's' : ''} you both want to visit
           </p>
           <p className="text-xs text-[#131936]/50 mt-0.5">

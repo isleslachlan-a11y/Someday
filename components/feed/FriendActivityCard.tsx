@@ -83,7 +83,7 @@ export default function FriendActivityCard({
             />
           ) : place.image_keyword ? (
             <span
-              className="absolute font-heading font-black text-white select-none pointer-events-none whitespace-nowrap"
+              className="absolute font-syne font-black text-white select-none pointer-events-none whitespace-nowrap"
               style={{ fontSize: '100px', opacity: 0.04 }}
               aria-hidden
             >
@@ -102,7 +102,7 @@ export default function FriendActivityCard({
 
       {/* Content */}
       <div className="px-4 py-4">
-        <h3 className="font-heading text-[17px] font-bold text-[#F0EEFF] leading-tight mb-0.5">
+        <h3 className="font-syne text-[17px] font-bold text-[#F0EEFF] leading-tight mb-0.5">
           {place.name}
         </h3>
         <p className="text-[12px] font-nunito text-[#9b8fc4] mb-3">

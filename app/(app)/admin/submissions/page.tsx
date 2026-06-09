@@ -107,7 +107,7 @@ export default async function AdminSubmissionsPage() {
       <header className="sticky top-0 z-30 bg-[#fff9f0] border-b border-[#fcd99a]/50">
         <div className="max-w-[480px] mx-auto px-4 h-14 flex items-center justify-between">
           <div>
-            <span className="font-display font-bold text-[#131936] text-[18px]">
+            <span className="font-syne font-bold text-[#131936] text-[18px]">
               Submissions
             </span>
             {pendingCount > 0 && (

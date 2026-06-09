@@ -33,7 +33,7 @@ export default function AdminAddForm({ userId }: Props) {
           <div className="flex items-start gap-4">
             <span className="text-[32px] shrink-0">🗺</span>
             <div>
-              <p className="font-display font-bold text-[#131936] text-[16px]">Destination</p>
+              <p className="font-syne font-bold text-[#131936] text-[16px]">Destination</p>
               <p className="font-nunito text-[#131936]/50 text-[13px] mt-0.5">
                 A city, region, country, or natural landscape.
               </p>
@@ -47,7 +47,7 @@ export default function AdminAddForm({ userId }: Props) {
           <div className="flex items-start gap-4">
             <span className="text-[32px] shrink-0">✨</span>
             <div>
-              <p className="font-display font-bold text-[#131936] text-[16px]">Experience</p>
+              <p className="font-syne font-bold text-[#131936] text-[16px]">Experience</p>
               <p className="font-nunito text-[#131936]/50 text-[13px] mt-0.5">
                 A specific activity, attraction, restaurant, or event.
               </p>

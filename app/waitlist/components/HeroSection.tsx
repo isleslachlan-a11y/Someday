@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useInView } from './useInView'
 
 interface Props {
@@ -21,6 +22,16 @@ export function HeroSection({ count }: Props) {
       <section className="bg-[#fff9f0] min-h-[80vh] flex flex-col items-center justify-center px-6 py-20">
         <div className="max-w-3xl w-full mx-auto text-center">
 
+          {/* Logo */}
+          <Image
+            src="/images/logo-gradient.png"
+            alt="Someday"
+            width={64}
+            height={64}
+            className="mx-auto mb-6"
+            priority
+          />
+
           {/* Eyebrow pill */}
           <div className="inline-flex items-center gap-1.5 border border-[#f89a14]/40 rounded-full px-4 py-1.5 mb-8">
             <span className="text-[#f89a14] text-xs">✦</span>
@@ -30,7 +41,7 @@ export function HeroSection({ count }: Props) {
           </div>
 
           {/* Headline */}
-          <h1 className="font-brice font-display font-extrabold text-[#131936] text-5xl md:text-7xl leading-[1.05] tracking-tight">
+          <h1 className="font-brice font-syne font-extrabold text-[#131936] text-5xl md:text-7xl leading-[1.05] tracking-tight">
             Your list of<br />someday trips.
           </h1>
 
@@ -69,7 +80,7 @@ export function HeroSection({ count }: Props) {
           <div className="max-w-5xl mx-auto mt-16 rounded-2xl overflow-hidden aspect-video">
             {/* TODO: replace with app screenshot or Lottie animation */}
             <div className="w-full h-full bg-gradient-to-br from-[#fcd99a] to-[#f89a14] flex items-center justify-center min-h-[200px]">
-              <span className="font-display text-sm text-[#131936]/40">
+              <span className="font-syne text-sm text-[#131936]/40">
                 [ App screenshots coming soon ]
               </span>
             </div>

@@ -134,7 +134,7 @@ export default function PlaceManager({ places: initialPlaces, taggedCount }: Pro
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <p className="font-display font-bold text-[#131936] text-[14px] truncate">
+                    <p className="font-syne font-bold text-[#131936] text-[14px] truncate">
                       {place.name}
                     </p>
                     <p className="font-nunito text-[#131936]/50 text-[12px] flex items-center gap-1">

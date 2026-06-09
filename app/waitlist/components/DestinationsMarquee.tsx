@@ -23,8 +23,8 @@ export function DestinationsMarquee() {
       `}</style>
       <div className="flex whitespace-nowrap">
         <div className="wl-marquee flex shrink-0">
-          <span className="font-display italic text-sm text-[#131936]/60 pr-0">{track}</span>
-          <span className="font-display italic text-sm text-[#131936]/60">{track}</span>
+          <span className="font-syne italic text-sm text-[#131936]/60 pr-0">{track}</span>
+          <span className="font-syne italic text-sm text-[#131936]/60">{track}</span>
         </div>
       </div>
     </div>

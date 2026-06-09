@@ -200,7 +200,7 @@ export default function FriendsSheet({ initialFriendCount }: Props) {
         onClick={open}
         className="flex flex-col items-center gap-0.5 rounded-2xl border border-[#fcd99a]/40 bg-white px-4 py-5 text-center hover:border-[#f89a14]/30 hover:bg-white transition-colors cursor-pointer"
       >
-        <p className="font-display text-3xl font-bold text-[#f89a14]">{friendCount}</p>
+        <p className="font-syne text-3xl font-bold text-[#f89a14]">{friendCount}</p>
         <p className="text-[#131936]/50 text-xs mt-1">Friends</p>
       </button>
 
@@ -224,7 +224,7 @@ export default function FriendsSheet({ initialFriendCount }: Props) {
 
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-[#fcd99a]/40 shrink-0">
-              <h2 className="font-display text-lg font-bold text-[#131936]">Friends</h2>
+              <h2 className="font-syne text-lg font-bold text-[#131936]">Friends</h2>
               <button
                 onClick={close}
                 className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-white text-[#131936]/50 hover:text-[#131936] transition-colors"

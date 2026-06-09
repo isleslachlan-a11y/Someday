@@ -37,6 +37,7 @@
   --color-background:      #fff9f0;
 
   /* Typography — next/font CSS variables */
+  --font-syne:    var(--font-syne);
   --font-dm-sans: var(--font-dm-sans);
   --font-nunito:  var(--font-nunito);
   --font-dm-mono: var(--font-dm-mono);

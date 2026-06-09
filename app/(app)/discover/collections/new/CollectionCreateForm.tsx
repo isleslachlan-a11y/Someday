@@ -98,11 +98,11 @@ export default function CollectionCreateForm({ places }: Props) {
         >
           <ChevronLeft size={18} className="text-[#131936]" />
         </button>
-        <span className="font-display font-bold text-[#131936] text-[17px] flex-1">New Collection</span>
+        <span className="font-syne font-bold text-[#131936] text-[17px] flex-1">New Collection</span>
         <button
           onClick={() => void handleSubmit()}
           disabled={submitting || !name.trim()}
-          className="px-4 py-2 rounded-full bg-[#f89a14] text-white font-display font-bold text-[13px] disabled:opacity-40"
+          className="px-4 py-2 rounded-full bg-[#f89a14] text-white font-syne font-bold text-[13px] disabled:opacity-40"
         >
           {submitting ? 'Saving…' : 'Save'}
         </button>
@@ -110,7 +110,7 @@ export default function CollectionCreateForm({ places }: Props) {
 
       {/* Name */}
       <div className="mt-6">
-        <label className="font-display font-bold text-[#131936] text-[12px] uppercase tracking-widest">
+        <label className="font-syne font-bold text-[#131936] text-[12px] uppercase tracking-widest">
           Name
         </label>
         <input
@@ -124,7 +124,7 @@ export default function CollectionCreateForm({ places }: Props) {
 
       {/* Slug */}
       <div className="mt-4">
-        <label className="font-display font-bold text-[#131936] text-[12px] uppercase tracking-widest">
+        <label className="font-syne font-bold text-[#131936] text-[12px] uppercase tracking-widest">
           Slug
         </label>
         <input
@@ -138,7 +138,7 @@ export default function CollectionCreateForm({ places }: Props) {
 
       {/* Type */}
       <div className="mt-4">
-        <label className="font-display font-bold text-[#131936] text-[12px] uppercase tracking-widest">
+        <label className="font-syne font-bold text-[#131936] text-[12px] uppercase tracking-widest">
           Type
         </label>
         <div className="mt-2 flex gap-2">
@@ -161,7 +161,7 @@ export default function CollectionCreateForm({ places }: Props) {
 
       {/* Description */}
       <div className="mt-4">
-        <label className="font-display font-bold text-[#131936] text-[12px] uppercase tracking-widest">
+        <label className="font-syne font-bold text-[#131936] text-[12px] uppercase tracking-widest">
           Description <span className="font-nunito font-normal normal-case tracking-normal text-[#131936]/40">(optional)</span>
         </label>
         <textarea
@@ -197,7 +197,7 @@ export default function CollectionCreateForm({ places }: Props) {
 
       {/* Place picker */}
       <div className="mt-6">
-        <label className="font-display font-bold text-[#131936] text-[12px] uppercase tracking-widest">
+        <label className="font-syne font-bold text-[#131936] text-[12px] uppercase tracking-widest">
           Places ({selected.length})
         </label>
 

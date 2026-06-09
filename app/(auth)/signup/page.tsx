@@ -99,7 +99,7 @@ export default function SignupPage() {
             <path d="M2 7l10 7 10-7" />
           </svg>
         </div>
-        <h2 className="font-display text-[20px] font-bold text-[#131936] mb-2">
+        <h2 className="font-syne text-[20px] font-bold text-[#131936] mb-2">
           Check your inbox
         </h2>
         <p className="font-nunito text-[14px] text-[#131936]/50 leading-relaxed mb-1">
@@ -128,7 +128,7 @@ export default function SignupPage() {
 
   return (
     <>
-      <h2 className="font-display text-[22px] font-bold text-[#131936] mb-6">
+      <h2 className="font-syne text-[22px] font-bold text-[#131936] mb-6">
         Create your account
       </h2>
 
@@ -201,7 +201,7 @@ export default function SignupPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-xl bg-[#f89a14] hover:bg-[#d97a1b] disabled:opacity-60 px-4 py-2.5 font-heading font-semibold text-white transition-colors mt-2 flex items-center justify-center gap-2"
+          className="w-full rounded-xl bg-[#f89a14] hover:bg-[#d97a1b] disabled:opacity-60 px-4 py-2.5 font-syne font-semibold text-white transition-colors mt-2 flex items-center justify-center gap-2"
         >
           {loading && (
             <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin shrink-0" />

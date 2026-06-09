@@ -144,7 +144,7 @@ export default async function PublicProfilePage({ params }: Props) {
           <div className="flex items-start gap-5 mb-4">
             <Avatar avatarUrl={profile.avatar_url} username={profile.username ?? ''} size={80} />
             <div className="flex-1 min-w-0">
-              <h1 className="font-display text-2xl font-bold text-[#131936] leading-tight">
+              <h1 className="font-syne text-2xl font-bold text-[#131936] leading-tight">
                 @{profile.username}
               </h1>
               {profile.bio ? (
@@ -209,7 +209,7 @@ export default async function PublicProfilePage({ params }: Props) {
             <>
               {entries.filter(e => e.status !== 'completed').length > 0 && (
                 <section className="mb-6">
-                  <h2 className="font-display text-base font-bold text-[#131936] mb-3">
+                  <h2 className="font-syne text-base font-bold text-[#131936] mb-3">
                     Someday ({entries.filter(e => e.status !== 'completed').length})
                   </h2>
                   <div className="grid gap-3 sm:grid-cols-2">
@@ -224,7 +224,7 @@ export default async function PublicProfilePage({ params }: Props) {
 
               {entries.filter(e => e.status === 'completed').length > 0 && (
                 <section>
-                  <h2 className="font-display text-base font-bold text-[#131936] mb-3">
+                  <h2 className="font-syne text-base font-bold text-[#131936] mb-3">
                     Been there ({entries.filter(e => e.status === 'completed').length})
                   </h2>
                   <div className="grid gap-3 sm:grid-cols-2">
@@ -263,7 +263,7 @@ function StatCard({
   }
   return (
     <div className="rounded-2xl border border-[#fcd99a]/40 bg-white px-4 py-5 text-center">
-      <p className={`font-display text-3xl font-bold ${colorMap[accent]}`}>{value}</p>
+      <p className={`font-syne text-3xl font-bold ${colorMap[accent]}`}>{value}</p>
       <p className="text-[#131936]/50 text-xs mt-1">{label}</p>
     </div>
   )
@@ -291,7 +291,7 @@ function PublicPlaceCard({ entry }: { entry: BucketEntry }) {
         {TYPE_ICON[entry.place.type] ?? '✦'}
       </span>
       <div className="flex-1 min-w-0">
-        <p className="font-display text-sm font-semibold text-[#131936] truncate">
+        <p className="font-syne text-sm font-semibold text-[#131936] truncate">
           {entry.place.name}
         </p>
         <p className="text-xs text-[#131936]/50">{entry.place.country}</p>

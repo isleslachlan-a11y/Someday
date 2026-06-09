@@ -40,10 +40,12 @@ const config: Config = {
         background:      '#fff9f0',
       },
       fontFamily: {
-        display: ['Brice', 'serif'],                          // hero headings, wordmark only — 24px+
-        brice:   ['Brice', 'serif'],                          // alias for explicit display usage
-        heading: ['var(--font-dm-sans)', 'sans-serif'],       // screen titles, card headings
-        body:    ['var(--font-nunito)', 'sans-serif'],        // body copy, labels, inputs
+        syne:    ['var(--font-syne)', 'sans-serif'],          // all UI text that was previously syne
+        nunito:  ['var(--font-nunito)', 'sans-serif'],        // body copy — also used directly in waitlist
+        display: ['Brice', 'serif'],                          // Brice via CSS var — kept for reference
+        brice:   ['Brice', 'serif'],                          // 5 app page titles only
+        heading: ['var(--font-dm-sans)', 'sans-serif'],       // DM Sans — kept for reference
+        body:    ['var(--font-nunito)', 'sans-serif'],        // body copy
         mono:    ['var(--font-dm-mono)', 'monospace'],        // numbers, distances, stats
       },
       fontSize: {

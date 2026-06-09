@@ -249,7 +249,7 @@ export default function MapView({ places, initialBucketPlaceIds, savedCityPrefer
         <div className="w-14 h-14 rounded-full bg-violet-accent/10 border border-violet-accent/20 flex items-center justify-center">
           <MapPin size={24} className="text-violet-accent" strokeWidth={1.75} />
         </div>
-        <h2 className="font-display text-lg font-bold text-white-soft">Map not configured</h2>
+        <h2 className="font-syne text-lg font-bold text-white-soft">Map not configured</h2>
         <p className="text-muted text-sm max-w-xs leading-relaxed">
           Set{' '}
           <code className="text-lavender bg-white/5 px-1.5 py-0.5 rounded text-xs">
@@ -268,7 +268,7 @@ export default function MapView({ places, initialBucketPlaceIds, savedCityPrefer
       {/* ── Header ──────────────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between gap-3 px-4 h-14 bg-[#130f2a]/80 backdrop-blur-sm border-b border-white/[0.07] shrink-0">
         <div className="min-w-0">
-          <h1 className="font-display text-lg font-bold text-white-soft leading-none">Explore</h1>
+          <h1 className="font-syne text-lg font-bold text-white-soft leading-none">Explore</h1>
           {cityPlaces.length > 0 && (
             <p className="text-[10px] text-muted mt-0.5 leading-none">
               {cityPlaces.length} {cityPlaces.length === 1 ? 'place' : 'places'} in {activeCity.name}
@@ -468,7 +468,7 @@ function PlaceDetail({
           >
             {TYPE_LABEL[place.type] ?? place.type}
           </span>
-          <h3 className="font-display text-xl font-bold text-white-soft leading-tight">
+          <h3 className="font-syne text-xl font-bold text-white-soft leading-tight">
             {place.name}
           </h3>
           <p className="text-sm text-muted mt-0.5">{place.country}</p>
@@ -522,7 +522,7 @@ function PlaceDetail({
         <button
           onClick={() => !isAdded && onAdd(place)}
           disabled={isAdded}
-          className={`w-full rounded-xl py-3 font-heading font-semibold text-sm transition-all active:scale-[0.98] ${
+          className={`w-full rounded-xl py-3 font-syne font-semibold text-sm transition-all active:scale-[0.98] ${
             isAdded
               ? 'bg-violet-accent/15 text-violet-accent border border-violet-accent/25 cursor-default'
               : 'bg-violet-accent hover:bg-violet-accent/90 text-white'
@@ -558,7 +558,7 @@ function CityPickerContent({
     <>
       {/* Header */}
       <div className="flex items-center justify-between px-5 pt-5 pb-3 shrink-0">
-        <h2 className="font-display font-bold text-white-soft text-base">Choose city</h2>
+        <h2 className="font-syne font-bold text-white-soft text-base">Choose city</h2>
         <button
           onClick={onClose}
           aria-label="Close city picker"

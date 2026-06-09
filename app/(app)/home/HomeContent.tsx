@@ -79,7 +79,7 @@ function GridSkeleton() {
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-      <p className="font-display font-bold text-[#131936] text-[16px]">
+      <p className="font-syne font-bold text-[#131936] text-[16px]">
         Couldn&apos;t load right now
       </p>
       <p className="font-nunito text-[#131936]/60 text-[13px] mt-1">
@@ -286,7 +286,7 @@ export default function HomeContent({
                 />
               ) : (
                 <div className="w-8 h-8 rounded-full bg-[#131936] flex items-center justify-center">
-                  <span className="font-display font-bold text-[#f89a14] text-[13px]">{initials}</span>
+                  <span className="font-syne font-bold text-[#f89a14] text-[13px]">{initials}</span>
                 </div>
               )}
             </Link>
@@ -294,7 +294,7 @@ export default function HomeContent({
 
           {/* Centre: wordmark */}
           <div className="flex justify-center">
-            <span className="font-display font-bold text-[#131936] text-[18px] tracking-widest uppercase">
+            <span className="font-brice font-syne font-bold text-[#131936] text-[18px] tracking-widest uppercase">
               SOMEDAY
             </span>
           </div>
@@ -319,7 +319,7 @@ export default function HomeContent({
         {isFirstSession && (
           <div className="mb-5 rounded-2xl bg-[#131936] px-5 py-4 relative overflow-hidden">
             <div className="absolute top-3 right-4 text-[#f89a14] text-[24px] opacity-40 select-none">✦</div>
-            <p className="font-display font-bold text-white text-[16px] mb-1">
+            <p className="font-syne font-bold text-white text-[16px] mb-1">
               Your Someday starts here.
             </p>
             <p className="font-nunito text-white/60 text-[13px] leading-relaxed">
@@ -382,7 +382,7 @@ export default function HomeContent({
         {startHerePlaces.length > 0 && isNewUser && (
           <div className="mt-5 mb-1">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="font-display font-bold text-[#131936] text-[16px]">Start here</h2>
+              <h2 className="font-syne font-bold text-[#131936] text-[16px]">Start here</h2>
               <Link href="/discover" className="font-nunito text-[#f89a14] text-[13px]">see all →</Link>
             </div>
             <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-none">
@@ -404,7 +404,7 @@ export default function HomeContent({
         {/* Bucket list section */}
         <div className="mt-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-display font-bold text-[#131936] text-[18px]">
+            <h2 className="font-syne font-bold text-[#131936] text-[18px]">
               {isNewUser ? 'Start building your list' : isPersonalised ? 'Picked for you' : 'For your bucket list'}
             </h2>
             <Link href="/list" className="font-nunito text-[13px] text-[#f89a14]">

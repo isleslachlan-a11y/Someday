@@ -48,7 +48,7 @@ export function FAQSection() {
             FAQ
           </p>
           {/* TODO: refine — the "answered honestly" framing is from Alloovium; keep if it fits Someday voice */}
-          <h2 className="font-brice font-display font-bold text-[#131936] text-3xl md:text-4xl leading-tight">
+          <h2 className="font-brice font-syne font-bold text-[#131936] text-3xl md:text-4xl leading-tight">
             Common questions,<br />answered honestly.
           </h2>
 
@@ -60,7 +60,7 @@ export function FAQSection() {
                   onClick={() => toggle(i)}
                   className="w-full flex items-center justify-between gap-4 text-left"
                 >
-                  <span className="font-heading font-semibold text-[#131936] text-base">
+                  <span className="font-syne font-semibold text-[#131936] text-base">
                     {faq.q}
                   </span>
                   <span className="text-[#f89a14] text-xl font-light shrink-0 leading-none">

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import { Toaster } from 'react-hot-toast'
 
 export const metadata: Metadata = {
@@ -22,15 +23,15 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         {/* Brand header */}
         <div className="mb-8 text-center select-none">
           <div className="flex justify-center mb-3">
-            <svg viewBox="0 0 48 48" width="48" height="48" aria-hidden="true">
-              <path
-                d="M24 6L28.1 18.3L41.1 18.4L30.7 26.2L34.6 38.6L24 31L13.4 38.6L17.3 26.2L6.9 18.4L19.9 18.3Z"
-                fill="#f89a14"
-              />
-              <circle cx="24" cy="24" r="5" fill="#fcd99a" />
-            </svg>
+            <Image
+              src="/images/logo-gradient.png"
+              alt="Someday"
+              width={56}
+              height={56}
+              priority
+            />
           </div>
-          <h1 className="font-brice font-display text-3xl font-bold tracking-tight text-[#131936]">
+          <h1 className="font-syne text-3xl font-bold tracking-tight text-[#131936]">
             Someday
           </h1>
           <p className="font-nunito text-sm text-[#131936]/50 mt-1">Your travel bucket list</p>

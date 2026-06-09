@@ -55,7 +55,7 @@ export default function AppShell({ username, avatarUrl, pendingRequestCount = 0,
         {/* Wordmark */}
         <div className="flex items-center gap-3 px-5 py-7 select-none shrink-0">
           <span className="text-2xl text-[#f89a14]">✦</span>
-          <span className="font-display text-xl font-bold text-[#131936] tracking-tight">Someday</span>
+          <span className="font-syne text-xl font-bold text-[#131936] tracking-tight">Someday</span>
         </div>
 
         {/* Nav links */}
