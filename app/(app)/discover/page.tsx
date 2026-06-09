@@ -1,10 +1,9 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
-import Link from 'next/link'
-import { Plus, FolderPlus } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { DiscoverHeader } from '@/components/DiscoverHeader'
 import DiscoverContent from './DiscoverContent'
 import type { DiscoverCollection } from './DiscoverContent'
 import type { Place } from '@/lib/types'
@@ -117,35 +116,7 @@ export default async function DiscoverPage({
 
   return (
     <div className="min-h-screen bg-[#fff9f0]">
-      {/* Sticky header */}
-      <header className="sticky top-0 z-30 bg-[#fff9f0] border-b border-[#fcd99a]/50">
-        <div className="max-w-[480px] mx-auto px-4 h-14 grid grid-cols-3 items-center">
-          <div />
-          <div className="flex justify-center">
-            <span className="font-brice font-syne font-bold text-[#131936] text-[20px] tracking-widest uppercase">
-              DISCOVER
-            </span>
-          </div>
-          <div className="flex items-center justify-end gap-2">
-            {isAdmin && (
-              <Link
-                href="/discover/collections/new"
-                aria-label="Create collection"
-                className="flex items-center justify-center w-9 h-9 rounded-full bg-[#fcd99a]/60 text-[#131936]"
-              >
-                <FolderPlus size={18} />
-              </Link>
-            )}
-            <Link
-              href="/submit"
-              aria-label="Submit a place"
-              className="flex items-center justify-center w-11 h-11 rounded-full bg-[#f89a14] text-white"
-            >
-              <Plus size={22} strokeWidth={2.5} />
-            </Link>
-          </div>
-        </div>
-      </header>
+      <DiscoverHeader isAdmin={isAdmin} />
 
       <Suspense fallback={<DiscoverSkeleton />}>
         <DiscoverContent
