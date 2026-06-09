@@ -98,11 +98,11 @@ export default function CollectionCreateForm({ places }: Props) {
         >
           <ChevronLeft size={18} className="text-[#131936]" />
         </button>
-        <span className="font-brice font-bold text-[#131936] text-[17px] flex-1">New Collection</span>
+        <span className="font-display font-bold text-[#131936] text-[17px] flex-1">New Collection</span>
         <button
           onClick={() => void handleSubmit()}
           disabled={submitting || !name.trim()}
-          className="px-4 py-2 rounded-full bg-[#f08c21] text-white font-brice font-bold text-[13px] disabled:opacity-40"
+          className="px-4 py-2 rounded-full bg-[#f89a14] text-white font-display font-bold text-[13px] disabled:opacity-40"
         >
           {submitting ? 'Saving…' : 'Save'}
         </button>
@@ -110,7 +110,7 @@ export default function CollectionCreateForm({ places }: Props) {
 
       {/* Name */}
       <div className="mt-6">
-        <label className="font-brice font-bold text-[#131936] text-[12px] uppercase tracking-widest">
+        <label className="font-display font-bold text-[#131936] text-[12px] uppercase tracking-widest">
           Name
         </label>
         <input
@@ -118,13 +118,13 @@ export default function CollectionCreateForm({ places }: Props) {
           value={name}
           onChange={e => setName(e.target.value)}
           placeholder="e.g. Hidden Gems of Asia"
-          className="mt-2 w-full rounded-2xl bg-white border border-[#fcd99a] px-4 py-3 font-nunito text-[#131936] text-[15px] outline-none focus:border-[#f08c21]"
+          className="mt-2 w-full rounded-2xl bg-white border border-[#fcd99a] px-4 py-3 font-nunito text-[#131936] text-[15px] outline-none focus:border-[#f89a14]"
         />
       </div>
 
       {/* Slug */}
       <div className="mt-4">
-        <label className="font-brice font-bold text-[#131936] text-[12px] uppercase tracking-widest">
+        <label className="font-display font-bold text-[#131936] text-[12px] uppercase tracking-widest">
           Slug
         </label>
         <input
@@ -132,13 +132,13 @@ export default function CollectionCreateForm({ places }: Props) {
           value={slug}
           onChange={e => { setSlug(e.target.value); setSlugManual(true) }}
           placeholder="hidden-gems-of-asia"
-          className="mt-2 w-full rounded-2xl bg-white border border-[#fcd99a] px-4 py-3 font-nunito text-[#131936] text-[15px] outline-none focus:border-[#f08c21]"
+          className="mt-2 w-full rounded-2xl bg-white border border-[#fcd99a] px-4 py-3 font-nunito text-[#131936] text-[15px] outline-none focus:border-[#f89a14]"
         />
       </div>
 
       {/* Type */}
       <div className="mt-4">
-        <label className="font-brice font-bold text-[#131936] text-[12px] uppercase tracking-widest">
+        <label className="font-display font-bold text-[#131936] text-[12px] uppercase tracking-widest">
           Type
         </label>
         <div className="mt-2 flex gap-2">
@@ -149,7 +149,7 @@ export default function CollectionCreateForm({ places }: Props) {
               onClick={() => setType(t)}
               className={`flex-1 py-3 rounded-2xl font-nunito font-semibold text-[14px] border transition-colors ${
                 type === t
-                  ? 'bg-[#f08c21] text-white border-[#f08c21]'
+                  ? 'bg-[#f89a14] text-white border-[#f89a14]'
                   : 'bg-white text-[#131936]/60 border-[#fcd99a]'
               }`}
             >
@@ -161,7 +161,7 @@ export default function CollectionCreateForm({ places }: Props) {
 
       {/* Description */}
       <div className="mt-4">
-        <label className="font-brice font-bold text-[#131936] text-[12px] uppercase tracking-widest">
+        <label className="font-display font-bold text-[#131936] text-[12px] uppercase tracking-widest">
           Description <span className="font-nunito font-normal normal-case tracking-normal text-[#131936]/40">(optional)</span>
         </label>
         <textarea
@@ -169,7 +169,7 @@ export default function CollectionCreateForm({ places }: Props) {
           onChange={e => setDescription(e.target.value)}
           placeholder="Short description shown under the collection heading…"
           rows={3}
-          className="mt-2 w-full rounded-2xl bg-white border border-[#fcd99a] px-4 py-3 font-nunito text-[#131936] text-[14px] outline-none focus:border-[#f08c21] resize-none"
+          className="mt-2 w-full rounded-2xl bg-white border border-[#fcd99a] px-4 py-3 font-nunito text-[#131936] text-[14px] outline-none focus:border-[#f89a14] resize-none"
         />
       </div>
 
@@ -197,14 +197,14 @@ export default function CollectionCreateForm({ places }: Props) {
 
       {/* Place picker */}
       <div className="mt-6">
-        <label className="font-brice font-bold text-[#131936] text-[12px] uppercase tracking-widest">
+        <label className="font-display font-bold text-[#131936] text-[12px] uppercase tracking-widest">
           Places ({selected.length})
         </label>
 
         {/* Search */}
         <div className="mt-2 relative">
-          <div className="flex items-center gap-2 bg-white border border-[#fcd99a] rounded-full px-4 h-11 focus-within:border-[#f08c21]">
-            <Search size={14} className="text-[#f08c21] shrink-0" />
+          <div className="flex items-center gap-2 bg-white border border-[#fcd99a] rounded-full px-4 h-11 focus-within:border-[#f89a14]">
+            <Search size={14} className="text-[#f89a14] shrink-0" />
             <input
               type="text"
               value={search}
@@ -258,7 +258,7 @@ export default function CollectionCreateForm({ places }: Props) {
                           ref={drag.innerRef}
                           {...drag.draggableProps}
                           className={`flex items-center gap-3 bg-white rounded-2xl border px-4 py-3 ${
-                            snapshot.isDragging ? 'border-[#f08c21] shadow-md' : 'border-[#fcd99a]/50'
+                            snapshot.isDragging ? 'border-[#f89a14] shadow-md' : 'border-[#fcd99a]/50'
                           }`}
                         >
                           <div {...drag.dragHandleProps} className="text-[#131936]/30 shrink-0">

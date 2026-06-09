@@ -48,16 +48,16 @@ const DIMENSION_LABELS: Record<string, string> = {
 
 // ── Style helpers ─────────────────────────────────────────────────────────────
 
-const INPUT_CLASS = 'w-full rounded-2xl border border-[#fcd99a] bg-white px-4 py-3 font-nunito text-[14px] text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:ring-2 focus:ring-[#f08c21]/30 transition'
-const SECTION_HEADING = 'font-brice font-bold text-[#131936] text-[15px] mb-3'
+const INPUT_CLASS = 'w-full rounded-2xl border border-[#fcd99a] bg-white px-4 py-3 font-nunito text-[14px] text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:ring-2 focus:ring-[#f89a14]/30 transition'
+const SECTION_HEADING = 'font-display font-bold text-[#131936] text-[15px] mb-3'
 
 function pillClass(active: boolean) {
-  return `px-4 py-2 rounded-full border font-nunito text-[13px] font-medium transition-all ${active ? 'bg-[#f08c21] text-[#131936] border-[#f08c21]' : 'bg-white text-[#131936]/60 border-[#fcd99a]'}`
+  return `px-4 py-2 rounded-full border font-nunito text-[13px] font-medium transition-all ${active ? 'bg-[#f89a14] text-[#131936] border-[#f89a14]' : 'bg-white text-[#131936]/60 border-[#fcd99a]'}`
 }
 
 function catPillClass(state: 'none' | 'selected' | 'primary') {
-  if (state === 'primary')  return 'px-4 py-2 rounded-full border font-nunito text-[13px] font-medium transition-all bg-[#f08c21] text-white border-[#f08c21]'
-  if (state === 'selected') return 'px-4 py-2 rounded-full border font-nunito text-[13px] font-medium transition-all bg-[#f08c21]/10 text-[#131936] border-[#f08c21]'
+  if (state === 'primary')  return 'px-4 py-2 rounded-full border font-nunito text-[13px] font-medium transition-all bg-[#f89a14] text-white border-[#f89a14]'
+  if (state === 'selected') return 'px-4 py-2 rounded-full border font-nunito text-[13px] font-medium transition-all bg-[#f89a14]/10 text-[#131936] border-[#f89a14]'
   return 'px-4 py-2 rounded-full border font-nunito text-[13px] font-medium transition-all bg-white text-[#131936]/60 border-[#fcd99a]'
 }
 
@@ -103,7 +103,7 @@ function ActivityAdder({ placeId }: { placeId: string }) {
       <div className="flex flex-wrap gap-2">
         {ACTIVITY_CATEGORIES.map(c => <button key={c} type="button" onClick={() => setCategory(prev => prev === c ? '' : c)} className={pillClass(category === c)}>{c}</button>)}
       </div>
-      <button type="button" onClick={() => void addActivity()} disabled={saving || !name.trim()} className="w-full h-11 rounded-full bg-[#f08c21] text-[#131936] font-brice font-bold text-[14px] disabled:opacity-50">
+      <button type="button" onClick={() => void addActivity()} disabled={saving || !name.trim()} className="w-full h-11 rounded-full bg-[#f89a14] text-[#131936] font-display font-bold text-[14px] disabled:opacity-50">
         {saving ? 'Adding…' : '+ Add activity'}
       </button>
     </div>
@@ -357,7 +357,7 @@ export default function AdminDestinationForm({ userId: _userId, onBack }: Props)
 
       <div className="flex items-center gap-2">
         <span className="text-[20px]">🗺</span>
-        <p className="font-brice font-bold text-[#131936] text-[17px]">Add a Destination</p>
+        <p className="font-display font-bold text-[#131936] text-[17px]">Add a Destination</p>
       </div>
 
       {/* ── Section 1: Basic info ─────────────────────────────────────────── */}
@@ -366,7 +366,7 @@ export default function AdminDestinationForm({ userId: _userId, onBack }: Props)
 
         <div className="relative">
           <label htmlFor="admin-dest-name" className="font-nunito text-[12px] text-[#131936]/50 mb-1 block">
-            Place name <span className="text-[#f08c21]">*</span>
+            Place name <span className="text-[#f89a14]">*</span>
           </label>
           <div className="relative">
             <input
@@ -377,7 +377,7 @@ export default function AdminDestinationForm({ userId: _userId, onBack }: Props)
               onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
               placeholder="Start typing a destination name…" autoComplete="off" className={INPUT_CLASS}
             />
-            {geocoding && <div className="absolute right-3 top-1/2 -translate-y-1/2"><div className="w-4 h-4 rounded-full border-2 border-[#f08c21] border-t-transparent animate-spin" /></div>}
+            {geocoding && <div className="absolute right-3 top-1/2 -translate-y-1/2"><div className="w-4 h-4 rounded-full border-2 border-[#f89a14] border-t-transparent animate-spin" /></div>}
           </div>
           {showSuggestions && suggestions.length > 0 && (
             <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white rounded-2xl border border-[#fcd99a] shadow-lg overflow-hidden">
@@ -417,7 +417,7 @@ export default function AdminDestinationForm({ userId: _userId, onBack }: Props)
         </div>
 
         <div>
-          <label className="font-nunito text-[12px] text-[#131936]/50 mb-2 block">Country <span className="text-[#f08c21]">*</span></label>
+          <label className="font-nunito text-[12px] text-[#131936]/50 mb-2 block">Country <span className="text-[#f89a14]">*</span></label>
           {locationLocked ? (
             <div className="flex items-center gap-2 flex-wrap">
               <span className="px-3 py-1.5 rounded-full bg-[#fcd99a]/50 border border-[#fcd99a] font-nunito text-[13px] text-[#131936]">
@@ -491,12 +491,12 @@ export default function AdminDestinationForm({ userId: _userId, onBack }: Props)
         <div>
           <div className="flex items-center justify-between mb-2">
             <p className="font-nunito text-[12px] text-[#131936]/50">Tags <span className="ml-1 text-[#131936]/30 font-normal">(describe the place)</span></p>
-            <button type="button" onClick={() => setShowAllTags(prev => !prev)} className="font-nunito text-[11px] text-[#f08c21] hover:opacity-80 transition-opacity">
+            <button type="button" onClick={() => setShowAllTags(prev => !prev)} className="font-nunito text-[11px] text-[#f89a14] hover:opacity-80 transition-opacity">
               {showAllTags ? `Show relevant only` : `Show all (${allTags.length})`}
             </button>
           </div>
           <input id="dest-tag-search" name="dest-tag-search" type="text" value={tagSearch} onChange={e => setTagSearch(e.target.value)} placeholder="Filter tags…"
-            className="w-full rounded-full border border-[#fcd99a] bg-white px-4 py-2 font-nunito text-[13px] text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:ring-2 focus:ring-[#f08c21]/30 mb-3" />
+            className="w-full rounded-full border border-[#fcd99a] bg-white px-4 py-2 font-nunito text-[13px] text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:ring-2 focus:ring-[#f89a14]/30 mb-3" />
           <div className="space-y-4 max-h-64 overflow-y-auto pr-1">
             {DIMENSION_ORDER.map(dim => {
               const dimTags = visibleTags.filter(t => t.category === dim)
@@ -525,7 +525,7 @@ export default function AdminDestinationForm({ userId: _userId, onBack }: Props)
           {selectedTags.length > 0 && (
             <p className="font-nunito text-[11px] text-[#131936]/50 mt-2">
               {selectedTags.length} tag{selectedTags.length !== 1 ? 's' : ''} selected —{' '}
-              <button type="button" onClick={() => setSelectedTags([])} className="text-[#f08c21]">clear all</button>
+              <button type="button" onClick={() => setSelectedTags([])} className="text-[#f89a14]">clear all</button>
             </p>
           )}
         </div>
@@ -561,8 +561,8 @@ export default function AdminDestinationForm({ userId: _userId, onBack }: Props)
           <>
             <div className="flex gap-2 mb-3">
               <input id="dest-unsplash-search" name="dest-unsplash-search" value={imageQuery} onChange={e => setImageQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && void searchImages()} placeholder="Search Unsplash…"
-                className="flex-1 rounded-full border border-[#fcd99a] bg-white px-4 py-2.5 font-nunito text-[14px] text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:ring-2 focus:ring-[#f08c21]/30" />
-              <button type="button" onClick={() => void searchImages()} disabled={imageSearchLoading} className="px-4 py-2.5 rounded-full bg-[#f08c21] text-[#131936] font-nunito font-semibold text-[13px] shrink-0 disabled:opacity-50">
+                className="flex-1 rounded-full border border-[#fcd99a] bg-white px-4 py-2.5 font-nunito text-[14px] text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:ring-2 focus:ring-[#f89a14]/30" />
+              <button type="button" onClick={() => void searchImages()} disabled={imageSearchLoading} className="px-4 py-2.5 rounded-full bg-[#f89a14] text-[#131936] font-nunito font-semibold text-[13px] shrink-0 disabled:opacity-50">
                 {imageSearchLoading ? '…' : 'Search'}
               </button>
             </div>
@@ -571,20 +571,20 @@ export default function AdminDestinationForm({ userId: _userId, onBack }: Props)
                 <div className="grid grid-cols-3 gap-2 mb-3">
                   {visibleImages.map(img => (
                     <button key={img.id} type="button" onClick={() => setSelectedImage(prev => prev?.id === img.id ? null : img)}
-                      className={`relative aspect-[2/3] rounded-xl overflow-hidden border-2 transition-all ${selectedImage?.id === img.id ? 'border-[#f08c21] scale-[0.97]' : 'border-transparent'}`}>
+                      className={`relative aspect-[2/3] rounded-xl overflow-hidden border-2 transition-all ${selectedImage?.id === img.id ? 'border-[#f89a14] scale-[0.97]' : 'border-transparent'}`}>
                       <Image src={img.image_thumb_url} alt={img.attribution.photographer_name} fill sizes="33vw" className="object-cover" />
-                      {selectedImage?.id === img.id && <div className="absolute inset-0 bg-[#f08c21]/20 flex items-center justify-center"><span className="text-white text-[20px]">✓</span></div>}
+                      {selectedImage?.id === img.id && <div className="absolute inset-0 bg-[#f89a14]/20 flex items-center justify-center"><span className="text-white text-[20px]">✓</span></div>}
                     </button>
                   ))}
                 </div>
-                {hasMore && <button type="button" onClick={() => setImagePage(p => p + 1)} className="w-full py-2 font-nunito text-[13px] text-[#f08c21] hover:opacity-80 transition-opacity">Show more images ({allImageResults.length - visibleImages.length} more)</button>}
+                {hasMore && <button type="button" onClick={() => setImagePage(p => p + 1)} className="w-full py-2 font-nunito text-[13px] text-[#f89a14] hover:opacity-80 transition-opacity">Show more images ({allImageResults.length - visibleImages.length} more)</button>}
               </>
             )}
             {selectedImage && (
               <div className="rounded-2xl overflow-hidden border border-[#fcd99a] mb-2 mt-3">
                 <div className="relative aspect-[2/3]"><Image src={selectedImage.image_url} alt="Selected" fill sizes="480px" className="object-cover" /></div>
                 <p className="font-nunito text-[#131936]/40 text-[10px] px-3 py-1.5">
-                  Photo by <a href={selectedImage.attribution.photographer_url} target="_blank" rel="noopener noreferrer" className="text-[#f08c21]">{selectedImage.attribution.photographer_name}</a> on Unsplash
+                  Photo by <a href={selectedImage.attribution.photographer_url} target="_blank" rel="noopener noreferrer" className="text-[#f89a14]">{selectedImage.attribution.photographer_name}</a> on Unsplash
                 </p>
               </div>
             )}
@@ -595,9 +595,9 @@ export default function AdminDestinationForm({ userId: _userId, onBack }: Props)
           <div className="space-y-3">
             {!uploadPreview ? (
               <button type="button" onClick={() => adminFileInputRef.current?.click()}
-                className="w-full rounded-2xl border-2 border-dashed border-[#fcd99a] bg-white py-12 flex flex-col items-center gap-3 hover:border-[#f08c21]/60 transition-colors">
+                className="w-full rounded-2xl border-2 border-dashed border-[#fcd99a] bg-white py-12 flex flex-col items-center gap-3 hover:border-[#f89a14]/60 transition-colors">
                 <span className="text-[36px]">📷</span>
-                <p className="font-brice font-bold text-[#131936]/50 text-[14px]">Upload a place photo</p>
+                <p className="font-display font-bold text-[#131936]/50 text-[14px]">Upload a place photo</p>
                 <p className="font-nunito text-[#131936]/30 text-[12px]">JPG, PNG or WebP · up to 10 MB</p>
               </button>
             ) : (
@@ -609,12 +609,12 @@ export default function AdminDestinationForm({ userId: _userId, onBack }: Props)
             )}
             {uploadFile && (
               <label className="flex items-start gap-3 cursor-pointer">
-                <input type="checkbox" checked={uploadConsent} onChange={e => setUploadConsent(e.target.checked)} className="mt-0.5 w-4 h-4 accent-[#f08c21] shrink-0 cursor-pointer" />
+                <input type="checkbox" checked={uploadConsent} onChange={e => setUploadConsent(e.target.checked)} className="mt-0.5 w-4 h-4 accent-[#f89a14] shrink-0 cursor-pointer" />
                 <span className="font-nunito text-[#131936]/60 text-[13px] leading-relaxed">This photo is licensed for use. I confirm Someday may display it in the app.</span>
               </label>
             )}
             {uploadFile && uploadConsent && !uploadedImageUrl && (
-              <button type="button" onClick={() => void handleAdminUpload()} disabled={uploading} className="w-full h-11 rounded-full bg-[#131936] text-white font-brice font-bold text-[14px] disabled:opacity-50">
+              <button type="button" onClick={() => void handleAdminUpload()} disabled={uploading} className="w-full h-11 rounded-full bg-[#131936] text-white font-display font-bold text-[14px] disabled:opacity-50">
                 {uploading ? 'Uploading…' : 'Use this photo'}
               </button>
             )}
@@ -636,7 +636,7 @@ export default function AdminDestinationForm({ userId: _userId, onBack }: Props)
               <input type="url" value={manualImageUrl} onChange={e => { setManualImageUrl(e.target.value); setManualImageValid(false) }} placeholder="https://example.com/photo.jpg" className={INPUT_CLASS} />
               <p className="font-nunito text-[11px] text-[#131936]/40 mt-1.5 leading-relaxed">Only use images you have permission to use. Do not paste images from Google or travel blogs.</p>
             </div>
-            {manualImageUrl && !manualImageValid && <button type="button" onClick={() => setManualImageValid(true)} className="font-nunito text-[13px] text-[#f08c21]">Preview image →</button>}
+            {manualImageUrl && !manualImageValid && <button type="button" onClick={() => setManualImageValid(true)} className="font-nunito text-[13px] text-[#f89a14]">Preview image →</button>}
             {manualImageValid && manualImageUrl && (
               <div className="rounded-2xl overflow-hidden border border-[#fcd99a]">
                 <div className="relative aspect-[2/3]"><Image src={manualImageUrl} alt="Manual URL preview" fill className="object-cover" onError={() => { toast.error('Could not load image from that URL.'); setManualImageValid(false) }} /></div>
@@ -650,7 +650,7 @@ export default function AdminDestinationForm({ userId: _userId, onBack }: Props)
       {error && <div className="rounded-2xl bg-red-50 border border-red-200 px-4 py-3"><p className="font-nunito text-[13px] text-red-600">{error}</p></div>}
 
       <button type="button" onClick={() => void handleSubmit()} disabled={saving}
-        className="w-full h-14 rounded-full bg-[#131936] text-white font-brice font-bold text-[16px] disabled:opacity-50 transition-opacity">
+        className="w-full h-14 rounded-full bg-[#131936] text-white font-display font-bold text-[16px] disabled:opacity-50 transition-opacity">
         {saving ? 'Adding to database…' : 'Add Destination to Someday ✦'}
       </button>
 

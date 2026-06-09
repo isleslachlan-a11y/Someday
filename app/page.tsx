@@ -7,7 +7,7 @@ export default function LandingPage() {
 
         {/* Logo */}
         <div className="text-5xl text-violet-accent mb-4 select-none">✦</div>
-        <h1 className="font-brice text-4xl font-bold text-white-soft tracking-tight mb-3">
+        <h1 className="font-display text-4xl font-bold text-white-soft tracking-tight mb-3">
           Someday
         </h1>
         <p className="text-lavender text-lg leading-relaxed mb-10">
@@ -19,13 +19,13 @@ export default function LandingPage() {
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link
             href="/signup"
-            className="rounded-xl bg-violet-accent hover:bg-violet-accent/90 px-6 py-3 font-brice font-semibold text-white-soft transition-colors"
+            className="rounded-xl bg-violet-accent hover:bg-violet-accent/90 px-6 py-3 font-heading font-semibold text-white-soft transition-colors"
           >
             Get started
           </Link>
           <Link
             href="/login"
-            className="rounded-xl border border-white/15 hover:border-violet-accent/40 hover:bg-violet-accent/5 px-6 py-3 font-brice font-semibold text-white-soft/80 transition-colors"
+            className="rounded-xl border border-white/15 hover:border-violet-accent/40 hover:bg-violet-accent/5 px-6 py-3 font-heading font-semibold text-white-soft/80 transition-colors"
           >
             Sign in
           </Link>

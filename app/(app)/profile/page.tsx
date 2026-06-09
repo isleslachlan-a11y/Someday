@@ -134,7 +134,7 @@ export default async function ProfilePage() {
           <div className="max-w-[480px] mx-auto px-4 h-14 grid grid-cols-3 items-center">
             <div />
             <div className="flex justify-center">
-              <span className="font-brice font-bold text-[#131936] text-[20px] tracking-widest uppercase">
+              <span className="font-display font-bold text-[#131936] text-[20px] tracking-widest uppercase">
                 PROFILE
               </span>
             </div>
@@ -154,7 +154,7 @@ export default async function ProfilePage() {
           {/* Avatar + name block */}
           <div className="flex flex-col items-center text-center mb-6">
             <Avatar avatarUrl={profile.avatar_url} username={profile.username ?? ''} size={80} />
-            <h1 className="font-brice text-[22px] font-bold text-[#131936] mt-3">
+            <h1 className="font-display text-[22px] font-bold text-[#131936] mt-3">
               @{profile.username}
             </h1>
             {profile.bio ? (
@@ -182,14 +182,14 @@ export default async function ProfilePage() {
               href="/list"
               className="flex flex-col items-center gap-0.5 rounded-2xl border border-[#fcd99a]/40 bg-white px-4 py-5 text-center"
             >
-              <p className="font-brice text-[28px] font-bold text-[#f08c21]">{placeCount}</p>
+              <p className="font-display text-[28px] font-bold text-[#f89a14]">{placeCount}</p>
               <p className="font-nunito text-[#131936]/50 text-[11px] mt-0.5">Places</p>
             </Link>
             <Link
               href="/plan"
               className="flex flex-col items-center gap-0.5 rounded-2xl border border-[#fcd99a]/40 bg-white px-4 py-5 text-center"
             >
-              <p className="font-brice text-[28px] font-bold text-[#f08c21]">{tripCount}</p>
+              <p className="font-display text-[28px] font-bold text-[#f89a14]">{tripCount}</p>
               <p className="font-nunito text-[#131936]/50 text-[11px] mt-0.5">Trips</p>
             </Link>
           </div>
@@ -203,15 +203,15 @@ export default async function ProfilePage() {
           {/* Bucket list grid */}
           <section className="mt-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-brice font-bold text-[#131936] text-[17px]">Your list</h2>
-              <Link href="/list" className="font-nunito text-[#f08c21] text-[13px]">
+              <h2 className="font-display font-bold text-[#131936] text-[17px]">Your list</h2>
+              <Link href="/list" className="font-nunito text-[#f89a14] text-[13px]">
                 Manage →
               </Link>
             </div>
             {entries.length === 0 ? (
               <div className="rounded-2xl border border-[#fcd99a]/40 bg-white px-6 py-10 text-center">
                 <p className="font-nunito text-[#131936]/40 text-[14px]">Nothing saved yet.</p>
-                <Link href="/home" className="inline-block mt-3 font-nunito text-[#f08c21] text-[13px]">
+                <Link href="/home" className="inline-block mt-3 font-nunito text-[#f89a14] text-[13px]">
                   Discover places →
                 </Link>
               </div>
@@ -225,7 +225,7 @@ export default async function ProfilePage() {
             {entries.length > 8 && (
               <p className="font-nunito text-[#131936]/40 text-[12px] text-center mt-4">
                 +{entries.length - 8} more —{' '}
-                <Link href="/list" className="text-[#f08c21]">see all</Link>
+                <Link href="/list" className="text-[#f89a14]">see all</Link>
               </p>
             )}
           </section>
@@ -247,7 +247,7 @@ export default async function ProfilePage() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="flex items-center gap-2.5 rounded-2xl border border-[#fcd99a]/50 bg-white px-4 py-3 hover:border-[#f08c21]/40 transition-colors"
+                    className="flex items-center gap-2.5 rounded-2xl border border-[#fcd99a]/50 bg-white px-4 py-3 hover:border-[#f89a14]/40 transition-colors"
                   >
                     <span className="text-[18px]">{item.icon}</span>
                     <span className="font-nunito font-semibold text-[#131936] text-[13px]">
@@ -293,12 +293,12 @@ function ProfilePlaceCard({ entry }: { entry: BucketEntry }) {
         {TYPE_ICON[entry.place.type] ?? '✦'}
       </span>
       <div className="flex-1 min-w-0">
-        <p className="font-brice text-sm font-semibold text-[#131936] truncate">
+        <p className="font-display text-sm font-semibold text-[#131936] truncate">
           {entry.place.name}
         </p>
         <p className="text-xs text-[#131936]/50">{entry.place.country}</p>
       </div>
-      <span className="shrink-0 text-xs font-semibold text-[#f08c21]">
+      <span className="shrink-0 text-xs font-semibold text-[#f89a14]">
         {STATUS_LABEL[entry.status]}
       </span>
     </div>

@@ -45,7 +45,7 @@ export function SocialRow({ compact = false, dark = false }: SocialRowProps) {
   const gap = compact ? 'gap-3' : 'gap-4'
   const size = compact ? 'w-9 h-9' : 'w-12 h-12'
   const base = `${size} rounded-full flex items-center justify-center transition-colors`
-  const light = 'border border-[rgba(252,217,154,0.5)] bg-white text-[#131936]/50 hover:text-[#f08c21] hover:border-[#f08c21]'
+  const light = 'border border-[rgba(252,217,154,0.5)] bg-white text-[#131936]/50 hover:text-[#f89a14] hover:border-[#f89a14]'
   const darkStyle = 'border border-white/20 bg-white/10 text-white/60 hover:text-white hover:bg-white/20'
   const btnClass = `${base} ${dark ? darkStyle : light}`
 

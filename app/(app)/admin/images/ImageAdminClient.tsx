@@ -71,7 +71,7 @@ export default function ImageAdminClient({ places }: Props) {
           disabled={bulkRunning || unlinkedCount === 0}
           style={{
             padding: '0.5rem 1.25rem',
-            background: bulkRunning ? '#999' : '#f08c21',
+            background: bulkRunning ? '#999' : '#f89a14',
             color: '#131936',
             border: 'none',
             borderRadius: 6,

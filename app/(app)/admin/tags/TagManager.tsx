@@ -79,7 +79,7 @@ function CreateForm({ onCreated, onCancel }: CreateFormProps) {
       onSubmit={e => void handleSubmit(e)}
       className="bg-white rounded-2xl border border-[#fcd99a] p-4 mb-6 space-y-3"
     >
-      <p className="font-brice font-bold text-[#131936] text-[14px]">Create tag</p>
+      <p className="font-display font-bold text-[#131936] text-[14px]">Create tag</p>
 
       <div>
         <label className="font-nunito text-[11px] text-[#131936]/50 uppercase tracking-wider mb-1 block">
@@ -91,7 +91,7 @@ function CreateForm({ onCreated, onCancel }: CreateFormProps) {
           onChange={e => handleNameChange(e.target.value)}
           placeholder="e.g. street food"
           required
-          className="w-full rounded-xl border border-[#fcd99a] bg-white px-3 py-2 font-nunito text-[14px] text-[#131936] placeholder:text-[#131936]/30 focus:outline-none focus:ring-2 focus:ring-[#f08c21]/30"
+          className="w-full rounded-xl border border-[#fcd99a] bg-white px-3 py-2 font-nunito text-[14px] text-[#131936] placeholder:text-[#131936]/30 focus:outline-none focus:ring-2 focus:ring-[#f89a14]/30"
         />
       </div>
 
@@ -105,7 +105,7 @@ function CreateForm({ onCreated, onCancel }: CreateFormProps) {
           onChange={e => { setSlug(e.target.value); setSlugEdited(true) }}
           placeholder="e.g. street-food"
           required
-          className="w-full rounded-xl border border-[#fcd99a] bg-white px-3 py-2 font-nunito text-[13px] text-[#131936]/60 placeholder:text-[#131936]/30 focus:outline-none focus:ring-2 focus:ring-[#f08c21]/30"
+          className="w-full rounded-xl border border-[#fcd99a] bg-white px-3 py-2 font-nunito text-[13px] text-[#131936]/60 placeholder:text-[#131936]/30 focus:outline-none focus:ring-2 focus:ring-[#f89a14]/30"
         />
       </div>
 
@@ -116,7 +116,7 @@ function CreateForm({ onCreated, onCancel }: CreateFormProps) {
         <select
           value={category}
           onChange={e => setCategory(e.target.value)}
-          className="w-full rounded-xl border border-[#fcd99a] bg-white px-3 py-2 font-nunito text-[14px] text-[#131936] focus:outline-none focus:ring-2 focus:ring-[#f08c21]/30"
+          className="w-full rounded-xl border border-[#fcd99a] bg-white px-3 py-2 font-nunito text-[14px] text-[#131936] focus:outline-none focus:ring-2 focus:ring-[#f89a14]/30"
         >
           {Object.entries(CATEGORY_LABELS).map(([val, label]) => (
             <option key={val} value={val}>{label}</option>
@@ -131,7 +131,7 @@ function CreateForm({ onCreated, onCancel }: CreateFormProps) {
         <select
           value={dimension}
           onChange={e => setDimension(e.target.value)}
-          className="w-full rounded-xl border border-[#fcd99a] bg-white px-3 py-2 font-nunito text-[14px] text-[#131936] focus:outline-none focus:ring-2 focus:ring-[#f08c21]/30"
+          className="w-full rounded-xl border border-[#fcd99a] bg-white px-3 py-2 font-nunito text-[14px] text-[#131936] focus:outline-none focus:ring-2 focus:ring-[#f89a14]/30"
         >
           {DIMENSIONS.map(d => (
             <option key={d} value={d}>{d}</option>
@@ -151,7 +151,7 @@ function CreateForm({ onCreated, onCancel }: CreateFormProps) {
               onClick={() => togglePlaceType(pt)}
               className={`px-3 py-1 rounded-full border font-nunito text-[12px] font-medium capitalize transition-all ${
                 placeType.includes(pt)
-                  ? 'bg-[#f08c21] border-[#f08c21] text-[#131936]'
+                  ? 'bg-[#f89a14] border-[#f89a14] text-[#131936]'
                   : 'bg-white border-[#fcd99a] text-[#131936]/60'
               }`}
             >
@@ -165,7 +165,7 @@ function CreateForm({ onCreated, onCancel }: CreateFormProps) {
         <button
           type="submit"
           disabled={saving || !name.trim()}
-          className="flex-1 h-10 rounded-full bg-[#131936] text-white font-brice font-bold text-[13px] disabled:opacity-50"
+          className="flex-1 h-10 rounded-full bg-[#131936] text-white font-display font-bold text-[13px] disabled:opacity-50"
         >
           {saving ? 'Creating…' : 'Create tag'}
         </button>
@@ -260,7 +260,7 @@ function TagRow({ tag, categoryPeers, onDeleted, onMerged }: TagRowProps) {
           value={mergeTarget}
           onChange={e => setMergeTarget(e.target.value)}
           disabled={merging}
-          className="flex-1 min-w-0 rounded-xl border border-[#fcd99a] bg-white px-2.5 py-1.5 font-nunito text-[12px] text-[#131936]/60 focus:outline-none focus:ring-1 focus:ring-[#f08c21]/30"
+          className="flex-1 min-w-0 rounded-xl border border-[#fcd99a] bg-white px-2.5 py-1.5 font-nunito text-[12px] text-[#131936]/60 focus:outline-none focus:ring-1 focus:ring-[#f89a14]/30"
         >
           <option value="">Merge into…</option>
           {categoryPeers
@@ -391,7 +391,7 @@ export default function TagManager({ grouped: initial, categories, labels: initi
       {!showCreate && (
         <button
           onClick={() => setShowCreate(true)}
-          className="w-full h-11 rounded-full border border-[#f08c21] text-[#f08c21] font-brice font-bold text-[13px] mb-6 hover:bg-[#f08c21]/5 transition-colors"
+          className="w-full h-11 rounded-full border border-[#f89a14] text-[#f89a14] font-display font-bold text-[13px] mb-6 hover:bg-[#f89a14]/5 transition-colors"
         >
           + Create tag
         </button>
@@ -411,7 +411,7 @@ export default function TagManager({ grouped: initial, categories, labels: initi
         return (
           <section key={cat} className="mb-6">
             <div className="flex items-center gap-2 mb-2">
-              <h2 className="font-brice font-bold text-[#131936] text-[13px] uppercase tracking-wider">
+              <h2 className="font-display font-bold text-[#131936] text-[13px] uppercase tracking-wider">
                 {CATEGORY_LABELS[cat] ?? cat}
               </h2>
               <span className="font-nunito text-[11px] text-[#131936]/30">{tags.length}</span>
@@ -434,7 +434,7 @@ export default function TagManager({ grouped: initial, categories, labels: initi
       {total === 0 && (
         <div className="text-center py-16">
           <p className="text-[32px] mb-3">✦</p>
-          <p className="font-brice font-bold text-[#131936]">No tags yet</p>
+          <p className="font-display font-bold text-[#131936]">No tags yet</p>
           <p className="font-nunito text-[#131936]/40 text-[13px] mt-1">
             Create your first tag above
           </p>
@@ -443,7 +443,7 @@ export default function TagManager({ grouped: initial, categories, labels: initi
 
       {/* ── Display Labels ─────────────────────────────────────────────────── */}
       <section className="mt-8 pt-6 border-t border-[#fcd99a]/50">
-        <h2 className="font-brice font-bold text-[#131936] text-[15px] mb-1">
+        <h2 className="font-display font-bold text-[#131936] text-[15px] mb-1">
           Display Labels
         </h2>
         <p className="font-nunito text-[12px] text-[#131936]/40 mb-4">
@@ -484,7 +484,7 @@ export default function TagManager({ grouped: initial, categories, labels: initi
             onChange={e => setNewLabelName(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && void handleCreateLabel()}
             placeholder="New label e.g. UNESCO Heritage"
-            className="flex-1 rounded-xl border border-[#fcd99a] bg-white px-3 py-2 font-nunito text-[14px] text-[#131936] placeholder:text-[#131936]/30 focus:outline-none focus:ring-2 focus:ring-[#f08c21]/30"
+            className="flex-1 rounded-xl border border-[#fcd99a] bg-white px-3 py-2 font-nunito text-[14px] text-[#131936] placeholder:text-[#131936]/30 focus:outline-none focus:ring-2 focus:ring-[#f89a14]/30"
           />
           <button
             onClick={() => void handleCreateLabel()}

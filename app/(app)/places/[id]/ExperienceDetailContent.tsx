@@ -180,7 +180,7 @@ export default function ExperienceDetailContent({
       {/* ── Full-bleed hero ────────────────────────────────────────────────── */}
       <div
         className="relative w-full overflow-hidden"
-        style={{ aspectRatio: '4/3', background: 'linear-gradient(135deg, #f08c21 0%, #f5b05a 50%, #fcd99a 100%)' }}
+        style={{ aspectRatio: '4/3', background: 'linear-gradient(135deg, #f89a14 0%, #f5b05a 50%, #fcd99a 100%)' }}
       >
         {place.image_url && (
           <Image
@@ -221,15 +221,15 @@ export default function ExperienceDetailContent({
           >
             <Heart
               size={18}
-              className={isSaved ? 'text-[#f08c21]' : 'text-white'}
-              fill={isSaved ? '#f08c21' : 'transparent'}
+              className={isSaved ? 'text-[#f89a14]' : 'text-white'}
+              fill={isSaved ? '#f89a14' : 'transparent'}
             />
           </button>
           {isAdmin && (
             <button
               onClick={() => setShowCollectionSheet(true)}
               className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                collectionIds.size > 0 ? 'bg-[#f08c21]' : 'bg-black/30'
+                collectionIds.size > 0 ? 'bg-[#f89a14]' : 'bg-black/30'
               }`}
               aria-label="Manage collections"
             >
@@ -240,7 +240,7 @@ export default function ExperienceDetailContent({
 
         {/* Bottom overlay: name + location */}
         <div className="absolute bottom-0 left-0 right-0 px-5 pb-5 pointer-events-none">
-          <h1 className="font-brice font-bold text-white text-[26px] leading-tight line-clamp-2">
+          <h1 className="font-display font-bold text-white text-[26px] leading-tight line-clamp-2">
             {place.name}
           </h1>
           {location && (
@@ -256,7 +256,7 @@ export default function ExperienceDetailContent({
       {parentPlace && (
         <Link
           href={`/places/${parentPlace.id}`}
-          className="flex items-center gap-1.5 px-5 py-3 font-nunito text-[12px] text-[#f08c21] bg-[#fff9f0] hover:opacity-80 transition-opacity"
+          className="flex items-center gap-1.5 px-5 py-3 font-nunito text-[12px] text-[#f89a14] bg-[#fff9f0] hover:opacity-80 transition-opacity"
         >
           <span>🗺</span>
           <span>Part of {parentPlace.name}</span>
@@ -280,7 +280,7 @@ export default function ExperienceDetailContent({
                 key={label}
                 className="bg-white rounded-2xl p-3 flex-1 text-center border border-[#fcd99a]/50"
               >
-                <p className="font-brice font-bold text-[#131936] text-[11px] leading-tight line-clamp-2">{value}</p>
+                <p className="font-display font-bold text-[#131936] text-[11px] leading-tight line-clamp-2">{value}</p>
                 <p className="font-nunito text-[#131936]/50 text-[10px] mt-0.5">{label}</p>
               </div>
             ))}
@@ -289,14 +289,14 @@ export default function ExperienceDetailContent({
           {/* ── Description ────────────────────────────────────────────────── */}
           {place.description && (
             <div className="px-5 mt-6">
-              <h2 className="font-brice font-bold text-[#131936] text-[17px]">Description</h2>
+              <h2 className="font-display font-bold text-[#131936] text-[17px]">Description</h2>
               <p className={`font-nunito text-[14px] text-[#131936]/70 leading-relaxed mt-2 ${descExpanded ? '' : 'line-clamp-3'}`}>
                 {place.description}
               </p>
               {place.description.length > 120 && (
                 <button
                   onClick={() => setDescExpanded(v => !v)}
-                  className="mt-1 font-nunito text-[13px] text-[#f08c21] font-medium min-h-[44px] flex items-center"
+                  className="mt-1 font-nunito text-[13px] text-[#f89a14] font-medium min-h-[44px] flex items-center"
                 >
                   {descExpanded ? 'Show less' : 'Read more'}
                 </button>
@@ -333,10 +333,10 @@ export default function ExperienceDetailContent({
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-brice font-bold text-[#131936] text-[14px]">
+                      <p className="font-display font-bold text-[#131936] text-[14px]">
                         {friendVisitors.length} friend{friendVisitors.length !== 1 ? 's' : ''} spent time here
                       </p>
-                      <Link href="/plan" className="font-nunito text-[#f08c21] text-[12px] mt-0.5 block">
+                      <Link href="/plan" className="font-nunito text-[#f89a14] text-[12px] mt-0.5 block">
                         Tap to read their notes →
                       </Link>
                     </div>
@@ -363,7 +363,7 @@ export default function ExperienceDetailContent({
           {activities.length > 0 && (
             <div className="px-5 mt-6">
               <div className="flex items-center justify-between mb-3">
-                <h2 className="font-brice font-bold text-[#131936] text-[17px]">What to do here</h2>
+                <h2 className="font-display font-bold text-[#131936] text-[17px]">What to do here</h2>
                 <span className="font-nunito text-[#131936]/40 text-[12px]">
                   {activities.length} {activities.length === 1 ? 'activity' : 'activities'}
                 </span>
@@ -375,10 +375,10 @@ export default function ExperienceDetailContent({
                     className="bg-white rounded-2xl p-3 flex items-center gap-3 border border-[#fcd99a]/40"
                   >
                     <div className="w-9 h-9 rounded-full bg-[#fcd99a]/60 flex items-center justify-center shrink-0">
-                      <span className="font-brice font-bold text-[#131936] text-[14px]">{i + 1}</span>
+                      <span className="font-display font-bold text-[#131936] text-[14px]">{i + 1}</span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-brice font-bold text-[#131936] text-[14px] leading-tight">
+                      <p className="font-display font-bold text-[#131936] text-[14px] leading-tight">
                         {activity.name}
                       </p>
                       <p className="font-nunito text-[#131936]/50 text-[12px] mt-0.5">
@@ -386,7 +386,7 @@ export default function ExperienceDetailContent({
                       </p>
                     </div>
                     {activity.rating && (
-                      <span className="font-nunito text-[12px] text-[#f08c21] shrink-0">
+                      <span className="font-nunito text-[12px] text-[#f89a14] shrink-0">
                         ★ {activity.rating.toFixed(1)}
                       </span>
                     )}
@@ -402,11 +402,11 @@ export default function ExperienceDetailContent({
               href={`/discover?country=${encodeURIComponent(place.country)}`}
               className="block bg-[#131936] rounded-2xl p-5 relative overflow-hidden"
             >
-              <div className="absolute right-4 top-4 w-16 h-16 rounded-full bg-[#f08c21]/20" />
+              <div className="absolute right-4 top-4 w-16 h-16 rounded-full bg-[#f89a14]/20" />
               <p className="font-nunito text-[#fcd99a]/60 text-[10px] font-semibold tracking-widest uppercase">
                 DISCOVER COUNTRY →
               </p>
-              <p className="font-brice font-bold text-white text-[22px] mt-1">{place.country}</p>
+              <p className="font-display font-bold text-white text-[22px] mt-1">{place.country}</p>
               <p className="font-nunito text-[#fcd99a]/60 text-[12px] mt-0.5">
                 {countryCount} more experience{countryCount !== 1 ? 's' : ''} · {place.popularity} saves
               </p>
@@ -417,10 +417,10 @@ export default function ExperienceDetailContent({
           {statePlaces.length > 0 && (
             <div className="mt-6">
               <div className="flex items-center justify-between px-5 mb-3">
-                <h2 className="font-brice font-bold text-[#131936] text-[17px]">
+                <h2 className="font-display font-bold text-[#131936] text-[17px]">
                   More in {place.state_province}
                 </h2>
-                <Link href={`/discover?country=${encodeURIComponent(place.country)}`} className="font-nunito text-[#f08c21] text-[13px]">
+                <Link href={`/discover?country=${encodeURIComponent(place.country)}`} className="font-nunito text-[#f89a14] text-[13px]">
                   Explore →
                 </Link>
               </div>
@@ -445,8 +445,8 @@ export default function ExperienceDetailContent({
           {similarPlaces.length > 0 && (
             <div className="mt-6">
               <div className="flex items-center justify-between px-5 mb-3">
-                <h2 className="font-brice font-bold text-[#131936] text-[17px]">More like this</h2>
-                <Link href={`/discover?type=${encodeURIComponent(place.type)}`} className="font-nunito text-[#f08c21] text-[13px]">
+                <h2 className="font-display font-bold text-[#131936] text-[17px]">More like this</h2>
+                <Link href={`/discover?type=${encodeURIComponent(place.type)}`} className="font-nunito text-[#f89a14] text-[13px]">
                   See all →
                 </Link>
               </div>
@@ -470,7 +470,7 @@ export default function ExperienceDetailContent({
                   <div
                     key={dot}
                     className={`rounded-full transition-all duration-200 ${
-                      activeDot === dot ? 'w-4 h-1.5 bg-[#f08c21]' : 'w-1.5 h-1.5 bg-[#131936]/20'
+                      activeDot === dot ? 'w-4 h-1.5 bg-[#f89a14]' : 'w-1.5 h-1.5 bg-[#131936]/20'
                     }`}
                   />
                 ))}
@@ -482,7 +482,7 @@ export default function ExperienceDetailContent({
           {collectionContext && collectionContext.places.length > 0 && (
             <div className="mt-6">
               <div className="px-5 mb-3">
-                <h2 className="font-brice font-bold text-[#131936] text-[17px]">
+                <h2 className="font-display font-bold text-[#131936] text-[17px]">
                   More from {collectionContext.name}
                 </h2>
               </div>
@@ -512,7 +512,7 @@ export default function ExperienceDetailContent({
           <div className="absolute inset-0 bg-black/40" onClick={() => setShowCollectionSheet(false)} />
           <div className="relative w-full bg-[#fff9f0] rounded-t-3xl px-4 pt-5 pb-10 max-h-[70vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-brice font-bold text-[#131936] text-[16px]">Collections</h3>
+              <h3 className="font-display font-bold text-[#131936] text-[16px]">Collections</h3>
               <button
                 onClick={() => setShowCollectionSheet(false)}
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-[#131936]/10"
@@ -548,7 +548,7 @@ export default function ExperienceDetailContent({
                         {col.name}
                       </span>
                       {togglingId === col.id && (
-                        <div className="w-4 h-4 rounded-full border-2 border-[#f08c21] border-t-transparent animate-spin" />
+                        <div className="w-4 h-4 rounded-full border-2 border-[#f89a14] border-t-transparent animate-spin" />
                       )}
                     </button>
                   )
@@ -579,7 +579,7 @@ function ExpSimilarCard({
       className="relative w-36 h-48 rounded-2xl overflow-hidden shrink-0"
       style={{ scrollSnapAlign: 'start' }}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-[#f08c21] to-[#fcd99a]" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[#f89a14] to-[#fcd99a]" />
       {place.image_url && (
         <Image src={place.image_url} alt={place.name} fill sizes="144px" className="object-cover" />
       )}
@@ -589,7 +589,7 @@ function ExpSimilarCard({
 
       <div className="absolute top-2 left-2 z-10 pointer-events-none">
         <div className="w-7 h-7 rounded-full bg-white/90 flex items-center justify-center">
-          <span className="text-[#f08c21] text-[11px]">✦</span>
+          <span className="text-[#f89a14] text-[11px]">✦</span>
         </div>
       </div>
 
@@ -601,14 +601,14 @@ function ExpSimilarCard({
         >
           <Heart
             size={13}
-            className={isSaved ? 'text-[#f08c21]' : 'text-[#131936]'}
-            fill={isSaved ? '#f08c21' : 'transparent'}
+            className={isSaved ? 'text-[#f89a14]' : 'text-[#131936]'}
+            fill={isSaved ? '#f89a14' : 'transparent'}
           />
         </button>
       </div>
 
       <div className="absolute bottom-0 left-0 right-0 p-2 pointer-events-none">
-        <p className="font-brice font-bold text-white text-[13px] leading-tight line-clamp-2">{place.name}</p>
+        <p className="font-display font-bold text-white text-[13px] leading-tight line-clamp-2">{place.name}</p>
         <p className="font-nunito text-white/70 text-[11px] mt-0.5">{place.country}</p>
       </div>
     </div>

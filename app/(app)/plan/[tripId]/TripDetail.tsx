@@ -170,15 +170,15 @@ export default function TripDetail({
             {trip.icon}
           </span>
           <div className="flex-1 min-w-0">
-            <h1 className="font-brice text-2xl font-bold text-[#131936] leading-snug">
+            <h1 className="font-display text-2xl font-bold text-[#131936] leading-snug">
               {trip.title}
             </h1>
             {trip.destination && (
-              <p className="text-[#f08c21] text-sm mt-0.5">{trip.destination}</p>
+              <p className="text-[#f89a14] text-sm mt-0.5">{trip.destination}</p>
             )}
           </div>
           {countdown && (
-            <span className="shrink-0 rounded-full bg-pink-accent/10 border border-pink-accent/20 px-2.5 py-1 text-xs font-semibold text-[#f08c21]">
+            <span className="shrink-0 rounded-full bg-pink-accent/10 border border-pink-accent/20 px-2.5 py-1 text-xs font-semibold text-[#f89a14]">
               {countdown}
             </span>
           )}
@@ -220,7 +220,7 @@ export default function TripDetail({
             onClick={() => setActiveTab(t)}
             className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-colors ${
               activeTab === t
-                ? 'bg-[#f08c21] text-[#131936]'
+                ? 'bg-[#f89a14] text-[#131936]'
                 : 'text-[#131936]/50 hover:text-[#131936]'
             }`}
           >
@@ -233,10 +233,10 @@ export default function TripDetail({
       {activeTab === 'experiences' && (
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-brice font-bold text-[#131936]">Experiences</h2>
+            <h2 className="font-display font-bold text-[#131936]">Experiences</h2>
             <button
               onClick={() => setShowAdd(true)}
-              className="text-xs font-semibold text-[#f08c21] hover:text-[#131936] transition-colors flex items-center gap-1"
+              className="text-xs font-semibold text-[#f89a14] hover:text-[#131936] transition-colors flex items-center gap-1"
             >
               + Add
             </button>
@@ -245,13 +245,13 @@ export default function TripDetail({
           {tripItems.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-[#fcd99a]/50 p-8 text-center">
               <p className="text-3xl mb-3">🌍</p>
-              <p className="text-[#131936] font-brice font-bold mb-1">No experiences yet</p>
+              <p className="text-[#131936] font-display font-bold mb-1">No experiences yet</p>
               <p className="text-[#131936]/50 text-sm mb-4">
                 Add places you want to visit on this trip.
               </p>
               <button
                 onClick={() => setShowAdd(true)}
-                className="rounded-xl bg-[#f08c21] hover:bg-[#f08c21]/90 px-4 py-2 text-sm font-brice font-semibold text-[#131936] transition-colors"
+                className="rounded-xl bg-[#f89a14] hover:bg-[#f89a14]/90 px-4 py-2 text-sm font-heading font-semibold text-[#131936] transition-colors"
               >
                 Add first experience
               </button>
@@ -456,14 +456,14 @@ function TripChatPanel({
     return (
       <div className="rounded-2xl border border-[#fcd99a]/40 bg-white p-8 text-center mb-6">
         <p className="text-3xl mb-3">💬</p>
-        <p className="font-brice font-bold text-[#131936] mb-1">No group chat yet</p>
+        <p className="font-display font-bold text-[#131936] mb-1">No group chat yet</p>
         <p className="text-[#131936]/50 text-sm mb-5">
           Start a group chat to coordinate with your trip crew.
         </p>
         <button
           onClick={handleCreateChat}
           disabled={isCreatingChat}
-          className="rounded-xl bg-[#f08c21] hover:bg-[#f08c21]/90 disabled:opacity-50 px-5 py-2.5 font-brice font-semibold text-[#131936] text-sm transition-colors"
+          className="rounded-xl bg-[#f89a14] hover:bg-[#f89a14]/90 disabled:opacity-50 px-5 py-2.5 font-heading font-semibold text-[#131936] text-sm transition-colors"
         >
           {isCreatingChat ? 'Creating…' : 'Start group chat'}
         </button>
@@ -503,7 +503,7 @@ function TripChatPanel({
           </div>
           <button
             onClick={() => setShowInvite(true)}
-            className="text-xs font-semibold text-[#f08c21] hover:text-[#131936] transition-colors"
+            className="text-xs font-semibold text-[#f89a14] hover:text-[#131936] transition-colors"
           >
             + Invite
           </button>
@@ -517,7 +517,7 @@ function TripChatPanel({
         >
           {isLoadingMore && (
             <div className="flex justify-center py-2">
-              <div className="w-5 h-5 border-2 border-[#f08c21]/30 border-t-violet-accent rounded-full animate-spin" />
+              <div className="w-5 h-5 border-2 border-[#f89a14]/30 border-t-violet-accent rounded-full animate-spin" />
             </div>
           )}
 
@@ -564,12 +564,12 @@ function TripChatPanel({
               }}
               placeholder="Message the trip…"
               rows={1}
-              className="flex-1 resize-none rounded-2xl bg-white border border-[#fcd99a]/40 text-sm text-[#131936] placeholder:text-[#131936]/40 px-4 py-3 focus:outline-none focus:border-[#f08c21]/40 transition-colors max-h-32 overflow-y-auto leading-relaxed"
+              className="flex-1 resize-none rounded-2xl bg-white border border-[#fcd99a]/40 text-sm text-[#131936] placeholder:text-[#131936]/40 px-4 py-3 focus:outline-none focus:border-[#f89a14]/40 transition-colors max-h-32 overflow-y-auto leading-relaxed"
             />
             <button
               type="submit"
               disabled={!inputValue.trim() || isSending}
-              className="flex items-center justify-center w-11 h-11 rounded-full bg-[#f08c21] hover:bg-[#f08c21]/90 text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+              className="flex items-center justify-center w-11 h-11 rounded-full bg-[#f89a14] hover:bg-[#f89a14]/90 text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
               aria-label="Send message"
             >
               <Send size={18} />
@@ -637,7 +637,7 @@ function TripMessageBubble({
         <div
           className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
             isOwn
-              ? 'bg-[#f08c21] text-white rounded-br-sm'
+              ? 'bg-[#f89a14] text-white rounded-br-sm'
               : 'bg-white text-[#131936] rounded-bl-sm'
           } ${message.id.startsWith('optimistic-') ? 'opacity-60' : ''}`}
         >
@@ -707,14 +707,14 @@ function InviteFriendsSheet({
         </div>
 
         <div className="px-5 pb-3 shrink-0">
-          <h2 className="font-brice font-bold text-xl text-[#131936] mb-1">Invite to Trip</h2>
+          <h2 className="font-display font-bold text-xl text-[#131936] mb-1">Invite to Trip</h2>
           <p className="text-[#131936]/50 text-sm">Add friends to this trip and group chat.</p>
         </div>
 
         <div className="overflow-y-auto flex-1 px-5 pb-8">
           {isLoading ? (
             <div className="flex justify-center py-10">
-              <div className="w-6 h-6 border-2 border-[#f08c21]/30 border-t-violet-accent rounded-full animate-spin" />
+              <div className="w-6 h-6 border-2 border-[#f89a14]/30 border-t-violet-accent rounded-full animate-spin" />
             </div>
           ) : invitable.length === 0 ? (
             <div className="text-center py-10">
@@ -744,7 +744,7 @@ function InviteFriendsSheet({
                   <button
                     onClick={() => handleAdd(friend.id)}
                     disabled={adding === friend.id}
-                    className="shrink-0 rounded-lg bg-[#f08c21] hover:bg-[#f08c21]/90 disabled:opacity-50 px-3 py-1.5 text-xs font-semibold text-[#131936] transition-colors"
+                    className="shrink-0 rounded-lg bg-[#f89a14] hover:bg-[#f89a14]/90 disabled:opacity-50 px-3 py-1.5 text-xs font-semibold text-[#131936] transition-colors"
                   >
                     {adding === friend.id ? '…' : '+ Add'}
                   </button>
@@ -786,7 +786,7 @@ function ExperienceCard({
           {TYPE_ICON[item.place.type] ?? '✦'}
         </span>
         <div className="flex-1 min-w-0">
-          <h3 className="font-brice font-bold text-[#131936] leading-snug">{item.place.name}</h3>
+          <h3 className="font-display font-bold text-[#131936] leading-snug">{item.place.name}</h3>
           <p className="text-xs text-[#131936]/50">{item.place.country}</p>
           {item.proposed_date && (
             <p className="text-xs text-[#131936]/50 mt-0.5">
@@ -815,7 +815,7 @@ function ExperienceCard({
           <span className="text-[#131936]/50 flex-1">Remove this place?</span>
           <button
             onClick={onRemove}
-            className="text-[#f08c21] font-semibold hover:text-[#f08c21]/80 transition-colors"
+            className="text-[#f89a14] font-semibold hover:text-[#f89a14]/80 transition-colors"
           >
             Remove
           </button>
@@ -946,13 +946,13 @@ function AddExperienceSheet({
         </div>
 
         <div className="px-5 pb-2 shrink-0">
-          <h2 className="font-brice font-bold text-xl text-[#131936] mb-4">Add Experience</h2>
+          <h2 className="font-display font-bold text-xl text-[#131936] mb-4">Add Experience</h2>
           <input
             autoFocus
             value={query}
             onChange={e => handleQueryChange(e.target.value)}
             placeholder="Search destinations…"
-            className="w-full rounded-xl bg-white border border-[#fcd99a]/40 px-4 py-3 text-[#131936] placeholder:text-[#131936]/40 text-sm focus:outline-none focus:border-[#f08c21]/60 transition-colors mb-4"
+            className="w-full rounded-xl bg-white border border-[#fcd99a]/40 px-4 py-3 text-[#131936] placeholder:text-[#131936]/40 text-sm focus:outline-none focus:border-[#f89a14]/60 transition-colors mb-4"
           />
         </div>
 
@@ -1030,7 +1030,7 @@ function PlaceAddRow({
       <button
         onClick={onAdd}
         disabled={isAdding}
-        className="shrink-0 rounded-lg bg-[#f08c21] hover:bg-[#f08c21]/90 disabled:opacity-50 px-3 py-1.5 text-xs font-semibold text-[#131936] transition-colors"
+        className="shrink-0 rounded-lg bg-[#f89a14] hover:bg-[#f89a14]/90 disabled:opacity-50 px-3 py-1.5 text-xs font-semibold text-[#131936] transition-colors"
       >
         {isAdding ? '…' : '+ Add'}
       </button>

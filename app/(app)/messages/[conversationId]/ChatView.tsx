@@ -202,14 +202,14 @@ export default function ChatView({ conversation, initialMessages, currentUserId 
               username={conversation.other_user.username ?? ''}
               size={32}
             />
-            <span className="font-brice font-bold text-[#131936] truncate text-sm">{title}</span>
+            <span className="font-display font-bold text-[#131936] truncate text-sm">{title}</span>
           </Link>
         ) : (
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            <div className="w-8 h-8 rounded-full bg-[#f08c21]/10 border border-[#f08c21]/25 flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-full bg-[#f89a14]/10 border border-[#f89a14]/25 flex items-center justify-center shrink-0">
               <span className="text-xs select-none">{conversation.type === 'trip' ? '✈️' : '👥'}</span>
             </div>
-            <span className="font-brice font-bold text-[#131936] truncate text-sm">{title}</span>
+            <span className="font-display font-bold text-[#131936] truncate text-sm">{title}</span>
           </div>
         )}
       </div>
@@ -223,7 +223,7 @@ export default function ChatView({ conversation, initialMessages, currentUserId 
         {/* Load more indicator */}
         {isLoadingMore && (
           <div className="flex justify-center py-2">
-            <div className="w-5 h-5 border-2 border-[#f08c21]/30 border-t-violet-accent rounded-full animate-spin" />
+            <div className="w-5 h-5 border-2 border-[#f89a14]/30 border-t-violet-accent rounded-full animate-spin" />
           </div>
         )}
 
@@ -261,12 +261,12 @@ export default function ChatView({ conversation, initialMessages, currentUserId 
             }}
             placeholder="Message…"
             rows={1}
-            className="flex-1 resize-none rounded-2xl bg-white border border-[#fcd99a]/40 text-sm text-[#131936] placeholder:text-[#131936]/40 px-4 py-3 focus:outline-none focus:border-[#f08c21]/40 transition-colors max-h-32 overflow-y-auto leading-relaxed"
+            className="flex-1 resize-none rounded-2xl bg-white border border-[#fcd99a]/40 text-sm text-[#131936] placeholder:text-[#131936]/40 px-4 py-3 focus:outline-none focus:border-[#f89a14]/40 transition-colors max-h-32 overflow-y-auto leading-relaxed"
           />
           <button
             type="submit"
             disabled={!inputValue.trim() || isSending}
-            className="flex items-center justify-center w-11 h-11 rounded-full bg-[#f08c21] hover:bg-[#f08c21]/90 text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+            className="flex items-center justify-center w-11 h-11 rounded-full bg-[#f89a14] hover:bg-[#f89a14]/90 text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
             aria-label="Send message"
           >
             <Send size={18} />
@@ -322,7 +322,7 @@ function MessageBubble({
           <div
             className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
               isOwn
-                ? 'bg-[#f08c21] text-white rounded-br-sm'
+                ? 'bg-[#f89a14] text-white rounded-br-sm'
                 : 'bg-white text-[#131936] rounded-bl-sm'
             } ${message.id.startsWith('optimistic-') ? 'opacity-60' : ''}`}
           >
@@ -352,7 +352,7 @@ function PlaceCard({ message, isOwn }: { message: Message; isOwn: boolean }) {
   return (
     <div
       className={`rounded-2xl overflow-hidden border ${
-        isOwn ? 'border-[#f08c21]/30' : 'border-white/[0.10]'
+        isOwn ? 'border-[#f89a14]/30' : 'border-white/[0.10]'
       } bg-white min-w-[200px]`}
     >
       <div className="px-4 py-3">
@@ -364,16 +364,16 @@ function PlaceCard({ message, isOwn }: { message: Message; isOwn: boolean }) {
             {TYPE_ICON[placeType] ?? '✦'}
           </span>
           <div className="min-w-0">
-            <p className="text-sm font-brice font-bold text-[#131936] truncate">{placeName}</p>
+            <p className="text-sm font-display font-bold text-[#131936] truncate">{placeName}</p>
             {country && <p className="text-xs text-[#131936]/50">{country}</p>}
           </div>
         </div>
       </div>
       {placeId && (
-        <div className={`border-t ${isOwn ? 'border-[#f08c21]/20' : 'border-[#fcd99a]/40'}`}>
+        <div className={`border-t ${isOwn ? 'border-[#f89a14]/20' : 'border-[#fcd99a]/40'}`}>
           <Link
             href={`/list/new?place_id=${placeId}`}
-            className="flex items-center justify-center py-2.5 text-xs font-semibold text-[#f08c21] hover:text-[#131936] transition-colors"
+            className="flex items-center justify-center py-2.5 text-xs font-semibold text-[#f89a14] hover:text-[#131936] transition-colors"
           >
             Add to list →
           </Link>

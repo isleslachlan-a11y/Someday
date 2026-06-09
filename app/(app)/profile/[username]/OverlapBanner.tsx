@@ -20,7 +20,7 @@ export default function OverlapBanner({ places, username, viewerUserId }: Props)
   const count = places.length
 
   return (
-    <div className="rounded-2xl border border-[#f08c21]/25 bg-[#f08c21]/5 p-4 mb-6">
+    <div className="rounded-2xl border border-[#f89a14]/25 bg-[#f89a14]/5 p-4 mb-6">
       {/* Header row */}
       <button
         onClick={() => {
@@ -37,10 +37,10 @@ export default function OverlapBanner({ places, username, viewerUserId }: Props)
         className="w-full flex items-center justify-between gap-3 text-left"
       >
         <div>
-          <p className="text-xs text-[#f08c21] font-semibold uppercase tracking-wider mb-0.5">
+          <p className="text-xs text-[#f89a14] font-semibold uppercase tracking-wider mb-0.5">
             ✦ Overlap
           </p>
-          <p className="font-brice font-bold text-[#131936]">
+          <p className="font-display font-bold text-[#131936]">
             {count} place{count !== 1 ? 's' : ''} you both want to visit
           </p>
           <p className="text-xs text-[#131936]/50 mt-0.5">

@@ -54,8 +54,8 @@ export default function AppShell({ username, avatarUrl, pendingRequestCount = 0,
 
         {/* Wordmark */}
         <div className="flex items-center gap-3 px-5 py-7 select-none shrink-0">
-          <span className="text-2xl text-[#f08c21]">✦</span>
-          <span className="font-brice text-xl font-bold text-[#131936] tracking-tight">Someday</span>
+          <span className="text-2xl text-[#f89a14]">✦</span>
+          <span className="font-display text-xl font-bold text-[#131936] tracking-tight">Someday</span>
         </div>
 
         {/* Nav links */}
@@ -71,14 +71,14 @@ export default function AppShell({ username, avatarUrl, pendingRequestCount = 0,
                 href={href}
                 className={`relative flex items-center gap-3 h-12 px-5 w-full rounded-xl text-sm font-medium font-nunito transition-colors ${
                   active
-                    ? 'bg-[#f08c21] text-[#131936]'
+                    ? 'bg-[#f89a14] text-[#131936]'
                     : 'text-[#131936]/40 hover:bg-[#131936]/5 hover:text-[#131936]'
                 }`}
               >
                 <span className="relative shrink-0">
                   <Icon size={20} strokeWidth={1.75} />
                   {showBadge && (
-                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#f08c21]" />
+                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#f89a14]" />
                   )}
                 </span>
                 {label}
@@ -126,13 +126,13 @@ export default function AppShell({ username, avatarUrl, pendingRequestCount = 0,
                 key={href}
                 href={href}
                 className={`flex-1 flex flex-col items-center justify-center gap-1 min-h-[44px] transition-all active:scale-95 duration-150 ${
-                  active ? 'text-[#f08c21]' : 'text-[#131936]/40'
+                  active ? 'text-[#f89a14]' : 'text-[#131936]/40'
                 }`}
               >
                 <span className="relative">
                   <Icon size={24} strokeWidth={1.75} />
                   {showBadge && (
-                    <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#f08c21] border-2 border-[#fff9f0]" />
+                    <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#f89a14] border-2 border-[#fff9f0]" />
                   )}
                 </span>
                 <span className="text-[10px] font-nunito font-medium leading-none">{label}</span>

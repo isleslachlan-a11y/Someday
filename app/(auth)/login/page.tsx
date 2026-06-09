@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import { logEvent } from '@/lib/events'
 
 const LABEL = 'block font-nunito font-semibold uppercase tracking-wider text-[11px] text-[#131936]/50 mb-1.5'
-const INPUT = 'w-full rounded-xl bg-white border border-[#fcd99a] text-[#131936] placeholder:text-[#131936]/30 px-4 py-2.5 font-nunito text-[14px] focus:outline-none focus:ring-2 focus:ring-[#f08c21]/30 transition'
+const INPUT = 'w-full rounded-xl bg-white border border-[#fcd99a] text-[#131936] placeholder:text-[#131936]/30 px-4 py-2.5 font-nunito text-[14px] focus:outline-none focus:ring-2 focus:ring-[#f89a14]/30 transition'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -52,7 +52,7 @@ export default function LoginPage() {
 
   return (
     <>
-      <h2 className="font-brice text-[22px] font-bold text-[#131936] mb-6">
+      <h2 className="font-display text-[22px] font-bold text-[#131936] mb-6">
         Welcome back
       </h2>
 
@@ -97,7 +97,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-xl bg-[#f08c21] hover:bg-[#d97a1b] disabled:opacity-60 px-4 py-2.5 font-brice font-semibold text-white transition-colors mt-2 flex items-center justify-center gap-2"
+          className="w-full rounded-xl bg-[#f89a14] hover:bg-[#d97a1b] disabled:opacity-60 px-4 py-2.5 font-heading font-semibold text-white transition-colors mt-2 flex items-center justify-center gap-2"
         >
           {loading && (
             <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin shrink-0" />
@@ -108,7 +108,7 @@ export default function LoginPage() {
 
       <p className="text-center font-nunito text-[13px] text-[#131936]/50 mt-6">
         Don&apos;t have an account?{' '}
-        <Link href="/signup" className="font-semibold text-[#f08c21] hover:text-[#d97a1b] transition-colors">
+        <Link href="/signup" className="font-semibold text-[#f89a14] hover:text-[#d97a1b] transition-colors">
           Sign up
         </Link>
       </p>

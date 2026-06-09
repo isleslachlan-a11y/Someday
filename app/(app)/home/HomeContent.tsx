@@ -79,7 +79,7 @@ function GridSkeleton() {
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-      <p className="font-brice font-bold text-[#131936] text-[16px]">
+      <p className="font-display font-bold text-[#131936] text-[16px]">
         Couldn&apos;t load right now
       </p>
       <p className="font-nunito text-[#131936]/60 text-[13px] mt-1">
@@ -286,7 +286,7 @@ export default function HomeContent({
                 />
               ) : (
                 <div className="w-8 h-8 rounded-full bg-[#131936] flex items-center justify-center">
-                  <span className="font-brice font-bold text-[#f08c21] text-[13px]">{initials}</span>
+                  <span className="font-display font-bold text-[#f89a14] text-[13px]">{initials}</span>
                 </div>
               )}
             </Link>
@@ -294,7 +294,7 @@ export default function HomeContent({
 
           {/* Centre: wordmark */}
           <div className="flex justify-center">
-            <span className="font-brice font-bold text-[#131936] text-[18px] tracking-widest uppercase">
+            <span className="font-display font-bold text-[#131936] text-[18px] tracking-widest uppercase">
               SOMEDAY
             </span>
           </div>
@@ -318,8 +318,8 @@ export default function HomeContent({
         {/* First-session welcome banner */}
         {isFirstSession && (
           <div className="mb-5 rounded-2xl bg-[#131936] px-5 py-4 relative overflow-hidden">
-            <div className="absolute top-3 right-4 text-[#f08c21] text-[24px] opacity-40 select-none">✦</div>
-            <p className="font-brice font-bold text-white text-[16px] mb-1">
+            <div className="absolute top-3 right-4 text-[#f89a14] text-[24px] opacity-40 select-none">✦</div>
+            <p className="font-display font-bold text-white text-[16px] mb-1">
               Your Someday starts here.
             </p>
             <p className="font-nunito text-white/60 text-[13px] leading-relaxed">
@@ -331,7 +331,7 @@ export default function HomeContent({
             <div className="flex gap-2 mt-3">
               <Link
                 href="/discover"
-                className="px-4 py-1.5 rounded-full bg-[#f08c21] text-[#131936] font-nunito font-semibold text-[12px]"
+                className="px-4 py-1.5 rounded-full bg-[#f89a14] text-[#131936] font-nunito font-semibold text-[12px]"
               >
                 Explore →
               </Link>
@@ -348,7 +348,7 @@ export default function HomeContent({
         {/* Search bar */}
         <form onSubmit={handleSearchSubmit} className="mb-5">
           <div className="relative flex items-center gap-2 bg-white rounded-full border border-[#fcd99a] px-4 h-11">
-            <Search size={16} className="text-[#f08c21] shrink-0" />
+            <Search size={16} className="text-[#f89a14] shrink-0" />
             <input
               type="text"
               value={searchQuery}
@@ -382,8 +382,8 @@ export default function HomeContent({
         {startHerePlaces.length > 0 && isNewUser && (
           <div className="mt-5 mb-1">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="font-brice font-bold text-[#131936] text-[16px]">Start here</h2>
-              <Link href="/discover" className="font-nunito text-[#f08c21] text-[13px]">see all →</Link>
+              <h2 className="font-display font-bold text-[#131936] text-[16px]">Start here</h2>
+              <Link href="/discover" className="font-nunito text-[#f89a14] text-[13px]">see all →</Link>
             </div>
             <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-none">
               {startHerePlaces.map((place, i) => (
@@ -404,10 +404,10 @@ export default function HomeContent({
         {/* Bucket list section */}
         <div className="mt-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-brice font-bold text-[#131936] text-[18px]">
+            <h2 className="font-display font-bold text-[#131936] text-[18px]">
               {isNewUser ? 'Start building your list' : isPersonalised ? 'Picked for you' : 'For your bucket list'}
             </h2>
-            <Link href="/list" className="font-nunito text-[13px] text-[#f08c21]">
+            <Link href="/list" className="font-nunito text-[13px] text-[#f89a14]">
               See all →
             </Link>
           </div>
@@ -444,7 +444,7 @@ export default function HomeContent({
               {/* Loading spinner */}
               {loadingMore && (
                 <div className="flex justify-center py-4">
-                  <div className="w-5 h-5 rounded-full border-2 border-[#f08c21] border-t-transparent animate-spin" />
+                  <div className="w-5 h-5 rounded-full border-2 border-[#f89a14] border-t-transparent animate-spin" />
                 </div>
               )}
 

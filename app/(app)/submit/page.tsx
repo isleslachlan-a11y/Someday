@@ -67,7 +67,7 @@ export default async function SubmitPage() {
         <div className="max-w-[480px] mx-auto px-4 h-14 grid grid-cols-3 items-center">
           <SubmitBackButton />
           <div className="flex justify-center">
-            <span className="font-brice font-bold text-[#131936] text-[17px]">
+            <span className="font-display font-bold text-[#131936] text-[17px]">
               {isAdmin ? 'Add a Place' : 'Submit a Place'}
             </span>
           </div>
@@ -88,7 +88,7 @@ export default async function SubmitPage() {
                 >
                   <Map size={16} className="text-[#131936]" />
                 </Link>
-                <span className="px-2 py-0.5 rounded-full bg-[#f08c21] text-[#131936] font-nunito font-bold text-[10px] uppercase tracking-wider">
+                <span className="px-2 py-0.5 rounded-full bg-[#f89a14] text-[#131936] font-nunito font-bold text-[10px] uppercase tracking-wider">
                   Admin
                 </span>
               </div>
@@ -105,7 +105,7 @@ export default async function SubmitPage() {
         ) : (
           <>
             <div className="mb-6">
-              <h1 className="font-brice text-[22px] font-bold text-[#131936]">
+              <h1 className="font-display text-[22px] font-bold text-[#131936]">
                 Know somewhere we should add?
               </h1>
               <p className="font-nunito text-[#131936]/50 text-[14px] mt-2 leading-relaxed">
@@ -116,7 +116,7 @@ export default async function SubmitPage() {
             <SubmitTypeSelector userId={user.id} />
             {submissions.length > 0 && (
               <section className="mt-10">
-                <h2 className="font-brice font-bold text-[#131936] mb-4">Your submissions</h2>
+                <h2 className="font-display font-bold text-[#131936] mb-4">Your submissions</h2>
                 <div className="space-y-3">
                   {submissions.map(s => (
                     <SubmissionRow key={s.id} submission={s} />
@@ -166,7 +166,7 @@ function SubmissionRow({ submission }: { submission: Submission }) {
         </span>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-0.5">
-            <p className="font-brice font-bold text-[#131936] leading-snug">{submission.name}</p>
+            <p className="font-display font-bold text-[#131936] leading-snug">{submission.name}</p>
             <span
               className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold whitespace-nowrap ${STATUS_BADGE[submission.status]}`}
             >

@@ -100,7 +100,7 @@ export default function EditProfileForm({ profile }: Props) {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="relative rounded-full overflow-hidden focus:outline-none focus:ring-2 focus:ring-[#f08c21]"
+            className="relative rounded-full overflow-hidden focus:outline-none focus:ring-2 focus:ring-[#f89a14]"
             aria-label="Change avatar"
           >
             {displayAvatar ? (
@@ -113,7 +113,7 @@ export default function EditProfileForm({ profile }: Props) {
               />
             ) : (
               <div
-                className="rounded-full bg-[#f08c21]/20 border border-[#f08c21]/30 flex items-center justify-center font-brice font-bold text-[#f08c21]"
+                className="rounded-full bg-[#f89a14]/20 border border-[#f89a14]/30 flex items-center justify-center font-display font-bold text-[#f89a14]"
                 style={{ width: 72, height: 72, fontSize: 25 }}
               >
                 {username.slice(0, 2).toUpperCase()}
@@ -128,7 +128,7 @@ export default function EditProfileForm({ profile }: Props) {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="text-sm text-[#f08c21] hover:text-[#131936] transition-colors"
+              className="text-sm text-[#f89a14] hover:text-[#131936] transition-colors"
             >
               Upload photo
             </button>
@@ -158,7 +158,7 @@ export default function EditProfileForm({ profile }: Props) {
           onChange={e => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
           maxLength={20}
           required
-          className="w-full rounded-xl bg-white border border-[#fcd99a]/40 px-4 py-2.5 text-sm text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:ring-2 focus:ring-[#f08c21] transition"
+          className="w-full rounded-xl bg-white border border-[#fcd99a]/40 px-4 py-2.5 text-sm text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:ring-2 focus:ring-[#f89a14] transition"
         />
         <p className="text-xs text-[#131936]/50 mt-1">3–20 characters: letters, numbers, underscores.</p>
       </div>
@@ -176,7 +176,7 @@ export default function EditProfileForm({ profile }: Props) {
           rows={3}
           maxLength={200}
           placeholder="Tell people about your travel style…"
-          className="w-full rounded-xl bg-white border border-[#fcd99a]/40 px-4 py-2.5 text-sm text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:ring-2 focus:ring-[#f08c21] transition resize-none"
+          className="w-full rounded-xl bg-white border border-[#fcd99a]/40 px-4 py-2.5 text-sm text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:ring-2 focus:ring-[#f89a14] transition resize-none"
         />
         <p className="text-xs text-[#131936]/50 mt-1 text-right">{bio.length}/200</p>
       </div>
@@ -186,7 +186,7 @@ export default function EditProfileForm({ profile }: Props) {
         <button
           type="submit"
           disabled={isPending}
-          className="flex-1 rounded-xl bg-[#f08c21] hover:bg-[#f08c21]/90 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2.5 font-brice font-semibold text-[#131936] text-sm transition-colors"
+          className="flex-1 rounded-xl bg-[#f89a14] hover:bg-[#f89a14]/90 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2.5 font-heading font-semibold text-[#131936] text-sm transition-colors"
         >
           {isPending ? 'Saving…' : 'Save changes'}
         </button>

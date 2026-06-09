@@ -142,7 +142,7 @@ export default function SubmissionReview({ submissions: initial }: Props) {
               rounded-full border font-nunito text-[12px] font-medium
               transition-all ${
               filter === f.value
-                ? 'bg-[#f08c21] border-[#f08c21] text-white'
+                ? 'bg-[#f89a14] border-[#f89a14] text-white'
                 : 'bg-white border-[#fcd99a] text-[#131936]/60'
             }`}
           >
@@ -162,7 +162,7 @@ export default function SubmissionReview({ submissions: initial }: Props) {
       {filtered.length === 0 && (
         <div className="text-center py-16">
           <p className="text-[32px] mb-3">✦</p>
-          <p className="font-brice font-bold text-[#131936] text-[16px]">
+          <p className="font-display font-bold text-[#131936] text-[16px]">
             {filter === 'pending' ? 'All caught up' : 'Nothing here'}
           </p>
           <p className="font-nunito text-[#131936]/40 text-[13px] mt-1">
@@ -209,7 +209,7 @@ export default function SubmissionReview({ submissions: initial }: Props) {
                 {/* Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="font-brice font-bold text-[#131936] text-[15px] leading-tight">
+                    <p className="font-display font-bold text-[#131936] text-[15px] leading-tight">
                       {sub.name}
                     </p>
                     <StatusBadge status={sub.status} />
@@ -313,7 +313,7 @@ export default function SubmissionReview({ submissions: initial }: Props) {
                       value={rejectNote}
                       onChange={e => setRejectNote(e.target.value)}
                       placeholder="Optional note to the submitter…"
-                      className="w-full rounded-xl border border-[#fcd99a] bg-white px-3 py-2.5 font-nunito text-[13px] text-[#131936] placeholder:text-[#131936]/30 focus:outline-none focus:ring-2 focus:ring-[#f08c21]/30 resize-none"
+                      className="w-full rounded-xl border border-[#fcd99a] bg-white px-3 py-2.5 font-nunito text-[13px] text-[#131936] placeholder:text-[#131936]/30 focus:outline-none focus:ring-2 focus:ring-[#f89a14]/30 resize-none"
                     />
                   )}
 
@@ -324,7 +324,7 @@ export default function SubmissionReview({ submissions: initial }: Props) {
                         <button
                           onClick={() => void handleApprove(sub)}
                           disabled={isLoading}
-                          className="flex-1 flex items-center justify-center gap-1.5 h-11 rounded-full bg-[#131936] text-white font-brice font-bold text-[13px] disabled:opacity-50 transition-opacity"
+                          className="flex-1 flex items-center justify-center gap-1.5 h-11 rounded-full bg-[#131936] text-white font-display font-bold text-[13px] disabled:opacity-50 transition-opacity"
                         >
                           <CheckCircle size={15} />
                           {isLoading ? 'Adding…' : 'Approve'}
@@ -335,7 +335,7 @@ export default function SubmissionReview({ submissions: initial }: Props) {
                             <button
                               onClick={() => void handleReject(sub)}
                               disabled={isLoading}
-                              className="flex-1 flex items-center justify-center gap-1.5 h-11 rounded-full bg-red-500 text-white font-brice font-bold text-[13px] disabled:opacity-50"
+                              className="flex-1 flex items-center justify-center gap-1.5 h-11 rounded-full bg-red-500 text-white font-display font-bold text-[13px] disabled:opacity-50"
                             >
                               <XCircle size={15} />
                               {isLoading ? 'Rejecting…' : 'Confirm reject'}
@@ -350,7 +350,7 @@ export default function SubmissionReview({ submissions: initial }: Props) {
                         ) : (
                           <button
                             onClick={() => setRejectingId(sub.id)}
-                            className="flex-1 flex items-center justify-center gap-1.5 h-11 rounded-full border border-red-200 bg-red-50 text-red-500 font-brice font-bold text-[13px]"
+                            className="flex-1 flex items-center justify-center gap-1.5 h-11 rounded-full border border-red-200 bg-red-50 text-red-500 font-display font-bold text-[13px]"
                           >
                             <XCircle size={15} />
                             Reject

@@ -1,20 +1,49 @@
 @import "tailwindcss";
 @config "../tailwind.config.ts";
 
-@theme inline {
-  /* Brand colours */
-  --color-indigo-deep: #0D0B1E;
-  --color-lavender: #C8B8FF;
-  --color-violet-accent: #7B4FE8;
-  --color-pink-accent: #FF8FAB;
-  --color-white-soft: #F0EEFF;
-  --color-muted: #7A7A9A;
+/*
+ * BRICE FONT — MANUAL INSTALLATION REQUIRED
+ * Place the following files in /public/fonts/brice/ after purchasing the
+ * commercial app licence from Studio Sun (https://www.fontspring.com/fonts/studio-sun/brice):
+ *   - BriceSemiCondensed-ExtraBold.woff2
+ *   - BriceSemiCondensed-ExtraBold.woff
+ * The @font-face block below will activate once those files are present.
+ */
 
-  /* Typography — Brice family (Barlow stand-in) */
-  --font-brice:            var(--font-brice);
-  --font-brice-condensed:  var(--font-brice-condensed);
-  --font-brice-tight:      var(--font-brice-tight);
-  --font-nunito:           var(--font-nunito);
+@font-face {
+  font-family: 'Brice';
+  src:
+    url('/fonts/brice/BriceSemiCondensed-ExtraBold.woff2') format('woff2'),
+    url('/fonts/brice/BriceSemiCondensed-ExtraBold.woff') format('woff');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme inline {
+  /* App palette */
+  --color-indigo-deep:   #0D0B1E;
+  --color-lavender:      #C8B8FF;
+  --color-violet-accent: #7B4FE8;
+  --color-pink-accent:   #FF8FAB;
+  --color-white-soft:    #F0EEFF;
+  --color-muted:         #7A7A9A;
+
+  /* Brand palette v2 */
+  --color-amber:           #f89a14;
+  --color-navy:            #131936;
+  --color-mango:           #fcd99a;
+  --color-warm-white:      #fff9f0;
+  --color-gradient-start:  #f89a14;
+  --color-gradient-end:    #f24023;
+  --color-primary:         #f89a14;
+  --color-surface:         #131936;
+  --color-background:      #fff9f0;
+
+  /* Typography — next/font CSS variables */
+  --font-dm-sans: var(--font-dm-sans);
+  --font-nunito:  var(--font-nunito);
+  --font-dm-mono: var(--font-dm-mono);
 }
 
 :root {
@@ -26,12 +55,59 @@
   --sab: env(safe-area-inset-bottom);
   --sal: env(safe-area-inset-left);
   --sar: env(safe-area-inset-right);
+
+  /* Brand colours */
+  --color-amber:           #f89a14;
+  --color-navy:            #131936;
+  --color-mango:           #fcd99a;
+  --color-warm-white:      #fff9f0;
+  --color-gradient-start:  #f89a14;
+  --color-gradient-end:    #f24023;
+
+  /* Semantic aliases */
+  --color-primary:  var(--color-amber);
+  --color-surface:  var(--color-navy);
+  --color-bg:       var(--color-warm-white);
+
+  /* Typography */
+  --font-display: 'Brice', serif;
+  --font-heading: var(--font-dm-sans), sans-serif;
+  --font-body:    var(--font-nunito), sans-serif;
+  --font-mono:    var(--font-dm-mono), monospace;
 }
 
 body {
+  font-family: var(--font-body);
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-nunito), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Display — Brice only, headings 24px+ on marketing/hero surfaces */
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+
+/* UI headings — DM Sans */
+.font-heading {
+  font-family: var(--font-heading);
+}
+
+/* Body and UI copy — Nunito */
+.font-body {
+  font-family: var(--font-body);
+}
+
+/* Mono — DM Mono, numbers/stats only */
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Amber gradient — logo and hero elements only, never on interactive UI */
+.gradient-brand {
+  background: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-end));
 }
 
 /* ─── Scrollbar suppression ───────────────────────────────────────────────── */

@@ -198,9 +198,9 @@ export default function FriendsSheet({ initialFriendCount }: Props) {
       {/* Trigger button — rendered inline by the profile page */}
       <button
         onClick={open}
-        className="flex flex-col items-center gap-0.5 rounded-2xl border border-[#fcd99a]/40 bg-white px-4 py-5 text-center hover:border-[#f08c21]/30 hover:bg-white transition-colors cursor-pointer"
+        className="flex flex-col items-center gap-0.5 rounded-2xl border border-[#fcd99a]/40 bg-white px-4 py-5 text-center hover:border-[#f89a14]/30 hover:bg-white transition-colors cursor-pointer"
       >
-        <p className="font-brice text-3xl font-bold text-[#f08c21]">{friendCount}</p>
+        <p className="font-display text-3xl font-bold text-[#f89a14]">{friendCount}</p>
         <p className="text-[#131936]/50 text-xs mt-1">Friends</p>
       </button>
 
@@ -224,7 +224,7 @@ export default function FriendsSheet({ initialFriendCount }: Props) {
 
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-[#fcd99a]/40 shrink-0">
-              <h2 className="font-brice text-lg font-bold text-[#131936]">Friends</h2>
+              <h2 className="font-display text-lg font-bold text-[#131936]">Friends</h2>
               <button
                 onClick={close}
                 className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-white text-[#131936]/50 hover:text-[#131936] transition-colors"
@@ -246,7 +246,7 @@ export default function FriendsSheet({ initialFriendCount }: Props) {
                   onClick={() => setActiveTab(id)}
                   className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-semibold font-nunito transition-colors relative ${
                     activeTab === id
-                      ? 'text-[#f08c21]'
+                      ? 'text-[#f89a14]'
                       : 'text-[#131936]/50 hover:text-[#131936]'
                   }`}
                 >
@@ -258,7 +258,7 @@ export default function FriendsSheet({ initialFriendCount }: Props) {
                     </span>
                   )}
                   {activeTab === id && (
-                    <span className="absolute bottom-0 left-4 right-4 h-[2px] bg-[#f08c21] rounded-full" />
+                    <span className="absolute bottom-0 left-4 right-4 h-[2px] bg-[#f89a14] rounded-full" />
                   )}
                 </button>
               ))}
@@ -323,7 +323,7 @@ function FriendsTab({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-16">
-        <div className="w-6 h-6 border-2 border-[#f08c21]/30 border-t-violet-accent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-[#f89a14]/30 border-t-violet-accent rounded-full animate-spin" />
       </div>
     )
   }
@@ -354,7 +354,7 @@ function FriendsTab({
                   @{friend.username ?? 'unknown'}
                 </p>
                 {count > 0 ? (
-                  <p className="text-xs text-[#f08c21] mt-0.5">
+                  <p className="text-xs text-[#f89a14] mt-0.5">
                     {count} place{count !== 1 ? 's' : ''} in common
                   </p>
                 ) : (
@@ -374,7 +374,7 @@ function FriendsTab({
               className="flex items-center justify-center w-9 h-9 rounded-full border border-[#fcd99a]/50 text-[#131936]/50 hover:text-[#131936] hover:border-[#fcd99a]/60 transition-colors disabled:opacity-40 shrink-0"
             >
               {messaging === friend.id
-                ? <div className="w-4 h-4 border-2 border-[#f08c21]/30 border-t-violet-accent rounded-full animate-spin" />
+                ? <div className="w-4 h-4 border-2 border-[#f89a14]/30 border-t-violet-accent rounded-full animate-spin" />
                 : <MessageCircle size={16} />
               }
             </button>
@@ -401,7 +401,7 @@ function RequestsTab({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-16">
-        <div className="w-6 h-6 border-2 border-[#f08c21]/30 border-t-violet-accent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-[#f89a14]/30 border-t-violet-accent rounded-full animate-spin" />
       </div>
     )
   }
@@ -438,7 +438,7 @@ function RequestsTab({
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => onAccept(req.friendshipId)}
-              className="px-3 py-1.5 rounded-lg bg-[#f08c21] hover:bg-[#f08c21]/90 text-white text-xs font-semibold transition-colors min-h-[36px]"
+              className="px-3 py-1.5 rounded-lg bg-[#f89a14] hover:bg-[#f89a14]/90 text-white text-xs font-semibold transition-colors min-h-[36px]"
             >
               Accept
             </button>
@@ -485,7 +485,7 @@ function DiscoverTab({
             placeholder="Search by username…"
             value={searchQuery}
             onChange={e => onSearchChange(e.target.value)}
-            className="w-full h-11 pl-9 pr-4 rounded-xl bg-white border border-[#fcd99a]/40 text-sm text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:border-[#f08c21]/40 transition-colors"
+            className="w-full h-11 pl-9 pr-4 rounded-xl bg-white border border-[#fcd99a]/40 text-sm text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:border-[#f89a14]/40 transition-colors"
           />
         </div>
       </div>
@@ -510,7 +510,7 @@ function SearchResults({
   if (isSearching) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-5 h-5 border-2 border-[#f08c21]/30 border-t-violet-accent rounded-full animate-spin" />
+        <div className="w-5 h-5 border-2 border-[#f89a14]/30 border-t-violet-accent rounded-full animate-spin" />
       </div>
     )
   }
@@ -540,7 +540,7 @@ function Suggestions({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-5 h-5 border-2 border-[#f08c21]/30 border-t-violet-accent rounded-full animate-spin" />
+        <div className="w-5 h-5 border-2 border-[#f89a14]/30 border-t-violet-accent rounded-full animate-spin" />
       </div>
     )
   }

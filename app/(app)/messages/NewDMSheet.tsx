@@ -76,7 +76,7 @@ export default function NewDMSheet() {
 
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-[#fcd99a]/40 shrink-0">
-              <h2 className="font-brice text-lg font-bold text-[#131936]">New message</h2>
+              <h2 className="font-display text-lg font-bold text-[#131936]">New message</h2>
               <button
                 onClick={() => setIsOpen(false)}
                 className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-white text-[#131936]/50 hover:text-[#131936] transition-colors"
@@ -90,7 +90,7 @@ export default function NewDMSheet() {
             <div className="flex-1 overflow-y-auto">
               {isPending && friends === null ? (
                 <div className="flex items-center justify-center py-12">
-                  <div className="w-6 h-6 border-2 border-[#f08c21]/30 border-t-violet-accent rounded-full animate-spin" />
+                  <div className="w-6 h-6 border-2 border-[#f89a14]/30 border-t-violet-accent rounded-full animate-spin" />
                 </div>
               ) : !friends || friends.length === 0 ? (
                 <div className="px-5 py-10 text-center">

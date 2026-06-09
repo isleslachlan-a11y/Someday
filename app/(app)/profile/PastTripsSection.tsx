@@ -23,10 +23,10 @@ export default function PastTripsSection({ trips: initialTrips }: Props) {
   return (
     <section className="mb-8">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="font-brice font-bold text-[#131936]">Past Trips</h2>
+        <h2 className="font-display font-bold text-[#131936]">Past Trips</h2>
         <button
           onClick={() => setShowAdd(true)}
-          className="text-xs font-semibold text-[#f08c21] hover:text-[#131936] transition-colors"
+          className="text-xs font-semibold text-[#f89a14] hover:text-[#131936] transition-colors"
         >
           + Add
         </button>
@@ -38,7 +38,7 @@ export default function PastTripsSection({ trips: initialTrips }: Props) {
             No past trips recorded.{' '}
             <button
               onClick={() => setShowAdd(true)}
-              className="text-[#f08c21] hover:text-[#131936] transition-colors"
+              className="text-[#f89a14] hover:text-[#131936] transition-colors"
             >
               Add one →
             </button>
@@ -107,7 +107,7 @@ function TripRow({
           <button
             onClick={handleDelete}
             disabled={isPending}
-            className="text-[#f08c21] hover:text-[#f08c21]/80 font-semibold transition-colors"
+            className="text-[#f89a14] hover:text-[#f89a14]/80 font-semibold transition-colors"
           >
             {isPending ? '…' : 'Remove'}
           </button>
@@ -147,7 +147,7 @@ function AddTripModal({
   const [year, setYear] = useState('')
 
   const INPUT_CLASS =
-    'w-full rounded-xl bg-white border border-[#fcd99a]/40 px-4 py-3 text-[#131936] placeholder:text-[#131936]/40 text-sm focus:outline-none focus:border-[#f08c21]/60 transition-colors'
+    'w-full rounded-xl bg-white border border-[#fcd99a]/40 px-4 py-3 text-[#131936] placeholder:text-[#131936]/40 text-sm focus:outline-none focus:border-[#f89a14]/60 transition-colors'
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -191,7 +191,7 @@ function AddTripModal({
         </div>
 
         <div className="px-5 pb-10">
-          <h2 className="font-brice font-bold text-xl text-[#131936] mb-5">Add Past Trip</h2>
+          <h2 className="font-display font-bold text-xl text-[#131936] mb-5">Add Past Trip</h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -246,7 +246,7 @@ function AddTripModal({
               <button
                 type="submit"
                 disabled={isPending || !placeName.trim()}
-                className="flex-1 rounded-xl bg-[#f08c21] hover:bg-[#f08c21]/90 disabled:opacity-50 py-3 text-sm font-brice font-semibold text-[#131936] transition-colors"
+                className="flex-1 rounded-xl bg-[#f89a14] hover:bg-[#f89a14]/90 disabled:opacity-50 py-3 text-sm font-heading font-semibold text-[#131936] transition-colors"
               >
                 {isPending ? 'Adding…' : 'Add Trip'}
               </button>

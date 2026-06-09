@@ -68,7 +68,7 @@ export function WaitlistForm() {
             value={userName}
             onChange={e => setUserName(e.target.value)}
             placeholder="Your first name"
-            className="w-full rounded-2xl bg-white border border-[rgba(252,217,154,0.5)] px-5 py-4 font-nunito text-[#131936] text-[15px] placeholder:text-[rgba(19,25,54,0.35)] focus:outline-none focus:border-[#f08c21] transition-colors"
+            className="w-full rounded-2xl bg-white border border-[rgba(252,217,154,0.5)] px-5 py-4 font-nunito text-[#131936] text-[15px] placeholder:text-[rgba(19,25,54,0.35)] focus:outline-none focus:border-[#f89a14] transition-colors"
           />
           <div>
             <input
@@ -76,7 +76,7 @@ export function WaitlistForm() {
               value={email}
               onChange={e => { setEmail(e.target.value); setEmailError('') }}
               placeholder="your@email.com"
-              className={`w-full rounded-2xl bg-white border px-5 py-4 font-nunito text-[#131936] text-[15px] placeholder:text-[rgba(19,25,54,0.35)] focus:outline-none transition-colors ${emailError ? 'border-red-400 focus:border-red-400' : 'border-[rgba(252,217,154,0.5)] focus:border-[#f08c21]'}`}
+              className={`w-full rounded-2xl bg-white border px-5 py-4 font-nunito text-[#131936] text-[15px] placeholder:text-[rgba(19,25,54,0.35)] focus:outline-none transition-colors ${emailError ? 'border-red-400 focus:border-red-400' : 'border-[rgba(252,217,154,0.5)] focus:border-[#f89a14]'}`}
             />
             {emailError && (
               <p className="font-nunito text-[12px] text-red-500 mt-1.5 px-1">{emailError}</p>
@@ -86,7 +86,7 @@ export function WaitlistForm() {
             type="button"
             onClick={() => void handleJoin()}
             disabled={submitting || !canJoin}
-            className="w-full rounded-2xl bg-[#f08c21] text-white font-brice font-bold text-[16px] px-8 py-4 disabled:opacity-40 transition-opacity active:scale-[0.98]"
+            className="w-full rounded-2xl bg-[#f89a14] text-white font-display font-bold text-[16px] px-8 py-4 disabled:opacity-40 transition-opacity active:scale-[0.98]"
           >
             {submitting ? 'Joining…' : 'Join the waitlist ✦'}
           </button>
@@ -103,7 +103,7 @@ export function WaitlistForm() {
               Know somewhere worth adding?
             </span>
             <span
-              className="text-[#f08c21] text-[16px] transition-transform duration-200 shrink-0"
+              className="text-[#f89a14] text-[16px] transition-transform duration-200 shrink-0"
               style={{ transform: suggestionOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
             >
               ↓
@@ -124,7 +124,7 @@ export function WaitlistForm() {
                   value={placeName}
                   onChange={e => setPlaceName(e.target.value)}
                   placeholder="e.g. Chefchaouen, Morocco"
-                  className="w-full rounded-xl bg-[#fff9f0] border border-[rgba(252,217,154,0.5)] px-4 py-3 font-nunito text-[#131936] text-[14px] placeholder:text-[rgba(19,25,54,0.3)] focus:outline-none focus:border-[#f08c21] transition-colors"
+                  className="w-full rounded-xl bg-[#fff9f0] border border-[rgba(252,217,154,0.5)] px-4 py-3 font-nunito text-[#131936] text-[14px] placeholder:text-[rgba(19,25,54,0.3)] focus:outline-none focus:border-[#f89a14] transition-colors"
                 />
               </div>
               <div>
@@ -137,7 +137,7 @@ export function WaitlistForm() {
                       key={t}
                       type="button"
                       onClick={() => setSubmissionType(t)}
-                      className={`flex-1 py-2.5 rounded-xl font-nunito font-semibold text-[13px] border transition-all ${submissionType === t ? 'bg-[#f08c21] text-white border-[#f08c21]' : 'bg-white text-[rgba(19,25,54,0.55)] border-[rgba(252,217,154,0.5)] hover:border-[#f08c21]/60'}`}
+                      className={`flex-1 py-2.5 rounded-xl font-nunito font-semibold text-[13px] border transition-all ${submissionType === t ? 'bg-[#f89a14] text-white border-[#f89a14]' : 'bg-white text-[rgba(19,25,54,0.55)] border-[rgba(252,217,154,0.5)] hover:border-[#f89a14]/60'}`}
                     >
                       {t.charAt(0).toUpperCase() + t.slice(1)}
                     </button>
@@ -154,7 +154,7 @@ export function WaitlistForm() {
                   placeholder="e.g. Hike to the blue gates at sunrise before the crowds arrive"
                   rows={3}
                   maxLength={200}
-                  className="w-full rounded-xl bg-[#fff9f0] border border-[rgba(252,217,154,0.5)] px-4 py-3 font-nunito text-[#131936] text-[14px] placeholder:text-[rgba(19,25,54,0.3)] focus:outline-none focus:border-[#f08c21] transition-colors resize-none"
+                  className="w-full rounded-xl bg-[#fff9f0] border border-[rgba(252,217,154,0.5)] px-4 py-3 font-nunito text-[#131936] text-[14px] placeholder:text-[rgba(19,25,54,0.3)] focus:outline-none focus:border-[#f89a14] transition-colors resize-none"
                 />
               </div>
               <button
@@ -170,7 +170,7 @@ export function WaitlistForm() {
 
           {suggestionOpen && suggestionDone && (
             <div className="px-5 pb-5 pt-4 border-t border-[rgba(252,217,154,0.5)] text-center">
-              <p className="font-brice font-bold text-[#f08c21] text-[14px] mb-1">✦ Noted.</p>
+              <p className="font-display font-bold text-[#f89a14] text-[14px] mb-1">✦ Noted.</p>
               <p className="font-nunito text-[rgba(19,25,54,0.5)] text-[13px]">
                 We&apos;ll make sure {placeName} is in the catalogue.
               </p>
@@ -185,10 +185,10 @@ export function WaitlistForm() {
   return (
     <div>
       <div className="text-center mb-8">
-        <div className="w-16 h-16 rounded-full bg-[#f08c21]/10 flex items-center justify-center mx-auto mb-4">
-          <span className="text-[#f08c21] text-[28px] leading-none">✦</span>
+        <div className="w-16 h-16 rounded-full bg-[#f89a14]/10 flex items-center justify-center mx-auto mb-4">
+          <span className="text-[#f89a14] text-[28px] leading-none">✦</span>
         </div>
-        <h2 className="font-brice font-bold text-[#131936] text-[22px] mb-2">
+        <h2 className="font-display font-bold text-[#131936] text-[22px] mb-2">
           You&apos;re on the list{userName ? `, ${userName.split(' ')[0]}` : ''}.
         </h2>
         <p className="font-nunito text-[rgba(19,25,54,0.55)] text-[14px]">
@@ -197,7 +197,7 @@ export function WaitlistForm() {
       </div>
 
       <div className="rounded-2xl border border-[rgba(252,217,154,0.5)] bg-white p-6 mb-5 text-center">
-        <p className="font-brice font-bold text-[#131936] text-[15px] mb-1">Follow along while we build</p>
+        <p className="font-display font-bold text-[#131936] text-[15px] mb-1">Follow along while we build</p>
         <p className="font-nunito text-[rgba(19,25,54,0.5)] text-[13px] mb-5">
           Behind-the-scenes, new destinations, and early access news.
         </p>
@@ -206,7 +206,7 @@ export function WaitlistForm() {
 
       {!suggestionDone ? (
         <div className="rounded-2xl border border-[rgba(252,217,154,0.5)] bg-white p-5">
-          <p className="font-brice font-bold text-[#131936] text-[15px] mb-1">
+          <p className="font-display font-bold text-[#131936] text-[15px] mb-1">
             Know somewhere worth adding?
           </p>
           <p className="font-nunito text-[rgba(19,25,54,0.5)] text-[12px] mb-4">
@@ -218,7 +218,7 @@ export function WaitlistForm() {
               value={placeName}
               onChange={e => setPlaceName(e.target.value)}
               placeholder="e.g. Chefchaouen, Morocco"
-              className="w-full rounded-xl bg-[#fff9f0] border border-[rgba(252,217,154,0.5)] px-4 py-3 font-nunito text-[#131936] text-[14px] placeholder:text-[rgba(19,25,54,0.3)] focus:outline-none focus:border-[#f08c21] transition-colors"
+              className="w-full rounded-xl bg-[#fff9f0] border border-[rgba(252,217,154,0.5)] px-4 py-3 font-nunito text-[#131936] text-[14px] placeholder:text-[rgba(19,25,54,0.3)] focus:outline-none focus:border-[#f89a14] transition-colors"
             />
             <div className="flex gap-2">
               {(['destination', 'experience'] as const).map(t => (
@@ -226,7 +226,7 @@ export function WaitlistForm() {
                   key={t}
                   type="button"
                   onClick={() => setSubmissionType(t)}
-                  className={`flex-1 py-2.5 rounded-xl font-nunito font-semibold text-[13px] border transition-all ${submissionType === t ? 'bg-[#f08c21] text-white border-[#f08c21]' : 'bg-white text-[rgba(19,25,54,0.55)] border-[rgba(252,217,154,0.5)]'}`}
+                  className={`flex-1 py-2.5 rounded-xl font-nunito font-semibold text-[13px] border transition-all ${submissionType === t ? 'bg-[#f89a14] text-white border-[#f89a14]' : 'bg-white text-[rgba(19,25,54,0.55)] border-[rgba(252,217,154,0.5)]'}`}
                 >
                   {t.charAt(0).toUpperCase() + t.slice(1)}
                 </button>
@@ -238,7 +238,7 @@ export function WaitlistForm() {
               placeholder="The one thing everyone should do there…"
               rows={2}
               maxLength={200}
-              className="w-full rounded-xl bg-[#fff9f0] border border-[rgba(252,217,154,0.5)] px-4 py-3 font-nunito text-[#131936] text-[14px] placeholder:text-[rgba(19,25,54,0.3)] focus:outline-none focus:border-[#f08c21] transition-colors resize-none"
+              className="w-full rounded-xl bg-[#fff9f0] border border-[rgba(252,217,154,0.5)] px-4 py-3 font-nunito text-[#131936] text-[14px] placeholder:text-[rgba(19,25,54,0.3)] focus:outline-none focus:border-[#f89a14] transition-colors resize-none"
             />
             <button
               type="button"
@@ -252,7 +252,7 @@ export function WaitlistForm() {
         </div>
       ) : (
         <div className="rounded-2xl border border-[rgba(252,217,154,0.5)] bg-white p-5 text-center">
-          <p className="font-brice font-bold text-[#f08c21] text-[16px] mb-1">✦ Noted.</p>
+          <p className="font-display font-bold text-[#f89a14] text-[16px] mb-1">✦ Noted.</p>
           <p className="font-nunito text-[rgba(19,25,54,0.5)] text-[13px]">
             We&apos;ll make sure {placeName} makes it into the catalogue.
           </p>

@@ -262,11 +262,11 @@ export default function DestinationSubmitForm({ userId, onBack }: Props) {
                 onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
                 placeholder="Start typing…"
                 autoComplete="off"
-                className="w-full rounded-2xl border-2 border-[#fcd99a] bg-white px-5 py-4 font-brice font-bold text-[#131936] text-[20px] placeholder:text-[#131936]/20 placeholder:font-nunito placeholder:font-normal placeholder:text-[16px] focus:outline-none focus:border-[#f08c21] transition-colors"
+                className="w-full rounded-2xl border-2 border-[#fcd99a] bg-white px-5 py-4 font-display font-bold text-[#131936] text-[20px] placeholder:text-[#131936]/20 placeholder:font-nunito placeholder:font-normal placeholder:text-[16px] focus:outline-none focus:border-[#f89a14] transition-colors"
               />
               {searching && (
                 <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                  <div className="w-5 h-5 rounded-full border-2 border-[#f08c21] border-t-transparent animate-spin" />
+                  <div className="w-5 h-5 rounded-full border-2 border-[#f89a14] border-t-transparent animate-spin" />
                 </div>
               )}
             </div>
@@ -275,7 +275,7 @@ export default function DestinationSubmitForm({ userId, onBack }: Props) {
                 {suggestions.map(s => (
                   <button key={s.place_id} type="button" onMouseDown={() => void selectSuggestion(s)}
                     className="w-full text-left px-5 py-4 hover:bg-[#fcd99a]/20 transition-colors border-b border-[#fcd99a]/30 last:border-0">
-                    <p className="font-brice font-bold text-[#131936] text-[16px]">{s.main_text}</p>
+                    <p className="font-display font-bold text-[#131936] text-[16px]">{s.main_text}</p>
                     <p className="font-nunito text-[#131936]/50 text-[13px] mt-0.5">{s.secondary_text}</p>
                   </button>
                 ))}
@@ -303,7 +303,7 @@ export default function DestinationSubmitForm({ userId, onBack }: Props) {
                 onClick={() => setVibes(prev => prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v])}
                 className={`px-4 py-2.5 rounded-full border-2 font-nunito text-[14px] font-medium transition-all ${
                   vibes.includes(v)
-                    ? 'border-[#f08c21] bg-[#f08c21]/10 text-[#f08c21]'
+                    ? 'border-[#f89a14] bg-[#f89a14]/10 text-[#f89a14]'
                     : 'border-[#fcd99a]/60 bg-white text-[#131936]/70'
                 }`}
               >
@@ -326,9 +326,9 @@ export default function DestinationSubmitForm({ userId, onBack }: Props) {
               </div>
             ) : (
               <button type="button" onClick={() => fileInputRef.current?.click()}
-                className="w-full rounded-2xl border-2 border-dashed border-[#fcd99a] bg-white py-16 flex flex-col items-center gap-3 hover:border-[#f08c21]/60 transition-colors group">
+                className="w-full rounded-2xl border-2 border-dashed border-[#fcd99a] bg-white py-16 flex flex-col items-center gap-3 hover:border-[#f89a14]/60 transition-colors group">
                 <span className="text-[40px]">📷</span>
-                <p className="font-brice font-bold text-[#131936]/40 text-[15px] group-hover:text-[#131936] transition-colors">Add a photo</p>
+                <p className="font-display font-bold text-[#131936]/40 text-[15px] group-hover:text-[#131936] transition-colors">Add a photo</p>
                 <p className="font-nunito text-[#131936]/30 text-[12px]">Optional · up to 10 MB</p>
               </button>
             )}
@@ -343,7 +343,7 @@ export default function DestinationSubmitForm({ userId, onBack }: Props) {
             {photoFile && (
               <label className="flex items-start gap-3 mt-4 cursor-pointer">
                 <input type="checkbox" checked={photoConsent} onChange={e => setPhotoConsent(e.target.checked)}
-                  className="mt-0.5 w-4 h-4 accent-[#f08c21] shrink-0 cursor-pointer" />
+                  className="mt-0.5 w-4 h-4 accent-[#f89a14] shrink-0 cursor-pointer" />
                 <span className="font-nunito text-[#131936]/60 text-[13px] leading-relaxed">
                   This is my own photo or I have the right to share it. I grant Someday a licence to display it in the app.
                 </span>
@@ -366,12 +366,12 @@ export default function DestinationSubmitForm({ userId, onBack }: Props) {
               <textarea id={`dest-${textCard.id}`} name={`dest-${textCard.id}`} rows={5}
                 value={value} onChange={e => setter(e.target.value)}
                 placeholder={textCard.placeholder} maxLength={textCard.maxLength}
-                className="w-full rounded-2xl border-2 border-[#fcd99a] bg-white px-5 py-4 font-nunito text-[#131936] text-[16px] leading-relaxed placeholder:text-[#131936]/20 focus:outline-none focus:border-[#f08c21] transition-colors resize-none" />
+                className="w-full rounded-2xl border-2 border-[#fcd99a] bg-white px-5 py-4 font-nunito text-[#131936] text-[16px] leading-relaxed placeholder:text-[#131936]/20 focus:outline-none focus:border-[#f89a14] transition-colors resize-none" />
             ) : (
               <input id={`dest-${textCard.id}`} name={`dest-${textCard.id}`} type="text"
                 value={value} onChange={e => setter(e.target.value)}
                 placeholder={textCard.placeholder} maxLength={textCard.maxLength}
-                className="w-full rounded-2xl border-2 border-[#fcd99a] bg-white px-5 py-4 font-brice font-bold text-[#131936] text-[18px] placeholder:text-[#131936]/20 placeholder:font-nunito placeholder:font-normal placeholder:text-[15px] focus:outline-none focus:border-[#f08c21] transition-colors" />
+                className="w-full rounded-2xl border-2 border-[#fcd99a] bg-white px-5 py-4 font-display font-bold text-[#131936] text-[18px] placeholder:text-[#131936]/20 placeholder:font-nunito placeholder:font-normal placeholder:text-[15px] focus:outline-none focus:border-[#f89a14] transition-colors" />
             )}
             <p className="absolute bottom-3 right-4 font-nunito text-[11px] text-[#131936]/30">{value.length}/{textCard.maxLength}</p>
             {(() => {
@@ -392,12 +392,12 @@ export default function DestinationSubmitForm({ userId, onBack }: Props) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center">
         <div className="text-[56px] mb-4">🗺</div>
-        <h2 className="font-brice font-bold text-[#131936] text-[26px] mb-3">{placeName} is in the queue.</h2>
+        <h2 className="font-display font-bold text-[#131936] text-[26px] mb-3">{placeName} is in the queue.</h2>
         <p className="font-nunito text-[#131936]/50 text-[15px] leading-relaxed max-w-xs mb-8">
           We review every submission personally. Great ones make it into the Someday database.
         </p>
         <button onClick={resetForm}
-          className="px-8 py-3 rounded-full bg-[#f08c21] text-[#131936] font-brice font-bold text-[15px]">
+          className="px-8 py-3 rounded-full bg-[#f89a14] text-[#131936] font-display font-bold text-[15px]">
           Submit another
         </button>
       </div>
@@ -409,7 +409,7 @@ export default function DestinationSubmitForm({ userId, onBack }: Props) {
   return (
     <div className="flex flex-col min-h-[calc(100vh-56px)]">
       <div className="w-full h-1 bg-[#fcd99a]/30">
-        <div className="h-full bg-[#f08c21] transition-all duration-500 ease-out" style={{ width: `${((currentStep + 1) / totalSteps) * 100}%` }} />
+        <div className="h-full bg-[#f89a14] transition-all duration-500 ease-out" style={{ width: `${((currentStep + 1) / totalSteps) * 100}%` }} />
       </div>
 
       <div className="flex items-center justify-between px-1 py-3">
@@ -427,7 +427,7 @@ export default function DestinationSubmitForm({ userId, onBack }: Props) {
 
       <div className="flex-1 flex flex-col pt-4 pb-6">
         <div className="mb-8">
-          <h2 className="font-brice font-bold text-[#131936] text-[26px] leading-tight mb-2">{card.prompt}</h2>
+          <h2 className="font-display font-bold text-[#131936] text-[26px] leading-tight mb-2">{card.prompt}</h2>
           <p className="font-nunito text-[#131936]/50 text-[14px] leading-relaxed">{card.subprompt}</p>
         </div>
         <div className="flex-1">{renderCardInput(card)}</div>
@@ -436,12 +436,12 @@ export default function DestinationSubmitForm({ userId, onBack }: Props) {
       <div className="pb-8 pt-3 border-t border-[#fcd99a]/30">
         {card.id === 'review' ? (
           <button onClick={() => void handleSubmit()} disabled={!canAdvance() || submitting}
-            className="w-full h-14 rounded-full bg-[#131936] text-white font-brice font-bold text-[16px] disabled:opacity-40 transition-opacity active:scale-[0.98]">
+            className="w-full h-14 rounded-full bg-[#131936] text-white font-display font-bold text-[16px] disabled:opacity-40 transition-opacity active:scale-[0.98]">
             {uploadingPhoto ? 'Uploading photo…' : submitting ? 'Submitting…' : 'Submit for review ✦'}
           </button>
         ) : (
           <button onClick={goNext} disabled={!canAdvance()}
-            className="w-full h-14 rounded-full bg-[#f08c21] text-[#131936] font-brice font-bold text-[16px] disabled:opacity-40 transition-opacity active:scale-[0.98]">
+            className="w-full h-14 rounded-full bg-[#f89a14] text-[#131936] font-display font-bold text-[16px] disabled:opacity-40 transition-opacity active:scale-[0.98]">
             Continue →
           </button>
         )}

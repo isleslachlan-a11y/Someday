@@ -154,10 +154,10 @@ export default function PlaceTagger({
 
       {/* ── Categories ────────────────────────────────────────────────────────── */}
       <section>
-        <h2 className="font-brice font-bold text-[#131936] text-[15px] mb-3">
+        <h2 className="font-display font-bold text-[#131936] text-[15px] mb-3">
           Categories
           {selectedCategoryIds.size > 0 && (
-            <span className="ml-2 font-nunito font-normal text-[12px] text-[#f08c21]">
+            <span className="ml-2 font-nunito font-normal text-[12px] text-[#f89a14]">
               {selectedCategoryIds.size} selected
             </span>
           )}
@@ -172,7 +172,7 @@ export default function PlaceTagger({
                 onClick={() => toggleCategory(cat.id)}
                 className={`px-3 py-1.5 rounded-full border font-nunito text-[13px] font-medium transition-all flex items-center gap-1.5 ${
                   isPrimary
-                    ? 'bg-[#f08c21] border-[#f08c21] text-white'
+                    ? 'bg-[#f89a14] border-[#f89a14] text-white'
                     : isSelected
                     ? 'bg-[#131936] border-[#131936] text-white'
                     : 'bg-white border-[#fcd99a] text-[#131936]/60'
@@ -189,10 +189,10 @@ export default function PlaceTagger({
 
       {/* ── Tags ──────────────────────────────────────────────────────────────── */}
       <section>
-        <h2 className="font-brice font-bold text-[#131936] text-[15px] mb-3">
+        <h2 className="font-display font-bold text-[#131936] text-[15px] mb-3">
           Tags
           {selectedTagIds.size > 0 && (
-            <span className="ml-2 font-nunito font-normal text-[12px] text-[#f08c21]">
+            <span className="ml-2 font-nunito font-normal text-[12px] text-[#f89a14]">
               {selectedTagIds.size} selected
             </span>
           )}
@@ -230,7 +230,7 @@ export default function PlaceTagger({
           {tags.length === 0 && (
             <p className="font-nunito text-[#131936]/30 text-[13px]">
               No tags in library yet —{' '}
-              <Link href="/admin/tags" className="text-[#f08c21] underline">add tags first</Link>
+              <Link href="/admin/tags" className="text-[#f89a14] underline">add tags first</Link>
             </p>
           )}
         </div>
@@ -238,10 +238,10 @@ export default function PlaceTagger({
 
       {/* ── Labels ────────────────────────────────────────────────────────────── */}
       <section>
-        <h2 className="font-brice font-bold text-[#131936] text-[15px] mb-3">
+        <h2 className="font-display font-bold text-[#131936] text-[15px] mb-3">
           Labels
           {selectedLabelIds.size > 0 && (
-            <span className="ml-2 font-nunito font-normal text-[12px] text-[#f08c21]">
+            <span className="ml-2 font-nunito font-normal text-[12px] text-[#f89a14]">
               {selectedLabelIds.size} selected
             </span>
           )}
@@ -288,7 +288,7 @@ export default function PlaceTagger({
           <button
             onClick={() => void handleSave()}
             disabled={saving}
-            className="flex-1 h-11 rounded-full bg-[#f08c21] font-nunito font-bold text-[14px] text-white disabled:opacity-50"
+            className="flex-1 h-11 rounded-full bg-[#f89a14] font-nunito font-bold text-[14px] text-white disabled:opacity-50"
           >
             {saving ? 'Saving…' : 'Save tags'}
           </button>

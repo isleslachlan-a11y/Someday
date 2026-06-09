@@ -61,7 +61,7 @@ function slugify(name: string) {
 const TYPE_COLORS: Record<string, string> = {
   region:    'bg-[#131936]/10 text-[#131936]/70',
   theme:     'bg-[#7B4FE8]/15 text-[#7B4FE8]',
-  editorial: 'bg-[#f08c21]/15 text-[#f08c21]',
+  editorial: 'bg-[#f89a14]/15 text-[#f89a14]',
   country:   'bg-[#16a34a]/15 text-[#16a34a]',
 }
 
@@ -265,7 +265,7 @@ export default function CollectionsManager({ collections: initial, places, colle
       <div>
         <button
           onClick={startCreate}
-          className="w-full mb-4 h-11 rounded-2xl bg-[#f08c21] text-white font-brice font-bold text-[15px]"
+          className="w-full mb-4 h-11 rounded-2xl bg-[#f89a14] text-white font-display font-bold text-[15px]"
         >
           + New Collection
         </button>
@@ -298,7 +298,7 @@ export default function CollectionsManager({ collections: initial, places, colle
 
                         {/* Name + badges */}
                         <div className="flex-1 min-w-0">
-                          <p className="font-brice font-bold text-[#131936] text-[14px] truncate">{col.name}</p>
+                          <p className="font-display font-bold text-[#131936] text-[14px] truncate">{col.name}</p>
                           <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                             <span className={`px-2 py-0.5 rounded-full font-nunito text-[10px] font-medium capitalize ${TYPE_COLORS[col.type] ?? TYPE_COLORS.editorial}`}>
                               {col.type}
@@ -312,7 +312,7 @@ export default function CollectionsManager({ collections: initial, places, colle
                         {/* Active toggle */}
                         <button
                           onClick={() => handleToggleActive(col)}
-                          className={`relative h-5 w-9 rounded-full transition-colors shrink-0 ${col.is_active ? 'bg-[#f08c21]' : 'bg-[#131936]/20'}`}
+                          className={`relative h-5 w-9 rounded-full transition-colors shrink-0 ${col.is_active ? 'bg-[#f89a14]' : 'bg-[#131936]/20'}`}
                           aria-label={col.is_active ? 'Deactivate' : 'Activate'}
                         >
                           <span className={`absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${col.is_active ? 'translate-x-4' : 'translate-x-0'}`} />
@@ -321,7 +321,7 @@ export default function CollectionsManager({ collections: initial, places, colle
                         {/* Edit */}
                         <button
                           onClick={() => startEdit(col)}
-                          className="font-nunito text-[12px] text-[#f08c21] shrink-0 px-1 py-1 min-w-[44px] text-right"
+                          className="font-nunito text-[12px] text-[#f89a14] shrink-0 px-1 py-1 min-w-[44px] text-right"
                         >
                           Edit
                         </button>
@@ -353,7 +353,7 @@ export default function CollectionsManager({ collections: initial, places, colle
             value={formState.name}
             onChange={e => setName(e.target.value)}
             placeholder="e.g. Southeast Asia"
-            className="w-full rounded-2xl border border-[#fcd99a] bg-white px-4 py-3 font-nunito text-[14px] text-[#131936] placeholder:text-[#131936]/30 focus:outline-none focus:ring-2 focus:ring-[#f08c21]/30"
+            className="w-full rounded-2xl border border-[#fcd99a] bg-white px-4 py-3 font-nunito text-[14px] text-[#131936] placeholder:text-[#131936]/30 focus:outline-none focus:ring-2 focus:ring-[#f89a14]/30"
           />
         </div>
 
@@ -365,7 +365,7 @@ export default function CollectionsManager({ collections: initial, places, colle
             value={formState.slug}
             onChange={e => setSlug(e.target.value)}
             placeholder="e.g. southeast-asia"
-            className="w-full rounded-2xl border border-[#fcd99a] bg-white px-4 py-3 font-nunito text-[13px] text-[#131936]/70 placeholder:text-[#131936]/30 focus:outline-none focus:ring-2 focus:ring-[#f08c21]/30"
+            className="w-full rounded-2xl border border-[#fcd99a] bg-white px-4 py-3 font-nunito text-[13px] text-[#131936]/70 placeholder:text-[#131936]/30 focus:outline-none focus:ring-2 focus:ring-[#f89a14]/30"
           />
         </div>
 
@@ -379,7 +379,7 @@ export default function CollectionsManager({ collections: initial, places, colle
                 onClick={() => setFormState(prev => ({ ...prev, type: t }))}
                 className={`px-3 py-1.5 rounded-full border font-nunito text-[12px] font-medium capitalize transition-all ${
                   formState.type === t
-                    ? 'bg-[#f08c21] border-[#f08c21] text-white'
+                    ? 'bg-[#f89a14] border-[#f89a14] text-white'
                     : 'bg-white border-[#fcd99a] text-[#131936]/60'
                 }`}
               >
@@ -397,7 +397,7 @@ export default function CollectionsManager({ collections: initial, places, colle
             onChange={e => setFormState(prev => ({ ...prev, description: e.target.value }))}
             placeholder="Optional description…"
             rows={3}
-            className="w-full rounded-2xl border border-[#fcd99a] bg-white px-4 py-3 font-nunito text-[14px] text-[#131936] placeholder:text-[#131936]/30 focus:outline-none focus:ring-2 focus:ring-[#f08c21]/30 resize-none"
+            className="w-full rounded-2xl border border-[#fcd99a] bg-white px-4 py-3 font-nunito text-[14px] text-[#131936] placeholder:text-[#131936]/30 focus:outline-none focus:ring-2 focus:ring-[#f89a14]/30 resize-none"
           />
         </div>
 
@@ -408,7 +408,7 @@ export default function CollectionsManager({ collections: initial, places, colle
               type="checkbox"
               checked={formState.is_featured}
               onChange={e => setFormState(prev => ({ ...prev, is_featured: e.target.checked }))}
-              className="accent-[#f08c21] w-4 h-4 rounded"
+              className="accent-[#f89a14] w-4 h-4 rounded"
             />
             <span className="font-nunito text-[13px] text-[#131936]">Featured</span>
           </label>
@@ -417,7 +417,7 @@ export default function CollectionsManager({ collections: initial, places, colle
               type="checkbox"
               checked={formState.is_active}
               onChange={e => setFormState(prev => ({ ...prev, is_active: e.target.checked }))}
-              className="accent-[#f08c21] w-4 h-4 rounded"
+              className="accent-[#f89a14] w-4 h-4 rounded"
             />
             <span className="font-nunito text-[13px] text-[#131936]">Active</span>
           </label>
@@ -426,7 +426,7 @@ export default function CollectionsManager({ collections: initial, places, colle
 
       {/* ── Place picker ─────────────────────────────────────────────────────── */}
       <div className="mb-6">
-        <p className="font-brice font-bold text-[#131936] text-[15px] mb-3">
+        <p className="font-display font-bold text-[#131936] text-[15px] mb-3">
           Places
           <span className="font-nunito font-normal text-[12px] text-[#131936]/50 ml-2">
             {selectedPlaceIds.length} selected
@@ -472,7 +472,7 @@ export default function CollectionsManager({ collections: initial, places, colle
                               </div>
                               <button
                                 onClick={() => removePlace(placeId)}
-                                className="text-[#131936]/30 hover:text-[#f08c21] transition-colors shrink-0 w-6 h-6 flex items-center justify-center font-bold"
+                                className="text-[#131936]/30 hover:text-[#f89a14] transition-colors shrink-0 w-6 h-6 flex items-center justify-center font-bold"
                                 aria-label={`Remove ${place.name}`}
                               >
                                 ×
@@ -496,7 +496,7 @@ export default function CollectionsManager({ collections: initial, places, colle
           value={placeSearch}
           onChange={e => setPlaceSearch(e.target.value)}
           placeholder="Search places to add…"
-          className="w-full rounded-full border border-[#fcd99a] bg-white px-4 py-2.5 font-nunito text-[13px] text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:ring-2 focus:ring-[#f08c21]/30 mb-2"
+          className="w-full rounded-full border border-[#fcd99a] bg-white px-4 py-2.5 font-nunito text-[13px] text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:ring-2 focus:ring-[#f89a14]/30 mb-2"
         />
 
         <div className="space-y-1 max-h-56 overflow-y-auto">
@@ -504,7 +504,7 @@ export default function CollectionsManager({ collections: initial, places, colle
             <button
               key={place.id}
               onClick={() => addPlace(place.id)}
-              className="w-full flex items-center gap-2 bg-white rounded-xl border border-[#fcd99a]/40 px-3 py-2 hover:border-[#f08c21]/50 transition-colors text-left"
+              className="w-full flex items-center gap-2 bg-white rounded-xl border border-[#fcd99a]/40 px-3 py-2 hover:border-[#f89a14]/50 transition-colors text-left"
             >
               {place.image_thumb_url && (
                 <Image
@@ -541,7 +541,7 @@ export default function CollectionsManager({ collections: initial, places, colle
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex-[2] h-11 rounded-2xl bg-[#f08c21] text-white font-brice font-bold text-[14px] disabled:opacity-50"
+          className="flex-[2] h-11 rounded-2xl bg-[#f89a14] text-white font-display font-bold text-[14px] disabled:opacity-50"
         >
           {saving ? 'Saving…' : editingCollection ? 'Save Changes' : 'Save Collection'}
         </button>

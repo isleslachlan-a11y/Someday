@@ -75,10 +75,10 @@ export default function TravelProfileSection({ context }: Props) {
   return (
     <section className="mb-8">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="font-brice font-bold text-[#131936]">Travel Profile</h2>
+        <h2 className="font-display font-bold text-[#131936]">Travel Profile</h2>
         <button
           onClick={() => setShowEdit(true)}
-          className="text-xs font-semibold text-[#f08c21] hover:text-[#131936] transition-colors"
+          className="text-xs font-semibold text-[#f89a14] hover:text-[#131936] transition-colors"
         >
           {hasAnyData ? 'Edit' : 'Set up'}
         </button>
@@ -90,7 +90,7 @@ export default function TravelProfileSection({ context }: Props) {
             Tell us how you travel.{' '}
             <button
               onClick={() => setShowEdit(true)}
-              className="text-[#f08c21] hover:text-[#131936] transition-colors"
+              className="text-[#f89a14] hover:text-[#131936] transition-colors"
             >
               Set up your travel profile →
             </button>
@@ -104,7 +104,7 @@ export default function TravelProfileSection({ context }: Props) {
               {context!.travel_style.map(tag => (
                 <span
                   key={tag}
-                  className="rounded-full bg-[#f08c21]/10 border border-[#f08c21]/25 px-3 py-1 text-xs font-semibold text-[#f08c21]"
+                  className="rounded-full bg-[#f89a14]/10 border border-[#f89a14]/25 px-3 py-1 text-xs font-semibold text-[#f89a14]"
                 >
                   {tag}
                 </span>
@@ -213,7 +213,7 @@ function EditModal({
         </div>
 
         <div className="px-5 pb-10">
-          <h2 className="font-brice font-bold text-xl text-[#131936] mb-6">Travel Profile</h2>
+          <h2 className="font-display font-bold text-xl text-[#131936] mb-6">Travel Profile</h2>
 
           {/* Travel style */}
           <div className="mb-6">
@@ -231,7 +231,7 @@ function EditModal({
                   onClick={() => toggleStyle(tag)}
                   className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
                     travelStyle.includes(tag)
-                      ? 'border-[#f08c21]/50 bg-[#f08c21]/10 text-[#f08c21]'
+                      ? 'border-[#f89a14]/50 bg-[#f89a14]/10 text-[#f89a14]'
                       : 'border-[#fcd99a]/40 bg-white text-[#131936]/50 hover:border-[#fcd99a]/60 hover:text-[#131936]'
                   }`}
                 >
@@ -254,7 +254,7 @@ function EditModal({
                   onClick={() => setGroup(g => g === opt ? '' : opt)}
                   className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
                     group === opt
-                      ? 'border-[#f08c21]/50 bg-[#f08c21]/10 text-[#f08c21]'
+                      ? 'border-[#f89a14]/50 bg-[#f89a14]/10 text-[#f89a14]'
                       : 'border-[#fcd99a]/40 bg-white text-[#131936]/50 hover:border-[#fcd99a]/60 hover:text-[#131936]'
                   }`}
                 >
@@ -275,7 +275,7 @@ function EditModal({
                   onClick={() => setBudget(b => b === opt ? '' : opt)}
                   className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
                     budget === opt
-                      ? 'border-[#f08c21]/50 bg-[#f08c21]/10 text-[#f08c21]'
+                      ? 'border-[#f89a14]/50 bg-[#f89a14]/10 text-[#f89a14]'
                       : 'border-[#fcd99a]/40 bg-white text-[#131936]/50 hover:border-[#fcd99a]/60 hover:text-[#131936]'
                   }`}
                 >
@@ -298,7 +298,7 @@ function EditModal({
                   onClick={() => setComfort(c => c === opt ? '' : opt)}
                   className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
                     comfort === opt
-                      ? 'border-[#f08c21]/50 bg-[#f08c21]/10 text-[#f08c21]'
+                      ? 'border-[#f89a14]/50 bg-[#f89a14]/10 text-[#f89a14]'
                       : 'border-[#fcd99a]/40 bg-white text-[#131936]/50 hover:border-[#fcd99a]/60 hover:text-[#131936]'
                   }`}
                 >
@@ -321,7 +321,7 @@ function EditModal({
               type="button"
               onClick={handleSave}
               disabled={isPending}
-              className="flex-1 rounded-xl bg-[#f08c21] hover:bg-[#f08c21]/90 disabled:opacity-50 py-3 text-sm font-brice font-semibold text-[#131936] transition-colors"
+              className="flex-1 rounded-xl bg-[#f89a14] hover:bg-[#f89a14]/90 disabled:opacity-50 py-3 text-sm font-heading font-semibold text-[#131936] transition-colors"
             >
               {isPending ? 'Saving…' : 'Save'}
             </button>

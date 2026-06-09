@@ -54,9 +54,9 @@ const STATUS_LABEL: Record<BucketListStatus, string> = {
 }
 
 const STATUS_ACTIVE: Record<BucketListStatus, string> = {
-  wishlist:  'bg-[#f08c21]/10 border-[#f08c21]/30 text-[#f08c21]',
-  planning:  'bg-[#f08c21]/10 border-[#f08c21]/30 text-[#f08c21]',
-  completed: 'bg-[#f08c21]/10 border-[#f08c21]/30 text-[#f08c21]',
+  wishlist:  'bg-[#f89a14]/10 border-[#f89a14]/30 text-[#f89a14]',
+  planning:  'bg-[#f89a14]/10 border-[#f89a14]/30 text-[#f89a14]',
+  completed: 'bg-[#f89a14]/10 border-[#f89a14]/30 text-[#f89a14]',
 }
 
 type SortOption = 'date' | 'az'
@@ -300,7 +300,7 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
         {/* Search input */}
         <div className="relative flex-1">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none select-none">
-            <Search size={15} className="text-[#f08c21]" />
+            <Search size={15} className="text-[#f89a14]" />
           </span>
           {!searchInput && (
             <span className="absolute left-9 top-1/2 -translate-y-1/2 text-[#131936]/40 text-[14px] font-nunito pointer-events-none truncate max-w-[calc(100%-3rem)]">
@@ -316,7 +316,7 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
             value={searchInput}
             onChange={e => setSearchInput(e.target.value)}
             placeholder=""
-            className="w-full rounded-full bg-white border border-[#fcd99a] pl-9 pr-4 py-2.5 text-[14px] text-[#131936] font-nunito focus:outline-none focus:ring-2 focus:ring-[#f08c21]/30 transition"
+            className="w-full rounded-full bg-white border border-[#fcd99a] pl-9 pr-4 py-2.5 text-[14px] text-[#131936] font-nunito focus:outline-none focus:ring-2 focus:ring-[#f89a14]/30 transition"
           />
           {searchInput && (
             <button
@@ -334,7 +334,7 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
           onClick={() => setShowFilterSheet(true)}
           className={`relative flex items-center justify-center w-11 h-11 rounded-full border transition-all shrink-0 ${
             hasActiveFilters
-              ? 'bg-[#f08c21] border-[#f08c21]'
+              ? 'bg-[#f89a14] border-[#f89a14]'
               : 'bg-white border-[#fcd99a]'
           }`}
           aria-label="Filters"
@@ -427,7 +427,7 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
 
               {/* Header row */}
               <div className="flex items-center justify-between">
-                <h2 className="font-brice font-bold text-[#131936] text-[18px]">Filter & Sort</h2>
+                <h2 className="font-display font-bold text-[#131936] text-[18px]">Filter & Sort</h2>
                 {hasActiveFilters && (
                   <button
                     onClick={() => {
@@ -435,7 +435,7 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
                       navigate({ q: null, type: null, sort: null, status: null })
                       setShowFilterSheet(false)
                     }}
-                    className="font-nunito text-[#f08c21] text-[13px]"
+                    className="font-nunito text-[#f89a14] text-[13px]"
                   >
                     Clear all
                   </button>
@@ -444,7 +444,7 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
 
               {/* Status */}
               <div>
-                <p className="font-brice font-bold text-[#131936] text-[13px] uppercase tracking-wider mb-3">
+                <p className="font-display font-bold text-[#131936] text-[13px] uppercase tracking-wider mb-3">
                   Status
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -456,7 +456,7 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
                         onClick={() => setStatus(value)}
                         className={`px-4 py-2 rounded-full border font-nunito text-[13px] font-medium transition-all ${
                           active
-                            ? 'bg-[#f08c21] border-[#f08c21] text-white'
+                            ? 'bg-[#f89a14] border-[#f89a14] text-white'
                             : 'bg-white border-[#fcd99a] text-[#131936]'
                         }`}
                       >
@@ -469,7 +469,7 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
 
               {/* Type */}
               <div>
-                <p className="font-brice font-bold text-[#131936] text-[13px] uppercase tracking-wider mb-3">
+                <p className="font-display font-bold text-[#131936] text-[13px] uppercase tracking-wider mb-3">
                   Type
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -481,7 +481,7 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
                         onClick={() => setType(value)}
                         className={`flex items-center gap-1.5 px-4 py-2 rounded-full border font-nunito text-[13px] font-medium transition-all ${
                           active
-                            ? 'bg-[#f08c21] border-[#f08c21] text-white'
+                            ? 'bg-[#f89a14] border-[#f89a14] text-white'
                             : 'bg-white border-[#fcd99a] text-[#131936]'
                         }`}
                       >
@@ -495,7 +495,7 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
 
               {/* Sort */}
               <div>
-                <p className="font-brice font-bold text-[#131936] text-[13px] uppercase tracking-wider mb-3">
+                <p className="font-display font-bold text-[#131936] text-[13px] uppercase tracking-wider mb-3">
                   Sort by
                 </p>
                 <div className="flex gap-2">
@@ -508,7 +508,7 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
                       onClick={() => setSort(value)}
                       className={`flex-1 py-2.5 rounded-full border font-nunito text-[13px] font-medium transition-all ${
                         sort === value
-                          ? 'bg-[#f08c21] border-[#f08c21] text-white'
+                          ? 'bg-[#f89a14] border-[#f89a14] text-white'
                           : 'bg-white border-[#fcd99a] text-[#131936]'
                       }`}
                     >
@@ -521,7 +521,7 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
               {/* Apply */}
               <button
                 onClick={() => setShowFilterSheet(false)}
-                className="w-full h-12 rounded-full bg-[#131936] text-white font-brice font-bold text-[15px]"
+                className="w-full h-12 rounded-full bg-[#131936] text-white font-display font-bold text-[15px]"
               >
                 Show results
               </button>
@@ -538,7 +538,7 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
             <span className="text-[#fcd99a] text-[10px] opacity-30">·</span>
             <span className="text-[#fcd99a] text-[10px] opacity-50">·</span>
             <span className="text-[#fcd99a] text-[12px] opacity-70">·</span>
-            <span className="text-[#f08c21] text-[20px]">★</span>
+            <span className="text-[#f89a14] text-[20px]">★</span>
             <span className="text-[#fcd99a] text-[12px] opacity-70">·</span>
             <span className="text-[#fcd99a] text-[10px] opacity-50">·</span>
             <span className="text-[#fcd99a] text-[10px] opacity-30">·</span>
@@ -549,7 +549,7 @@ export default function ListFilters({ entries: initialEntries, userId, friendIte
         </p>
         <Link
           href="/discover"
-          className="flex items-center gap-1.5 font-nunito font-semibold text-[#f08c21] text-[14px] hover:opacity-80 transition-opacity"
+          className="flex items-center gap-1.5 font-nunito font-semibold text-[#f89a14] text-[14px] hover:opacity-80 transition-opacity"
         >
           Explore the world
           <span className="text-[16px]">→</span>
@@ -644,7 +644,7 @@ function ListItemSheet({
           {/* Header */}
           <div className="flex items-start justify-between gap-4 pt-2 pb-5 border-b border-[#fcd99a]/50 mb-5">
             <div>
-              <h2 className="font-brice text-xl font-bold text-[#131936] leading-tight">
+              <h2 className="font-display text-xl font-bold text-[#131936] leading-tight">
                 {entry.place.name}
               </h2>
               <p className="text-[#131936]/50 text-sm mt-1">
@@ -674,7 +674,7 @@ function ListItemSheet({
               {entry.place.tags.map(tag => (
                 <span
                   key={tag}
-                  className="rounded-full bg-[#fcd99a]/20 border border-[#fcd99a]/40 px-2.5 py-0.5 text-xs text-[#f08c21]"
+                  className="rounded-full bg-[#fcd99a]/20 border border-[#fcd99a]/40 px-2.5 py-0.5 text-xs text-[#f89a14]"
                 >
                   {tag}
                 </span>
@@ -688,7 +688,7 @@ function ListItemSheet({
               {entry.place.vibes.map(vibe => (
                 <span
                   key={vibe}
-                  className="rounded-full bg-[#f08c21]/10 border border-[#f08c21]/20 px-2.5 py-0.5 text-xs text-[#f08c21]"
+                  className="rounded-full bg-[#f89a14]/10 border border-[#f89a14]/20 px-2.5 py-0.5 text-xs text-[#f89a14]"
                 >
                   {vibe}
                 </span>
@@ -700,7 +700,7 @@ function ListItemSheet({
           {entry.place.intensity && (
             <p className="text-xs text-[#131936]/50 mb-6">
               Intensity:{' '}
-              <span className="text-[#f08c21] capitalize">{entry.place.intensity}</span>
+              <span className="text-[#f89a14] capitalize">{entry.place.intensity}</span>
             </p>
           )}
 
@@ -735,8 +735,8 @@ function ListItemSheet({
 
             {/* Completion prompt */}
             {showCompletionPrompt && (
-              <div className="rounded-2xl border border-[#f08c21]/20 bg-[#f08c21]/5 p-4">
-                <p className="font-brice font-bold text-[#131936] text-sm mb-1">
+              <div className="rounded-2xl border border-[#f89a14]/20 bg-[#f89a14]/5 p-4">
+                <p className="font-display font-bold text-[#131936] text-sm mb-1">
                   You did it. ✦
                 </p>
                 <p className="text-xs text-[#131936]/50 mb-3">
@@ -749,13 +749,13 @@ function ListItemSheet({
                   value={completionNote}
                   onChange={e => setCompletionNote(e.target.value)}
                   placeholder="How was it? Any tips for friends…"
-                  className="w-full rounded-xl bg-white border border-[#fcd99a]/40 px-4 py-2.5 text-sm text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:ring-2 focus:ring-[#f08c21] transition resize-none mb-3"
+                  className="w-full rounded-xl bg-white border border-[#fcd99a]/40 px-4 py-2.5 text-sm text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:ring-2 focus:ring-[#f89a14] transition resize-none mb-3"
                 />
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleSave(completionNote.trim() || null)}
                     disabled={saving}
-                    className="flex-1 rounded-xl bg-[#f08c21]/20 hover:bg-[#f08c21]/30 border border-[#f08c21]/30 py-2.5 text-sm font-semibold text-[#f08c21] transition-colors disabled:opacity-50"
+                    className="flex-1 rounded-xl bg-[#f89a14]/20 hover:bg-[#f89a14]/30 border border-[#f89a14]/30 py-2.5 text-sm font-semibold text-[#f89a14] transition-colors disabled:opacity-50"
                   >
                     {saving ? 'Saving…' : 'Save'}
                   </button>
@@ -782,13 +782,13 @@ function ListItemSheet({
                 type="month"
                 value={form.target_date}
                 onChange={e => update('target_date', e.target.value)}
-                className="w-full rounded-xl bg-white border border-[#fcd99a]/40 px-4 py-2.5 text-sm text-[#131936] focus:outline-none focus:ring-2 focus:ring-[#f08c21] transition"
+                className="w-full rounded-xl bg-white border border-[#fcd99a]/40 px-4 py-2.5 text-sm text-[#131936] focus:outline-none focus:ring-2 focus:ring-[#f89a14] transition"
               />
               {form.target_date && (
                 <button
                   type="button"
                   onClick={() => update('target_date', '')}
-                  className="mt-1.5 text-xs text-[#131936]/50 hover:text-[#f08c21] transition-colors"
+                  className="mt-1.5 text-xs text-[#131936]/50 hover:text-[#f89a14] transition-colors"
                 >
                   Clear date
                 </button>
@@ -808,7 +808,7 @@ function ListItemSheet({
                 value={form.notes}
                 onChange={e => update('notes', e.target.value)}
                 placeholder="Best time to visit, who to go with…"
-                className="w-full rounded-xl bg-white border border-[#fcd99a]/40 px-4 py-2.5 text-sm text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:ring-2 focus:ring-[#f08c21] transition resize-none"
+                className="w-full rounded-xl bg-white border border-[#fcd99a]/40 px-4 py-2.5 text-sm text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:ring-2 focus:ring-[#f89a14] transition resize-none"
               />
             </div>
 
@@ -817,7 +817,7 @@ function ListItemSheet({
               <button
                 onClick={() => handleSave()}
                 disabled={saving || removing}
-                className="w-full rounded-xl bg-[#131936] hover:bg-[#131936]/90 disabled:opacity-50 py-3.5 font-brice font-semibold text-white text-sm transition-all active:scale-[0.98]"
+                className="w-full rounded-xl bg-[#131936] hover:bg-[#131936]/90 disabled:opacity-50 py-3.5 font-heading font-semibold text-white text-sm transition-all active:scale-[0.98]"
               >
                 {saving ? 'Saving…' : 'Save changes'}
               </button>
@@ -826,7 +826,7 @@ function ListItemSheet({
             {/* Remove */}
             <div className="pt-2 border-t border-[#fcd99a]/50">
               {confirmRemove ? (
-                <div className="rounded-xl border border-[#f08c21]/30 bg-[#f08c21]/5 p-4">
+                <div className="rounded-xl border border-[#f89a14]/30 bg-[#f89a14]/5 p-4">
                   <p className="text-sm text-[#131936] mb-3">
                     Remove <strong>{entry.place.name}</strong> from your list?
                   </p>
@@ -841,7 +841,7 @@ function ListItemSheet({
                     <button
                       onClick={handleRemove}
                       disabled={removing}
-                      className="flex-1 rounded-lg bg-[#f08c21]/20 hover:bg-[#f08c21]/30 border border-[#f08c21]/30 px-3 py-2 text-sm font-semibold text-[#f08c21] transition-colors disabled:opacity-50"
+                      className="flex-1 rounded-lg bg-[#f89a14]/20 hover:bg-[#f89a14]/30 border border-[#f89a14]/30 px-3 py-2 text-sm font-semibold text-[#f89a14] transition-colors disabled:opacity-50"
                     >
                       {removing ? 'Removing…' : 'Remove'}
                     </button>
@@ -851,7 +851,7 @@ function ListItemSheet({
                 <button
                   onClick={() => setConfirmRemove(true)}
                   disabled={removing}
-                  className="w-full py-2 text-center text-sm text-[#131936]/50 hover:text-[#f08c21] transition-colors"
+                  className="w-full py-2 text-center text-sm text-[#131936]/50 hover:text-[#f89a14] transition-colors"
                 >
                   Remove from list
                 </button>
@@ -880,7 +880,7 @@ function EmptyListWithSuggestions({
   return (
     <div className="flex flex-col items-center pt-8 pb-4">
       <div className="text-[48px] mb-4 select-none">✦</div>
-      <h2 className="font-brice font-bold text-[#131936] text-[20px] mb-2 text-center">
+      <h2 className="font-display font-bold text-[#131936] text-[20px] mb-2 text-center">
         Your list is empty
       </h2>
       <p className="font-nunito text-[#131936]/50 text-[14px] text-center leading-relaxed max-w-[280px] mb-8">
@@ -938,7 +938,7 @@ function EmptyStatus({ status }: { status: 'all' | BucketListStatus }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center">
       <div className="text-5xl mb-4 select-none">{content.icon}</div>
-      <h2 className="font-brice text-xl font-bold text-[#131936] mb-2">{content.heading}</h2>
+      <h2 className="font-display text-xl font-bold text-[#131936] mb-2">{content.heading}</h2>
       <p className="text-[#131936]/50 text-sm max-w-xs">{content.body}</p>
     </div>
   )
@@ -948,13 +948,13 @@ function EmptySearch({ onClear }: { onClear: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center">
       <div className="text-5xl mb-4 select-none">🔍</div>
-      <h2 className="font-brice text-xl font-bold text-[#131936] mb-2">No results</h2>
+      <h2 className="font-display text-xl font-bold text-[#131936] mb-2">No results</h2>
       <p className="text-[#131936]/50 text-sm max-w-xs mb-6">
         Try a different search or remove some filters.
       </p>
       <button
         onClick={onClear}
-        className="rounded-xl border border-[#f08c21]/40 hover:bg-[#f08c21]/10 px-5 py-2.5 text-sm font-semibold text-[#f08c21] transition-colors"
+        className="rounded-xl border border-[#f89a14]/40 hover:bg-[#f89a14]/10 px-5 py-2.5 text-sm font-semibold text-[#f89a14] transition-colors"
       >
         Clear filters
       </button>

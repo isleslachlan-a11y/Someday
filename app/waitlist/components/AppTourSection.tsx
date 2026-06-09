@@ -22,7 +22,7 @@ const TILES: Tile[] = [
     label:   'SAVE',
     heading: 'Build your Someday list.',
     body:    'Add anything to your personal travel list in one tap. Cities, restaurants, hikes, hidden bars — if it\'s worth doing someday, it belongs here.',
-    gradient: 'from-[#f08c21] to-[#e07010]',
+    gradient: 'from-[#f89a14] to-[#e07010]',
     // TODO: replace placeholder gradient with List screen screenshot
   },
   {
@@ -37,7 +37,7 @@ const TILES: Tile[] = [
     label:   'SHARE',
     heading: 'See where your friends want to go.',
     body:    'Discover the overlap between your list and your friends\'. The best trips start with a shared bucket list.',
-    gradient: 'from-[#fcd99a] to-[#f08c21]',
+    gradient: 'from-[#fcd99a] to-[#f89a14]',
     // TODO: replace placeholder gradient with Friends/overlap screen screenshot
   },
 ]
@@ -57,7 +57,7 @@ export function AppTourSection() {
             Features
           </p>
           {/* TODO: refine heading copy */}
-          <h2 className="font-brice font-bold text-[#131936] text-3xl md:text-5xl max-w-2xl leading-tight">
+          <h2 className="font-display font-bold text-[#131936] text-3xl md:text-5xl max-w-2xl leading-tight">
             Everything a trip needs, before it starts.
           </h2>
 
@@ -69,17 +69,17 @@ export function AppTourSection() {
               >
                 {/* Image placeholder */}
                 <div className={`aspect-[4/3] bg-gradient-to-br ${tile.gradient} flex items-center justify-center`}>
-                  <span className={`font-brice text-xs ${tile.lightText ? 'text-white/30' : 'text-[#131936]/30'}`}>
+                  <span className={`font-display text-xs ${tile.lightText ? 'text-white/30' : 'text-[#131936]/30'}`}>
                     [ Screenshot coming soon ]
                   </span>
                 </div>
 
                 {/* Content */}
                 <div className="bg-white p-6">
-                  <p className="font-nunito uppercase tracking-widest text-xs text-[#f08c21] mb-2">
+                  <p className="font-nunito uppercase tracking-widest text-xs text-[#f89a14] mb-2">
                     {tile.label}
                   </p>
-                  <h3 className="font-brice-condensed font-semibold text-[#131936] text-xl mb-2">
+                  <h3 className="font-heading font-semibold text-[#131936] text-xl mb-2">
                     {tile.heading}
                   </h3>
                   <p className="font-nunito text-sm text-[rgba(19,25,54,0.5)] leading-relaxed">

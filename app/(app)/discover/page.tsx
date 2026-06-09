@@ -122,7 +122,7 @@ export default async function DiscoverPage({
         <div className="max-w-[480px] mx-auto px-4 h-14 grid grid-cols-3 items-center">
           <div />
           <div className="flex justify-center">
-            <span className="font-brice font-bold text-[#131936] text-[20px] tracking-widest uppercase">
+            <span className="font-display font-bold text-[#131936] text-[20px] tracking-widest uppercase">
               DISCOVER
             </span>
           </div>
@@ -139,7 +139,7 @@ export default async function DiscoverPage({
             <Link
               href="/submit"
               aria-label="Submit a place"
-              className="flex items-center justify-center w-11 h-11 rounded-full bg-[#f08c21] text-white"
+              className="flex items-center justify-center w-11 h-11 rounded-full bg-[#f89a14] text-white"
             >
               <Plus size={22} strokeWidth={2.5} />
             </Link>

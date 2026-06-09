@@ -56,11 +56,11 @@ export default async function AdminCollectionsPage() {
     <main className="min-h-screen bg-[#fff9f0]">
       <header className="sticky top-0 z-30 bg-[#fff9f0] border-b border-[#fcd99a]/50">
         <div className="max-w-[480px] mx-auto px-4 h-14 flex items-center gap-3">
-          <h1 className="font-brice font-bold text-[#131936] text-[18px] flex-1">Collections</h1>
+          <h1 className="font-display font-bold text-[#131936] text-[18px] flex-1">Collections</h1>
           <span className="px-2.5 py-1 rounded-full bg-[#fcd99a]/50 font-nunito text-[12px] text-[#131936]">
             {activeCount} active
           </span>
-          <span className="px-2 py-0.5 rounded-full bg-[#f08c21] text-[#131936] font-nunito font-bold text-[10px] uppercase tracking-wider">
+          <span className="px-2 py-0.5 rounded-full bg-[#f89a14] text-[#131936] font-nunito font-bold text-[10px] uppercase tracking-wider">
             Admin
           </span>
         </div>

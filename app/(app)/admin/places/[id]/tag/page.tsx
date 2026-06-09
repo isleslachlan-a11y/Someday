@@ -73,12 +73,12 @@ export default async function AdminPlaceTagPage({
             ←
           </a>
           <div className="flex-1 min-w-0">
-            <p className="font-brice font-bold text-[#131936] text-[15px] truncate">{place.name}</p>
+            <p className="font-display font-bold text-[#131936] text-[15px] truncate">{place.name}</p>
             <p className="font-nunito text-[#131936]/40 text-[11px] truncate">
               {[place.country, place.region].filter(Boolean).join(' · ')} · {place.type}
             </p>
           </div>
-          <span className="px-2 py-0.5 rounded-full bg-[#f08c21] text-[#131936] font-nunito font-bold text-[10px] uppercase tracking-wider shrink-0">
+          <span className="px-2 py-0.5 rounded-full bg-[#f89a14] text-[#131936] font-nunito font-bold text-[10px] uppercase tracking-wider shrink-0">
             Admin
           </span>
         </div>

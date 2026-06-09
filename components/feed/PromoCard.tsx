@@ -28,7 +28,7 @@ export default function PromoCard({ promo, index = 0 }: Props) {
 
         {/* Subtle watermark with title words */}
         <span
-          className="absolute font-brice-condensed font-black text-white select-none pointer-events-none text-center px-8 leading-tight"
+          className="absolute font-heading font-black text-white select-none pointer-events-none text-center px-8 leading-tight"
           style={{ fontSize: '72px', opacity: 0.04 }}
           aria-hidden
         >
@@ -42,7 +42,7 @@ export default function PromoCard({ promo, index = 0 }: Props) {
 
         {/* Title over image */}
         <div className="absolute bottom-0 left-0 right-0 px-4 pb-4">
-          <h3 className="font-brice-condensed text-[20px] font-bold text-white leading-tight">
+          <h3 className="font-heading text-[20px] font-bold text-white leading-tight">
             {promo.title}
           </h3>
         </div>

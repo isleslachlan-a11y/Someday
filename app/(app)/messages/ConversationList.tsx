@@ -14,7 +14,7 @@ export default function ConversationList({ conversations, currentUserId }: Props
     return (
       <div className="flex flex-col items-center justify-center px-6 py-20 text-center">
         <div className="text-4xl mb-4 select-none">✉️</div>
-        <p className="font-brice font-bold text-[#131936] mb-1">No messages yet</p>
+        <p className="font-display font-bold text-[#131936] mb-1">No messages yet</p>
         <p className="text-sm text-[#131936]/50">Start a conversation with a friend</p>
       </div>
     )
@@ -80,7 +80,7 @@ function ConversationRow({
       {isDM ? (
         <Avatar avatarUrl={avatarUrl} username={avatarName} size={48} />
       ) : (
-        <div className="w-12 h-12 rounded-full bg-[#f08c21]/10 border border-[#f08c21]/25 flex items-center justify-center shrink-0">
+        <div className="w-12 h-12 rounded-full bg-[#f89a14]/10 border border-[#f89a14]/25 flex items-center justify-center shrink-0">
           <span className="text-lg select-none">
             {conv.type === 'trip' ? '✈️' : '👥'}
           </span>
@@ -94,7 +94,7 @@ function ConversationRow({
             {displayName}
           </p>
           {timeLabel && (
-            <span className={`text-xs shrink-0 ${hasUnread ? 'text-[#f08c21]' : 'text-[#131936]/50'}`}>
+            <span className={`text-xs shrink-0 ${hasUnread ? 'text-[#f89a14]' : 'text-[#131936]/50'}`}>
               {timeLabel}
             </span>
           )}
@@ -104,7 +104,7 @@ function ConversationRow({
             {preview}
           </p>
           {hasUnread && (
-            <span className="shrink-0 w-2 h-2 rounded-full bg-[#f08c21]" />
+            <span className="shrink-0 w-2 h-2 rounded-full bg-[#f89a14]" />
           )}
         </div>
       </div>

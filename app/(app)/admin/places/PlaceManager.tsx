@@ -66,17 +66,17 @@ export default function PlaceManager({ places: initialPlaces, taggedCount }: Pro
       <p className="font-nunito text-[#131936]/50 text-[13px] mb-4">
         {places.length} places in database
         {filtered.length !== places.length && (
-          <span className="text-[#f08c21]"> · {filtered.length} shown</span>
+          <span className="text-[#f89a14]"> · {filtered.length} shown</span>
         )}
         <span className="text-[#131936]/30"> · </span>
-        <span className={taggedCount === places.length ? 'text-[#16a34a]' : 'text-[#f08c21]'}>
+        <span className={taggedCount === places.length ? 'text-[#16a34a]' : 'text-[#f89a14]'}>
           {taggedCount}/{places.length} tagged
         </span>
       </p>
 
       {/* Search */}
       <div className="relative mb-3">
-        <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#f08c21] shrink-0" />
+        <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#f89a14] shrink-0" />
         <input
           id="admin-place-search"
           name="admin-place-search"
@@ -84,7 +84,7 @@ export default function PlaceManager({ places: initialPlaces, taggedCount }: Pro
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search by name, country, region…"
-          className="w-full rounded-full border border-[#fcd99a] bg-white pl-9 pr-4 py-2.5 font-nunito text-[14px] text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:ring-2 focus:ring-[#f08c21]/30"
+          className="w-full rounded-full border border-[#fcd99a] bg-white pl-9 pr-4 py-2.5 font-nunito text-[14px] text-[#131936] placeholder:text-[#131936]/40 focus:outline-none focus:ring-2 focus:ring-[#f89a14]/30"
         />
       </div>
 
@@ -96,7 +96,7 @@ export default function PlaceManager({ places: initialPlaces, taggedCount }: Pro
             onClick={() => setTypeFilter(t)}
             className={`shrink-0 px-3 py-1.5 rounded-full border font-nunito text-[12px] font-medium transition-all capitalize ${
               typeFilter === t
-                ? 'bg-[#f08c21] border-[#f08c21] text-white'
+                ? 'bg-[#f89a14] border-[#f89a14] text-white'
                 : 'bg-white border-[#fcd99a] text-[#131936]/60'
             }`}
           >
@@ -134,7 +134,7 @@ export default function PlaceManager({ places: initialPlaces, taggedCount }: Pro
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <p className="font-brice font-bold text-[#131936] text-[14px] truncate">
+                    <p className="font-display font-bold text-[#131936] text-[14px] truncate">
                       {place.name}
                     </p>
                     <p className="font-nunito text-[#131936]/50 text-[12px] flex items-center gap-1">
@@ -152,7 +152,7 @@ export default function PlaceManager({ places: initialPlaces, taggedCount }: Pro
                       {place.trending && (
                         <>
                           <span className="text-[#131936]/20 text-[10px]">·</span>
-                          <span className="font-nunito text-[10px] text-[#f08c21]">trending</span>
+                          <span className="font-nunito text-[10px] text-[#f89a14]">trending</span>
                         </>
                       )}
                     </div>

@@ -9,7 +9,7 @@ export function WaitlistNav() {
     <nav className="sticky top-0 z-50 bg-[#fff9f0] border-b border-[rgba(252,217,154,0.5)] h-14 flex items-center px-6">
       <div className="max-w-6xl mx-auto w-full flex items-center justify-between">
 
-        <span className="font-brice font-bold text-[#131936] text-lg tracking-tight select-none">
+        <span className="font-display font-bold text-[#131936] text-lg tracking-tight select-none">
           Someday
         </span>
 
@@ -33,7 +33,7 @@ export function WaitlistNav() {
         <button
           type="button"
           onClick={() => scrollTo('waitlist-form')}
-          className="bg-[#f08c21] text-white font-nunito font-semibold text-sm px-5 py-2 rounded-full hover:bg-[#e07010] transition-colors"
+          className="bg-[#f89a14] text-white font-nunito font-semibold text-sm px-5 py-2 rounded-full hover:bg-[#e07010] transition-colors"
         >
           Join the waitlist
         </button>

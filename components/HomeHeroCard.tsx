@@ -32,7 +32,7 @@ export default function HomeHeroCard({ place, isAdded, onAdd, onRemove, userId }
       className="relative rounded-[20px] overflow-hidden w-full"
       style={{
         height: 220,
-        background: 'linear-gradient(135deg, #f08c21 0%, #f5b05a 50%, #fcd99a 100%)',
+        background: 'linear-gradient(135deg, #f89a14 0%, #f5b05a 50%, #fcd99a 100%)',
       }}
     >
       {/* Unsplash photo */}
@@ -68,8 +68,8 @@ export default function HomeHeroCard({ place, isAdded, onAdd, onRemove, userId }
         >
           <Heart
             size={14}
-            className={isAdded ? 'text-[#f08c21]' : 'text-[#131936]'}
-            fill={isAdded ? '#f08c21' : 'transparent'}
+            className={isAdded ? 'text-[#f89a14]' : 'text-[#131936]'}
+            fill={isAdded ? '#f89a14' : 'transparent'}
           />
         </button>
       </div>
@@ -78,7 +78,7 @@ export default function HomeHeroCard({ place, isAdded, onAdd, onRemove, userId }
       <div className="absolute inset-0 p-4 flex flex-col justify-between pointer-events-none">
         {/* Top row */}
         <div className="flex items-start flex-wrap gap-2">
-          <span className="px-3 py-1 rounded-full bg-white text-[#f08c21] text-[11px] font-nunito font-semibold leading-none flex items-center">
+          <span className="px-3 py-1 rounded-full bg-white text-[#f89a14] text-[11px] font-nunito font-semibold leading-none flex items-center">
             ✦ Trending this week
           </span>
           {place.primary_category && (
@@ -91,7 +91,7 @@ export default function HomeHeroCard({ place, isAdded, onAdd, onRemove, userId }
         {/* Bottom row */}
         <div className="flex items-end justify-between gap-3">
           <div className="min-w-0">
-            <h2 className="font-brice-condensed font-bold text-white leading-tight line-clamp-2" style={{ fontSize: 24 }}>
+            <h2 className="font-heading font-bold text-white leading-tight line-clamp-2" style={{ fontSize: 24 }}>
               {place.name}
             </h2>
             {location && (

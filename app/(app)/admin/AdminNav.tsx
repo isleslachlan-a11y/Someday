@@ -24,7 +24,7 @@ export default function AdminNav() {
               key={item.href}
               href={item.href}
               className={`flex flex-col items-center gap-0.5 px-2 py-1 min-w-[52px] ${
-                active ? 'text-[#f08c21]' : 'text-[#131936]/40'
+                active ? 'text-[#f89a14]' : 'text-[#131936]/40'
               }`}
             >
               <span className="text-[18px] leading-none">{item.icon}</span>

@@ -24,7 +24,7 @@ export default function Avatar({ avatarUrl, username, size = 40, className = '' 
 
   return (
     <div
-      className={`rounded-full bg-violet-accent/20 border border-violet-accent/30 flex items-center justify-center font-brice font-bold text-lavender select-none ${className}`}
+      className={`rounded-full bg-violet-accent/20 border border-violet-accent/30 flex items-center justify-center font-display font-bold text-lavender select-none ${className}`}
       style={{ width: size, height: size, fontSize: Math.round(size * 0.35) }}
       aria-label={username}
     >

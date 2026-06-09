@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { brice, briceCondensed, briceTight, nunito } from '@/lib/fonts'
+import { dmSans, nunito, dmMono } from '@/lib/fonts'
 import './globals.css'
 
 export const viewport: Viewport = {
@@ -28,8 +28,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${brice.variable} ${briceCondensed.variable} ${briceTight.variable} ${nunito.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-indigo-deep text-white-soft font-nunito">
+    <html lang="en" className="h-full antialiased">
+      <body className={`${dmSans.variable} ${nunito.variable} ${dmMono.variable} min-h-full flex flex-col bg-indigo-deep text-white-soft font-body`}>
         {children}
       </body>
     </html>

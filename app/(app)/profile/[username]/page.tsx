@@ -144,7 +144,7 @@ export default async function PublicProfilePage({ params }: Props) {
           <div className="flex items-start gap-5 mb-4">
             <Avatar avatarUrl={profile.avatar_url} username={profile.username ?? ''} size={80} />
             <div className="flex-1 min-w-0">
-              <h1 className="font-brice text-2xl font-bold text-[#131936] leading-tight">
+              <h1 className="font-display text-2xl font-bold text-[#131936] leading-tight">
                 @{profile.username}
               </h1>
               {profile.bio ? (
@@ -173,7 +173,7 @@ export default async function PublicProfilePage({ params }: Props) {
               <MessageButton friendId={profile.id} />
             )}
             {sharedPlaces.length > 0 && (
-              <p className="text-sm text-[#f08c21]">
+              <p className="text-sm text-[#f89a14]">
                 You both want to visit {sharedPlaces.length} place{sharedPlaces.length !== 1 ? 's' : ''}
               </p>
             )}
@@ -209,7 +209,7 @@ export default async function PublicProfilePage({ params }: Props) {
             <>
               {entries.filter(e => e.status !== 'completed').length > 0 && (
                 <section className="mb-6">
-                  <h2 className="font-brice text-base font-bold text-[#131936] mb-3">
+                  <h2 className="font-display text-base font-bold text-[#131936] mb-3">
                     Someday ({entries.filter(e => e.status !== 'completed').length})
                   </h2>
                   <div className="grid gap-3 sm:grid-cols-2">
@@ -224,7 +224,7 @@ export default async function PublicProfilePage({ params }: Props) {
 
               {entries.filter(e => e.status === 'completed').length > 0 && (
                 <section>
-                  <h2 className="font-brice text-base font-bold text-[#131936] mb-3">
+                  <h2 className="font-display text-base font-bold text-[#131936] mb-3">
                     Been there ({entries.filter(e => e.status === 'completed').length})
                   </h2>
                   <div className="grid gap-3 sm:grid-cols-2">
@@ -257,13 +257,13 @@ function StatCard({
   accent: 'violet' | 'lavender' | 'pink'
 }) {
   const colorMap = {
-    violet:  'text-[#f08c21]',
-    lavender: 'text-[#f08c21]',
-    pink:    'text-[#f08c21]',
+    violet:  'text-[#f89a14]',
+    lavender: 'text-[#f89a14]',
+    pink:    'text-[#f89a14]',
   }
   return (
     <div className="rounded-2xl border border-[#fcd99a]/40 bg-white px-4 py-5 text-center">
-      <p className={`font-brice text-3xl font-bold ${colorMap[accent]}`}>{value}</p>
+      <p className={`font-display text-3xl font-bold ${colorMap[accent]}`}>{value}</p>
       <p className="text-[#131936]/50 text-xs mt-1">{label}</p>
     </div>
   )
@@ -291,13 +291,13 @@ function PublicPlaceCard({ entry }: { entry: BucketEntry }) {
         {TYPE_ICON[entry.place.type] ?? '✦'}
       </span>
       <div className="flex-1 min-w-0">
-        <p className="font-brice text-sm font-semibold text-[#131936] truncate">
+        <p className="font-display text-sm font-semibold text-[#131936] truncate">
           {entry.place.name}
         </p>
         <p className="text-xs text-[#131936]/50">{entry.place.country}</p>
       </div>
       {isCompleted && (
-        <span className="ml-auto shrink-0 text-xs text-[#f08c21] font-semibold">✓</span>
+        <span className="ml-auto shrink-0 text-xs text-[#f89a14] font-semibold">✓</span>
       )}
     </div>
   )

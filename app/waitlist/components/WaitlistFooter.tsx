@@ -7,7 +7,7 @@ export function WaitlistFooter() {
 
         {/* Left: wordmark + tagline */}
         <div>
-          <p className="font-brice font-bold text-white text-xl tracking-tight">Someday</p>
+          <p className="font-display font-bold text-white text-xl tracking-tight">Someday</p>
           <p className="font-nunito text-sm text-white/60 mt-1">Your list of someday trips.</p>
         </div>
 

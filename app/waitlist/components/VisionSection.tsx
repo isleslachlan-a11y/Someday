@@ -38,7 +38,7 @@ export function VisionSection() {
             Why Someday
           </p>
           {/* TODO: refine heading with Sophia */}
-          <h2 className="font-brice font-bold text-[#131936] text-3xl md:text-5xl max-w-2xl leading-tight">
+          <h2 className="font-display font-bold text-[#131936] text-3xl md:text-5xl max-w-2xl leading-tight">
             The trips you keep putting off deserve a better home.
           </h2>
 
@@ -46,11 +46,11 @@ export function VisionSection() {
           <div className="max-w-2xl mt-12 space-y-10">
             {POINTS.map((point) => (
               <div key={point.number} className="flex gap-6">
-                <span className="font-brice font-bold text-4xl text-[#f08c21]/40 shrink-0 leading-none pt-1">
+                <span className="font-display font-bold text-4xl text-[#f89a14]/40 shrink-0 leading-none pt-1">
                   {point.number}
                 </span>
                 <div>
-                  <h3 className="font-brice font-semibold text-[#131936] text-xl mb-2">
+                  <h3 className="font-heading font-semibold text-[#131936] text-xl mb-2">
                     {point.heading}
                   </h3>
                   <p className="font-nunito text-base text-[rgba(19,25,54,0.5)] leading-relaxed">
@@ -75,12 +75,12 @@ export function VisionSection() {
               ].map((founder) => (
                 <div key={founder.initials} className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full bg-[#fcd99a] flex items-center justify-center shrink-0">
-                    <span className="font-brice font-bold text-lg text-[#131936]">
+                    <span className="font-display font-bold text-lg text-[#131936]">
                       {founder.initials}
                     </span>
                   </div>
                   <div>
-                    <p className="font-brice font-semibold text-[#131936]">{founder.name}</p>
+                    <p className="font-heading font-semibold text-[#131936]">{founder.name}</p>
                     <p className="font-nunito text-sm text-[rgba(19,25,54,0.5)]">{founder.role}</p>
                   </div>
                 </div>

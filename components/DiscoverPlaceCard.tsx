@@ -61,15 +61,15 @@ export default function DiscoverPlaceCard({
         >
           <Heart
             size={14}
-            className={isSaved ? 'text-[#f08c21]' : 'text-[#131936]'}
-            fill={isSaved ? '#f08c21' : 'transparent'}
+            className={isSaved ? 'text-[#f89a14]' : 'text-[#131936]'}
+            fill={isSaved ? '#f89a14' : 'transparent'}
           />
         </button>
       </div>
 
       {/* Bottom text */}
       <div className="absolute bottom-0 left-0 right-0 p-3 pointer-events-none">
-        <p className="font-brice-condensed font-bold text-white text-[13px] leading-tight line-clamp-2">
+        <p className="font-heading font-bold text-white text-[13px] leading-tight line-clamp-2">
           {place.name}
         </p>
         <p className="font-nunito text-white/70 text-[10px] mt-1 flex items-center gap-0.5 truncate">

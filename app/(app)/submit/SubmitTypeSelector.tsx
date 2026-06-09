@@ -22,7 +22,7 @@ export default function SubmitTypeSelector({ userId }: Props) {
 
   return (
     <div>
-      <h1 className="font-brice text-[22px] font-bold text-[#131936] mb-2">
+      <h1 className="font-display text-[22px] font-bold text-[#131936] mb-2">
         Know somewhere we should add?
       </h1>
       <p className="font-nunito text-[#131936]/50 text-[14px] mb-8 leading-relaxed">
@@ -32,12 +32,12 @@ export default function SubmitTypeSelector({ userId }: Props) {
       <div className="space-y-3">
         <button
           onClick={() => setKind('destination')}
-          className="w-full text-left rounded-2xl border-2 border-[#fcd99a]/60 bg-white p-5 active:scale-[0.98] transition-all hover:border-[#f08c21]/40"
+          className="w-full text-left rounded-2xl border-2 border-[#fcd99a]/60 bg-white p-5 active:scale-[0.98] transition-all hover:border-[#f89a14]/40"
         >
           <div className="flex items-start gap-4">
             <span className="text-[36px] shrink-0">🗺</span>
             <div>
-              <p className="font-brice font-bold text-[#131936] text-[17px]">Destination</p>
+              <p className="font-display font-bold text-[#131936] text-[17px]">Destination</p>
               <p className="font-nunito text-[#131936]/50 text-[13px] mt-0.5 leading-relaxed">
                 A city, country, region, or natural landscape worth travelling to.
               </p>
@@ -47,12 +47,12 @@ export default function SubmitTypeSelector({ userId }: Props) {
 
         <button
           onClick={() => setKind('experience')}
-          className="w-full text-left rounded-2xl border-2 border-[#fcd99a]/60 bg-white p-5 active:scale-[0.98] transition-all hover:border-[#f08c21]/40"
+          className="w-full text-left rounded-2xl border-2 border-[#fcd99a]/60 bg-white p-5 active:scale-[0.98] transition-all hover:border-[#f89a14]/40"
         >
           <div className="flex items-start gap-4">
             <span className="text-[36px] shrink-0">✨</span>
             <div>
-              <p className="font-brice font-bold text-[#131936] text-[17px]">Experience</p>
+              <p className="font-display font-bold text-[#131936] text-[17px]">Experience</p>
               <p className="font-nunito text-[#131936]/50 text-[13px] mt-0.5 leading-relaxed">
                 A specific activity, attraction, restaurant, or event at a destination.
               </p>

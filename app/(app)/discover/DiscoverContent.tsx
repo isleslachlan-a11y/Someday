@@ -141,7 +141,7 @@ export default function DiscoverContent({
 
       {/* ── Search bar ──────────────────────────────────────────────────────── */}
       <div className="flex items-center gap-2 bg-white rounded-full border border-[#fcd99a] px-4 h-11">
-        <Search size={16} className="text-[#f08c21] shrink-0" />
+        <Search size={16} className="text-[#f89a14] shrink-0" />
         <input
           type="text"
           value={searchQuery}
@@ -182,7 +182,7 @@ export default function DiscoverContent({
             </div>
           ) : searchResults !== null ? (
             <div className="flex flex-col items-center py-16 text-center">
-              <p className="font-brice font-bold text-[#131936] text-[16px]">No results</p>
+              <p className="font-display font-bold text-[#131936] text-[16px]">No results</p>
               <p className="font-nunito text-[#131936]/50 text-[13px] mt-1">Try a different search</p>
             </div>
           ) : null}
@@ -190,7 +190,7 @@ export default function DiscoverContent({
       ) : (
         <>
           {/* ── People row ────────────────────────────────────────────────── */}
-          <p className="font-brice font-bold text-[#131936] text-[15px] mt-5 mb-3">People</p>
+          <p className="font-display font-bold text-[#131936] text-[15px] mt-5 mb-3">People</p>
           {allPeople.length > 0 ? (
             <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-none">
               {allPeople.map(person => (
@@ -209,7 +209,7 @@ export default function DiscoverContent({
                     />
                   ) : (
                     <div className="w-14 h-14 rounded-full bg-[#131936] border-2 border-[#fcd99a] flex items-center justify-center">
-                      <span className="font-brice font-bold text-[#f08c21] text-[18px]">
+                      <span className="font-display font-bold text-[#f89a14] text-[18px]">
                         {person.username.slice(0, 1).toUpperCase()}
                       </span>
                     </div>
@@ -237,20 +237,20 @@ export default function DiscoverContent({
                   return (
                     <div className="mb-3">
                       <div className="flex items-center justify-between">
-                        <h2 className="font-brice font-bold text-[#131936] text-[16px]">
+                        <h2 className="font-display font-bold text-[#131936] text-[16px]">
                           {category.label}
                         </h2>
                         {col ? (
                           <Link
                             href={`/discover/collections/${col.slug}`}
-                            className="font-nunito text-[#f08c21] text-[13px]"
+                            className="font-nunito text-[#f89a14] text-[13px]"
                           >
                             see all →
                           </Link>
                         ) : (
                           <button
                             onClick={() => setSearchQuery(category.label.toLowerCase())}
-                            className="font-nunito text-[#f08c21] text-[13px]"
+                            className="font-nunito text-[#f89a14] text-[13px]"
                           >
                             see all →
                           </button>
@@ -291,7 +291,7 @@ export default function DiscoverContent({
             <span className="text-[#fcd99a] text-[10px] opacity-30">·</span>
             <span className="text-[#fcd99a] text-[10px] opacity-50">·</span>
             <span className="text-[#fcd99a] text-[12px] opacity-70">·</span>
-            <span className="text-[#f08c21] text-[20px]">★</span>
+            <span className="text-[#f89a14] text-[20px]">★</span>
             <span className="text-[#fcd99a] text-[12px] opacity-70">·</span>
             <span className="text-[#fcd99a] text-[10px] opacity-50">·</span>
             <span className="text-[#fcd99a] text-[10px] opacity-30">·</span>
@@ -302,7 +302,7 @@ export default function DiscoverContent({
         </p>
         <Link
           href="/home"
-          className="flex items-center gap-1.5 font-nunito font-semibold text-[#f08c21] text-[14px] hover:opacity-80 transition-opacity"
+          className="flex items-center gap-1.5 font-nunito font-semibold text-[#f89a14] text-[14px] hover:opacity-80 transition-opacity"
         >
           Back to home
           <span className="text-[16px]">→</span>

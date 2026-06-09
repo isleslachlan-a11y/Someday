@@ -20,8 +20,10 @@ export const TOKENS = {
   },
 
   fontFamily: {
-    display: 'Syne, sans-serif',
-    body:    'Nunito, sans-serif',
+    display: 'Brice, serif',
+    heading: 'var(--font-dm-sans), sans-serif',
+    body:    'var(--font-nunito), sans-serif',
+    mono:    'var(--font-dm-mono), monospace',
   },
 
   spacing: {
