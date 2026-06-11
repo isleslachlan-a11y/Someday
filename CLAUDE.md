@@ -47,6 +47,24 @@ npm run test         # Vitest (uses @cloudflare/vitest-pool-workers)
 
 Required Worker secrets: `AUTH_TOKEN` (shared secret header `X-Auth-Token`), `ANTHROPIC_API_KEY`.
 
+### Social Import Worker (Cloudflare)
+
+`someday-social-import-worker/` is a standalone Cloudflare Worker that accepts a `{ url, platform }` POST body, scrapes TikTok or Pinterest post metadata, then calls Claude to extract a structured `ExtractedPlace` (name, city, country, lat/lng, tags, confidence). It is **not** part of the Next.js build.
+
+```bash
+cd someday-social-import-worker
+npm run dev      # wrangler dev — local at http://localhost:8787
+npm run deploy   # wrangler deploy
+```
+
+Required Worker secrets (via `wrangler secret put`): `AUTH_TOKEN`, `ANTHROPIC_API_KEY`.
+
+The Next.js side calls it through `app/(app)/discover/actions/importPlace.ts` → `importPlaceFromUrl(url)` (Server Action). `lib/socialImport.ts` exports shared types (`SocialImportResult`, `ExtractedPlace`, `SocialImportPlatform`) and `detectPlatform(url)` — the actual worker-calling logic lives in the Server Action, not `lib/socialImport.ts`.
+
+**Import flow:** `detectPlatform` identifies TikTok or Pinterest → Server Action POSTs to worker with `X-Auth-Token` → worker returns `ExtractedPlace` with `confidence` (0–1) → if confidence ≥ 0.6, Server Action attempts a fuzzy name+country match against `places` table → returns `{ status: 'matched' | 'new' | 'low_confidence' | 'error' }`.
+
+CORS is locked to `https://go-someday.com` in the worker.
+
 ## Stack
 
 | Layer | Technology |
@@ -207,6 +225,8 @@ NEXT_PUBLIC_ADMIN_EMAIL=         # Email address — gates /admin/images
 NEXT_PUBLIC_MAPBOX_TOKEN=        # Required for the Map tab (mapbox-gl / react-map-gl)
 UNSPLASH_ACCESS_KEY=             # Used by seed scripts only — not required at runtime
 NEXT_PUBLIC_LAUNCHED=            # Set to 'true' in Vercel to open the full app; unset/false funnels all traffic to /waitlist
+SOCIAL_IMPORT_WORKER_URL=        # URL of the deployed someday-social-import Cloudflare Worker
+SOCIAL_IMPORT_AUTH_TOKEN=        # Shared secret matching the Worker's AUTH_TOKEN secret
 ```
 
 When adding new env variables, also add them to Vercel's environment settings. `vercel.json` only covers `SUPABASE_SERVICE_ROLE_KEY` and `ADMIN_USER_ID` via secret references — all others (`NEXT_PUBLIC_MAPBOX_TOKEN`, `NEXT_PUBLIC_ADMIN_EMAIL`, etc.) must be set manually in the Vercel dashboard.
@@ -251,6 +271,8 @@ await logEvent(userId, 'item_added', { experience_id, category, country })
 | `user_followed` | `following_id` |
 | `search_performed` | `query`, `result_count` |
 | `page_viewed` | `page` |
+| `social_import` | `platform`, `source_url`, `place_name`, `confidence` |
+| `social_import_matched` | `platform`, `source_url`, `matched_place_id` |
 
 ## Brand & Design
 

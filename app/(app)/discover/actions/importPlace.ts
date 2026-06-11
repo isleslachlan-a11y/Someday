@@ -1,5 +1,8 @@
 'use server'
 
+console.log('Worker URL:', process.env.SOCIAL_IMPORT_WORKER_URL)
+console.log('Auth Token set:', !!process.env.SOCIAL_IMPORT_AUTH_TOKEN)
+
 import { createClient } from '@/lib/supabase/server'
 import { detectPlatform } from '@/lib/socialImport'
 import type { SocialImportResult, ExtractedPlace } from '@/lib/socialImport'
@@ -44,8 +47,9 @@ export async function importPlaceFromUrl(url: string): Promise<SocialImportResul
       body: JSON.stringify({ url, platform }),
     })
     workerData = (await res.json()) as typeof workerData
-  } catch {
-    return { status: 'error', message: 'Could not reach import service' }
+  } catch (err) {
+  console.error('Worker fetch error:', err)
+  return { status: 'error', message: 'Could not reach import service' }
   }
 
   if (!workerData.success || !workerData.place) {
