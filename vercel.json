@@ -2,12 +2,7 @@
   "framework": "nextjs",
   "build": {
     "env": {
-      "NODE_VERSION": "20",
-      "NEXT_PUBLIC_SUPABASE_URL": "@next_public_supabase_url",
-      "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY": "@next_public_supabase_publishable_default_key"
+      "NODE_VERSION": "20"
     }
-  },
-  "env": {
-    "ADMIN_USER_ID": "@admin_user_id"
   }
 }
